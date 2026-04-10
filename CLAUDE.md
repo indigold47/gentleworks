@@ -14,7 +14,7 @@ This is the rebuild of [gentle.works](https://www.gentle.works) — an architect
 ## Stack (locked in)
 
 - **Next.js 16 App Router** (Turbopack), **TypeScript**, **Tailwind v4**
-- **Sanity** CMS — not yet wired up, still to-do
+- **Sanity** CMS — Studio embedded at `/studio`, schema + cached fetch helpers in place, webhook stubbed. Needs a real project ID and env vars to run.
 - **Motion** + **Lenis** for animation and smooth scroll
 - **Lucide** for icons (thin stroke, editorial feel)
 - **shadcn/ui** primitives — planned, **not yet initialized** (see TODO)
@@ -40,7 +40,9 @@ These are things we intentionally deferred. Do them when the trigger conditions 
 
 - [ ] **When client designs arrive:** Update `design-system/gentle-works/MASTER.md` *first* (colors, fonts, spacing, motion). Then sync `app/globals.css`. Then verify existing pages. Don't write new components until MASTER.md reflects reality.
 - [ ] **Before building any shadcn/ui components:** Run `npx shadcn@latest init` to set up `components.json`, then install primitives via `npx shadcn@latest add [component]`. Use `--base-color neutral` and reference brand tokens in the config. Don't do this until we actually need a primitive — the init asks about theme/colors and should be informed by the final design.
-- [ ] **Sanity setup (next session):** Install `sanity` + `next-sanity`, run `npx sanity@latest init --env` to create project, define project schema (title, slug, description, images, tags, year, location, metadata), embed Studio at `/studio`, add env vars (`SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_READ_TOKEN`), wire `'use cache'` fetch with `cacheTag('projects')`, and build the webhook at `app/api/revalidate/route.ts` that calls `updateTag` on publish.
+- [ ] **Sanity — create the actual project + fill env:** Code is scaffolded but there is no real Sanity project yet. Either run `npx sanity@latest init` (interactive — creates the project, logs you in, writes IDs) *or* create it manually at [sanity.io/manage](https://sanity.io/manage). Then copy `.env.local.example` → `.env.local` and fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` (default `production`), `SANITY_API_READ_TOKEN` (optional, for drafts), and `SANITY_REVALIDATE_SECRET` (`openssl rand -hex 32`). Then in sanity.io/manage → API → CORS, add `http://localhost:3000` and the prod domain.
+- [ ] **Configure the publish webhook** at sanity.io/manage → API → Webhooks. URL: `https://<prod-domain>/api/revalidate`. Trigger on create/update/delete. Filter: `_type in ["project", "tag"]`. Projection: `{ "_type": _type, "slug": slug.current }`. Secret: same value as `SANITY_REVALIDATE_SECRET`.
+- [ ] **Wire the projects pages to real data:** The fetch helpers in `sanity/lib/fetch.ts` are ready (`getAllProjects`, `getProjectBySlug`, `getAllProjectSlugs`, `getAllTags`) but `app/projects/page.tsx` is still a placeholder. Replace with a real implementation that calls `getAllProjects()` + `getAllTags()` and passes them to a client `ProjectsSplitScreen` component with URL-synced filter state. Add `app/projects/[slug]/page.tsx` using `generateStaticParams` backed by `getAllProjectSlugs()`.
 - [ ] **When we have first real project data:** Build out the split-screen projects page — sticky left image column, right column with filter chips and entries, URL-synced filter state via `useSearchParams`.
 - [ ] **Before launch:** Configure Vercel Analytics, Sanity webhook URL, OG image generation, `sitemap.ts`, `robots.ts`, JSON-LD, performance audit against the budget in ARCHITECTURE.md.
 
@@ -54,7 +56,8 @@ npm run lint
 
 ## Gotchas
 
-- **Cache Components is enabled** but no `'use cache'` directives exist yet. Both current pages are fully static (no async, no runtime APIs) so they prerender cleanly. When you add CMS fetches, either wrap them in `'use cache'` with `cacheTag` or wrap dynamic parts in `<Suspense>`.
+- **Cache Components is enabled.** `sanity/lib/fetch.ts` wraps every Sanity read in `'use cache'` + `cacheLife('hours')` + `cacheTag('projects')` / `cacheTag('project:<slug>')`. Never read `cookies()` / `headers()` / `searchParams` inside those helpers — pass anything dynamic as an argument so it becomes part of the cache key.
+- **Studio needs `"use client"`.** `app/studio/[[...tool]]/page.tsx` is a client component because `sanity.config.ts` imports React context APIs that blow up during server page-data collection. `metadata` + `viewport` are re-exported from the sibling `layout.tsx` (server). Don't collapse them back into one file.
 - **Instrument Serif is weight 400 only** — do not bold it. It's a display-regular face.
 - **The public/ dir was cleaned** — only add project assets intentionally, nothing left from create-next-app.
 - **`.bootstrap-backup` was a temp dir** used during scaffolding, already removed.

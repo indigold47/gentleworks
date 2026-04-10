@@ -1,0 +1,165 @@
+import { defineField, defineType } from "sanity";
+
+/**
+ * Project — the single editorial entity powering the portfolio.
+ *
+ * Field set matches the brief in CONTEXT.md: multiple images, rich description,
+ * tags for filtering, plus the surrounding metadata needed for SEO and detail
+ * pages (year, location, client, credits).
+ */
+export const project = defineType({
+  name: "project",
+  title: "Project",
+  type: "document",
+  fields: [
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+      validation: (rule) => rule.required().min(1).max(120),
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: { source: "title", maxLength: 96 },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "year",
+      title: "Year",
+      type: "number",
+      validation: (rule) => rule.required().integer().min(1900).max(2100),
+    }),
+    defineField({
+      name: "location",
+      title: "Location",
+      type: "string",
+      description: "e.g. London, UK",
+    }),
+    defineField({
+      name: "client",
+      title: "Client",
+      type: "string",
+    }),
+    defineField({
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "tag" }] }],
+      description: "Used to drive the filter chips on the Projects page.",
+      validation: (rule) => rule.unique(),
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Hero image",
+      type: "image",
+      description:
+        "Large lead image — used on the Projects split-screen and the OG card.",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "gallery",
+      title: "Gallery",
+      type: "array",
+      of: [
+        {
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+            }),
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: "description",
+      title: "Description",
+      type: "array",
+      of: [{ type: "block" }],
+      description: "Rich text shown on the individual project page.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "summary",
+      title: "Summary",
+      type: "text",
+      rows: 3,
+      description:
+        "One- or two-line summary used in listings, meta description, and OG.",
+      validation: (rule) => rule.required().max(240),
+    }),
+    defineField({
+      name: "credits",
+      title: "Credits",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({ name: "role", title: "Role", type: "string" }),
+            defineField({ name: "name", title: "Name", type: "string" }),
+          ],
+          preview: {
+            select: { title: "role", subtitle: "name" },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "featured",
+      title: "Featured",
+      type: "boolean",
+      description: "Surface on the home page.",
+      initialValue: false,
+    }),
+    defineField({
+      name: "order",
+      title: "Order",
+      type: "number",
+      description:
+        "Optional manual sort. Lower numbers appear first; ties fall back to year desc.",
+    }),
+  ],
+  orderings: [
+    {
+      title: "Year, newest first",
+      name: "yearDesc",
+      by: [{ field: "year", direction: "desc" }],
+    },
+    {
+      title: "Manual order",
+      name: "manualOrder",
+      by: [
+        { field: "order", direction: "asc" },
+        { field: "year", direction: "desc" },
+      ],
+    },
+  ],
+  preview: {
+    select: {
+      title: "title",
+      subtitle: "year",
+      media: "heroImage",
+    },
+  },
+});

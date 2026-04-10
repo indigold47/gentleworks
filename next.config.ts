@@ -5,9 +5,10 @@ const nextConfig: NextConfig = {
   // Required for our SSG+ISR strategy once the CMS is wired up.
   cacheComponents: true,
   images: {
-    // Remote patterns will be added once the CMS is chosen
-    // (e.g. cdn.sanity.io or notion S3 URLs).
-    remotePatterns: [],
+    remotePatterns: [
+      // Sanity's image CDN — all heroImage/gallery URLs come from here.
+      { protocol: "https", hostname: "cdn.sanity.io" },
+    ],
   },
 };
 
