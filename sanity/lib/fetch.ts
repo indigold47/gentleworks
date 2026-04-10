@@ -4,6 +4,7 @@ import type { QueryParams } from "next-sanity";
 import { client } from "./client";
 import {
   allProjectsQuery,
+  allProjectsDetailQuery,
   allProjectSlugsQuery,
   allTagsQuery,
   projectBySlugQuery,
@@ -50,6 +51,14 @@ export function projectTag(slug: string) {
 export async function getAllProjects() {
   return sanityFetch<ProjectListItem[], typeof allProjectsQuery>({
     query: allProjectsQuery,
+    tags: [PROJECTS_TAG],
+  });
+}
+
+/** All projects with full detail — for the split-screen projects page. */
+export async function getAllProjectsDetail() {
+  return sanityFetch<ProjectDetail[], typeof allProjectsDetailQuery>({
+    query: allProjectsDetailQuery,
     tags: [PROJECTS_TAG],
   });
 }

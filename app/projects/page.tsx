@@ -1,35 +1,72 @@
 import Link from "next/link";
 
+import { getAllProjectsDetail, getAllTags } from "@/sanity/lib/fetch";
+import { SplitScreen } from "@/components/projects/split-screen";
+import { ContactForm } from "@/components/contact-form";
+import { ScrollToTop } from "@/components/scroll-to-top";
+
 /**
- * Projects page — placeholder scaffold.
+ * Projects page — split-screen layout.
  *
- * Once the CMS is chosen, this page will:
- *   1. Fetch all projects + tag taxonomy from the CMS in a `'use cache'`
- *      function, tagged with `cacheTag('projects')`.
- *   2. Pass the data into a client <ProjectsSplitScreen /> component that
- *      renders the sticky left image column + scrollable right column of
- *      filter chips and project entries, with URL-synced filter state.
- *   3. Revalidate via a webhook → `/api/revalidate` → `updateTag('projects')`
- *      so editor changes appear without a redeploy.
- *
- * See ARCHITECTURE.md for the full plan.
+ * Server component: fetches all projects + tags at build time (via `'use cache'`
+ * in the fetch helpers), passes them down to the client SplitScreen component.
+ * Filtering and URL-synced state will layer on once designs arrive.
  */
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const [projects, tags] = await Promise.all([
+    getAllProjectsDetail(),
+    getAllTags(),
+  ]);
+
   return (
-    <main className="flex flex-1 flex-col px-6 py-16 sm:px-10 lg:px-16 lg:py-24">
-      <Link
-        href="/"
-        className="text-sm uppercase tracking-[0.14em] text-muted hover:text-ink transition-colors"
-      >
-        ← Back
-      </Link>
-      <h1 className="display mt-12 text-[clamp(2.5rem,8vw,7rem)]">
-        Projects
-      </h1>
-      <p className="mt-8 max-w-md text-base leading-relaxed text-muted">
-        Split-screen projects view lands here once the CMS is wired up and
-        designs arrive from the studio.
-      </p>
+    <main className="flex flex-col">
+      {/* Minimal header — matches home page for now */}
+      <header className="fixed top-0 z-20 w-full flex items-center justify-between px-6 py-6 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm tracking-[0.14em] uppercase"
+        >
+          <span
+            aria-hidden
+            className="inline-block h-2.5 w-2.5 rounded-full bg-sage"
+          />
+          Gentle Works
+        </Link>
+        <nav className="flex items-center gap-8 text-sm tracking-[0.1em] uppercase">
+          <Link href="/projects" className="text-sage">
+            Projects
+          </Link>
+          <Link href="/studio" className="hover:text-sage transition-colors">
+            Studio
+          </Link>
+          <Link href="/contact" className="hover:text-sage transition-colors">
+            Contact
+          </Link>
+        </nav>
+      </header>
+
+      {/* Push content below fixed header */}
+      <div className="pt-[72px]">
+        <SplitScreen projects={projects} tags={tags} />
+      </div>
+
+      {/* Contact section */}
+      <section className="border-t border-rule px-6 py-16 sm:px-10 lg:px-16 lg:py-24">
+        <p className="text-sm uppercase tracking-[0.14em] text-muted">
+          Get in touch
+        </p>
+        <h2 className="display mt-3 text-[clamp(2rem,5vw,4.5rem)]">
+          Start a conversation
+        </h2>
+        <p className="mt-6 max-w-lg text-base leading-relaxed text-muted">
+          Have a project in mind? We'd love to hear about it.
+        </p>
+        <div className="mt-10">
+          <ContactForm />
+        </div>
+      </section>
+
+      <ScrollToTop />
     </main>
   );
 }

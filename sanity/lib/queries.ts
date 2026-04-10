@@ -57,6 +57,35 @@ export const projectBySlugQuery = defineQuery(`
   }
 `);
 
+/** Full-detail query for the split-screen projects page. */
+export const allProjectsDetailQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current)] | order(coalesce(order, 9999) asc, year desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    year,
+    location,
+    client,
+    summary,
+    description,
+    featured,
+    heroImage {
+      ...,
+      "alt": coalesce(alt, "")
+    },
+    gallery[] {
+      ...,
+      "alt": coalesce(alt, "")
+    },
+    credits,
+    "tags": tags[]->{
+      _id,
+      label,
+      "slug": slug.current
+    }
+  }
+`);
+
 export const allProjectSlugsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)].slug.current
 `);
