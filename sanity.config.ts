@@ -8,6 +8,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
+import { colorInput } from "@sanity/color-input";
 
 import { apiVersion, dataset, projectId } from "./sanity/env";
 import { schemaTypes } from "./sanity/schemaTypes";
@@ -20,6 +21,7 @@ export default defineConfig({
   dataset,
   plugins: [
     structureTool(),
+    colorInput(),
     // Vision is the GROQ query playground — invaluable during schema work.
     visionTool({ defaultApiVersion: apiVersion }),
   ],

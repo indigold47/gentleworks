@@ -17,6 +17,9 @@ export const allProjectsQuery = defineQuery(`
     location,
     summary,
     featured,
+    status,
+    projectType,
+    projectTag,
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -40,6 +43,14 @@ export const projectBySlugQuery = defineQuery(`
     summary,
     description,
     featured,
+    status,
+    projectType,
+    projectTag,
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    },
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -69,6 +80,9 @@ export const allProjectsDetailQuery = defineQuery(`
     summary,
     description,
     featured,
+    status,
+    projectType,
+    projectTag,
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -95,5 +109,22 @@ export const allTagsQuery = defineQuery(`
     _id,
     label,
     "slug": slug.current
+  }
+`);
+
+export const allTeamMembersQuery = defineQuery(`
+  *[_type == "teamMember"] | order(coalesce(order, 9999) asc, displayName asc) {
+    _id,
+    displayName,
+    fullName,
+    "slug": slug.current,
+    role,
+    description,
+    email,
+    status,
+    picture {
+      ...,
+      "alt": coalesce(alt, "")
+    }
   }
 `);

@@ -13,6 +13,7 @@
   --color-sage: #4f6b4a;
   --color-sage-deep: #2f3e2c;
   --color-muted: #6b6b6b;
+  --color-default-green: #7a6f47;
   --color-rule: #e5dfd3;
   --color-surface: #ffffff;
 
@@ -41,6 +42,7 @@
   --color-sage: var(--color-sage);
   --color-sage-deep: var(--color-sage-deep);
   --color-muted: var(--color-muted);
+  --color-default-green: var(--color-default-green);
   --color-rule: var(--color-rule);
   --color-surface: var(--color-surface);
 
@@ -84,4 +86,10 @@ h1.display {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Remove heavy outline on form inputs — the bottom-border color shift is enough */
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { PortableText } from "next-sanity";
 
@@ -10,9 +8,11 @@ type ProjectSectionProps = {
   project: ProjectDetail;
   /** Whether this is the very first section (affects top spacing). */
   isFirst?: boolean;
+  /** Optional overlay rendered on top of the left image panel (e.g. nav). */
+  imageOverlay?: React.ReactNode;
 };
 
-export function ProjectSection({ project, isFirst }: ProjectSectionProps) {
+export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectionProps) {
   return (
     <section
       className="grid min-h-svh grid-cols-1 lg:grid-cols-2 border-b border-rule last:border-b-0"
@@ -27,6 +27,7 @@ export function ProjectSection({ project, isFirst }: ProjectSectionProps) {
           className="object-cover"
           priority={isFirst}
         />
+        {imageOverlay}
       </div>
 
       {/* Right: scrollable project info */}
@@ -67,14 +68,16 @@ export function ProjectSection({ project, isFirst }: ProjectSectionProps) {
         )}
 
         {/* Credits */}
-        {project.credits && project.credits.length > 0 && (
+        {project.credits && Object.values(project.credits).some(Boolean) && (
           <dl className="mt-10 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
-            {project.credits.map((credit, i) => (
-              <div key={i} className="contents">
-                <dt className="text-muted">{credit.role}</dt>
-                <dd>{credit.name}</dd>
-              </div>
-            ))}
+            {Object.entries(project.credits)
+              .filter(([, value]) => value)
+              .map(([key, value]) => (
+                <div key={key} className="contents">
+                  <dt className="text-muted capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
           </dl>
         )}
 

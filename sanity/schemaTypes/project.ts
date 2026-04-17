@@ -29,7 +29,7 @@ export const project = defineType({
       name: "year",
       title: "Year",
       type: "number",
-      validation: (rule) => rule.required().integer().min(1900).max(2100),
+      validation: (rule) => rule.integer().min(1900).max(2100),
     }),
     defineField({
       name: "location",
@@ -43,11 +43,58 @@ export const project = defineType({
       type: "string",
     }),
     defineField({
+      name: "status",
+      title: "Status",
+      type: "string",
+      description: "Project status shown in the index filter.",
+      options: {
+        list: [
+          { title: "Built", value: "built" },
+          { title: "In Design", value: "in-design" },
+          { title: "Under Construction", value: "under-construction" },
+          { title: "Unbuilt", value: "unbuilt" },
+        ],
+        layout: "radio",
+      },
+    }),
+    defineField({
+      name: "projectType",
+      title: "Type",
+      type: "string",
+      description: "Building type shown in the index filter.",
+      options: {
+        list: [
+          { title: "Mixed Use", value: "mixed-use" },
+          { title: "Housing", value: "housing" },
+          { title: "Commercial", value: "commercial" },
+          { title: "Civic", value: "civic" },
+          { title: "Workplace", value: "workplace" },
+        ],
+        layout: "radio",
+      },
+    }),
+    defineField({
+      name: "projectTag",
+      title: "Project Tag",
+      type: "string",
+      description: "Construction category shown in the index filter.",
+      options: {
+        list: [
+          { title: "New Build", value: "new-build" },
+          { title: "Renovation", value: "renovation" },
+          { title: "Adaptive Reuse", value: "adaptive-reuse" },
+          { title: "Addition/Infill", value: "addition-infill" },
+          { title: "Interiors", value: "interiors" },
+        ],
+        layout: "radio",
+      },
+    }),
+    defineField({
       name: "tags",
       title: "Tags",
       type: "array",
       of: [{ type: "reference", to: [{ type: "tag" }] }],
-      description: "Used to drive the filter chips on the Projects page.",
+      description: "Legacy tags — used for any additional categorisation.",
       validation: (rule) => rule.unique(),
     }),
     defineField({
@@ -111,19 +158,30 @@ export const project = defineType({
     defineField({
       name: "credits",
       title: "Credits",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            defineField({ name: "role", title: "Role", type: "string" }),
-            defineField({ name: "name", title: "Name", type: "string" }),
-          ],
-          preview: {
-            select: { title: "role", subtitle: "name" },
-          },
-        },
+      type: "object",
+      fields: [
+        defineField({ name: "architectDesigner", title: "Architect/Designer", type: "string" }),
+        defineField({ name: "client", title: "Client", type: "string" }),
+        defineField({ name: "photographer", title: "Photographer", type: "string" }),
+        defineField({ name: "contractor", title: "Contractor", type: "string" }),
+        defineField({ name: "mepEngineer", title: "MEP Engineer", type: "string" }),
+        defineField({ name: "structuralEngineer", title: "Structural Engineer", type: "string" }),
+        defineField({ name: "landscapeArchitect", title: "Landscape Architect", type: "string" }),
+        defineField({ name: "constructionManager", title: "Construction Manager", type: "string" }),
+        defineField({ name: "operator", title: "Operator", type: "string" }),
+        defineField({ name: "muralist", title: "Muralist", type: "string" }),
+        defineField({ name: "branding", title: "Branding", type: "string" }),
+        defineField({ name: "otherSpecialists", title: "Other Specialists", type: "string" }),
+        defineField({ name: "cinematographer", title: "Cinematographer", type: "string" }),
       ],
+    }),
+    defineField({
+      name: "theme",
+      title: "Theme",
+      type: "reference",
+      to: [{ type: "theme" }],
+      description:
+        "Color theme for the individual project page (text, logo, footer).",
     }),
     defineField({
       name: "featured",

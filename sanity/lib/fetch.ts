@@ -7,6 +7,7 @@ import {
   allProjectsDetailQuery,
   allProjectSlugsQuery,
   allTagsQuery,
+  allTeamMembersQuery,
   projectBySlugQuery,
 } from "./queries";
 
@@ -40,9 +41,11 @@ async function sanityFetch<T, Q extends string>({
   return client.fetch<T>(query, params ?? {});
 }
 
-// Shared tag — the webhook invalidates this to refresh every project-facing page.
+// Shared tags — the webhook invalidates these to refresh cached pages.
 export const PROJECTS_TAG = "projects";
 export const TAGS_TAG = "tags";
+export const TEAM_TAG = "team";
+export const THEMES_TAG = "themes";
 
 export function projectTag(slug: string) {
   return `project:${slug}`;
@@ -85,6 +88,13 @@ export async function getAllTags() {
   });
 }
 
+export async function getAllTeamMembers() {
+  return sanityFetch<TeamMemberItem[], typeof allTeamMembersQuery>({
+    query: allTeamMembersQuery,
+    tags: [TEAM_TAG],
+  });
+}
+
 // ---------- Hand-written types ----------
 // These are deliberately narrow and hand-written for now. When we wire up
 // sanity-codegen the generated types will replace these; the call sites can
@@ -104,6 +114,10 @@ export type SanityImage = {
   crop?: { top: number; bottom: number; left: number; right: number };
 };
 
+export type ProjectStatus = "built" | "in-design" | "under-construction" | "unbuilt";
+export type ProjectType = "mixed-use" | "housing" | "commercial" | "civic" | "workplace";
+export type ProjectTagValue = "new-build" | "renovation" | "adaptive-reuse" | "addition-infill" | "interiors";
+
 export type ProjectListItem = {
   _id: string;
   title: string;
@@ -112,6 +126,9 @@ export type ProjectListItem = {
   location: string | null;
   summary: string;
   featured: boolean | null;
+  status: ProjectStatus | null;
+  projectType: ProjectType | null;
+  projectTag: ProjectTagValue | null;
   heroImage: SanityImage;
   tags: TagItem[];
 };
@@ -126,9 +143,42 @@ type PortableTextBlock = {
   style?: string;
 };
 
+export type ProjectTheme = {
+  name: string;
+  mainColor: string;
+  secondaryColor: string;
+};
+
 export type ProjectDetail = ProjectListItem & {
   client: string | null;
   description: PortableTextBlock[];
   gallery: GalleryImage[] | null;
-  credits: { role: string; name: string }[] | null;
+  credits: {
+    architectDesigner?: string;
+    client?: string;
+    photographer?: string;
+    contractor?: string;
+    mepEngineer?: string;
+    structuralEngineer?: string;
+    landscapeArchitect?: string;
+    constructionManager?: string;
+    operator?: string;
+    muralist?: string;
+    branding?: string;
+    otherSpecialists?: string;
+    cinematographer?: string;
+  } | null;
+  theme: ProjectTheme | null;
+};
+
+export type TeamMemberItem = {
+  _id: string;
+  displayName: string;
+  fullName: string;
+  slug: string;
+  role: string;
+  description: PortableTextBlock[];
+  email: string | null;
+  status: "present" | "past";
+  picture: SanityImage | null;
 };

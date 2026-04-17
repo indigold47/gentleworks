@@ -12,7 +12,7 @@
  *   URL:     https://<prod-domain>/api/revalidate
  *   Dataset: production
  *   Trigger: Create / Update / Delete
- *   Filter:  _type in ["project", "tag"]
+ *   Filter:  _type in ["project", "tag", "teamMember", "theme"]
  *   Projection: {
  *     "_type": _type,
  *     "slug":  slug.current
@@ -25,7 +25,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
 import { revalidateSecret } from "@/sanity/env";
-import { PROJECTS_TAG, TAGS_TAG, projectTag } from "@/sanity/lib/fetch";
+import { PROJECTS_TAG, TAGS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
 
 type WebhookBody = {
   _type?: string;
@@ -76,6 +76,16 @@ export async function POST(req: NextRequest) {
       // Tag edits touch filter chips everywhere → invalidate project reads too,
       // since the projects query joins against tags.
       updateTag(TAGS_TAG);
+      updateTag(PROJECTS_TAG);
+      break;
+    }
+    case "teamMember": {
+      updateTag(TEAM_TAG);
+      break;
+    }
+    case "theme": {
+      // Theme edits affect project pages that reference them → invalidate both.
+      updateTag(THEMES_TAG);
       updateTag(PROJECTS_TAG);
       break;
     }

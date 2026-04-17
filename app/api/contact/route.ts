@@ -19,6 +19,8 @@ const FROM_EMAIL = process.env.CONTACT_FROM_EMAIL ?? "onboarding@resend.dev";
 type ContactPayload = {
   name?: string;
   email?: string;
+  phone?: string;
+  subject?: string;
   message?: string;
 };
 
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, email, message } = body;
+  const { name, email, phone, subject, message } = body;
 
   // Basic validation
   if (!name || !name.trim()) {
@@ -50,24 +52,25 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (!message || !message.trim()) {
-    return NextResponse.json(
-      { error: "Message is required" },
-      { status: 400 },
-    );
-  }
+
+  const emailSubject = subject?.trim()
+    ? `${subject.trim()} — from ${name.trim()}`
+    : `New inquiry from ${name.trim()}`;
+
+  const lines = [
+    `Name: ${name.trim()}`,
+    `Email: ${email.trim()}`,
+  ];
+  if (phone?.trim()) lines.push(`Phone: ${phone.trim()}`);
+  if (subject?.trim()) lines.push(`Subject: ${subject.trim()}`);
+  lines.push("", message?.trim() || "(No message provided)");
 
   const { error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: TO_EMAIL,
     replyTo: email,
-    subject: `New inquiry from ${name.trim()}`,
-    text: [
-      `Name: ${name.trim()}`,
-      `Email: ${email.trim()}`,
-      "",
-      message.trim(),
-    ].join("\n"),
+    subject: emailSubject,
+    text: lines.join("\n"),
   });
 
   if (error) {
