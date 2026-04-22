@@ -571,36 +571,40 @@ export function SplitScreen({ projects }: SplitScreenProps) {
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
       <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-2 ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
-        <div className="relative h-[50svh] sticky top-0 lg:h-svh">
+        <div className="relative h-[50svh] sticky top-0 z-10 overflow-hidden lg:h-svh">
           {displayProject && (
             <ViewTransition name={`project-hero-${displayProject.slug}`} share="hero-morph">
-              <Image
-                src={urlFor(displayProject.heroImage)
-                  .width(1600)
-                  .quality(85)
-                  .auto("format")
-                  .url()}
-                alt={displayProject.heroImage.alt}
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover transition-opacity duration-300"
-                priority
-              />
+              <div className="absolute inset-0">
+                <Image
+                  src={urlFor(displayProject.heroImage)
+                    .width(1600)
+                    .quality(85)
+                    .auto("format")
+                    .url()}
+                  alt={displayProject.heroImage.alt}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover transition-opacity duration-300"
+                  priority
+                />
+                {/* Top gradient scrim for nav text contrast — inside ViewTransition so it doesn't leak into the morph snapshot */}
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
+                />
+              </div>
             </ViewTransition>
           )}
-          {/* Top gradient scrim for nav text contrast */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
-          />
           <SiteNav activeHref="/projects" />
           {mobileToolbar}
           {/* Inline wordmark logo — bottom-left over the hero image */}
-          <img
-            src="/assets/GentleWorks-Logo-InLine.svg"
-            alt="Gentle Works"
-            className="absolute bottom-6 left-6 h-4 w-auto sm:bottom-8 sm:left-8 lg:bottom-10 lg:left-10 lg:h-5 pointer-events-none"
-          />
+          <Link href="/" className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 lg:bottom-10 lg:left-10 z-10">
+            <img
+              src="/assets/GentleWorks-Logo-InLine.svg"
+              alt="Gentle Works"
+              className="h-4 w-auto lg:h-5"
+            />
+          </Link>
         </div>
 
         {/* Right: filters + project index table */}
@@ -742,6 +746,11 @@ export function SplitScreen({ projects }: SplitScreenProps) {
               ))}
             </div>
           )}
+
+          {/* Logo — bottom-left on mobile, hidden on desktop (shown in filter row instead) */}
+          <div className="mt-6 lg:hidden">
+            <Logo className="h-10 w-10" />
+          </div>
 
           {/* Custom scroll indicator — centered on the split seam, desktop only */}
           {filteredProjects.length > 0 && (() => {

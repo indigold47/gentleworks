@@ -147,7 +147,7 @@ export function TeamView({ members }: TeamViewProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
-          <Logo className="h-[78px] w-[78px] shrink-0" />
+          <Logo className="hidden lg:block h-[78px] w-[78px] shrink-0" />
         </div>
 
         {/* Filter tabs */}
@@ -225,6 +225,9 @@ export function TeamView({ members }: TeamViewProps) {
             );
           })}
         </div>
+
+        {/* Logo — bottom-left on mobile */}
+        <Logo className="lg:hidden h-10 w-10 mt-6" />
       </div>
     </div>
   );

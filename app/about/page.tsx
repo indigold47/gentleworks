@@ -28,8 +28,9 @@ export default function AboutPage() {
 
         {/* Right: about text */}
         <div className="relative flex flex-col px-8 py-12 sm:px-12 lg:px-16 lg:py-16">
-          {/* Logo — branding element */}
-          <Logo className="absolute top-6 right-6 h-[67px] w-[67px] lg:top-12 lg:right-12" />
+          {/* Logo — top-right on desktop, bottom-left on mobile */}
+          <Logo className="hidden lg:block absolute top-12 right-12 h-[67px] w-[67px]" />
+          <Logo className="lg:hidden h-10 w-10 mt-auto" />
 
           {/* Vertical accent bar */}
           <div

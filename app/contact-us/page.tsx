@@ -31,7 +31,7 @@ export default function ContactUsPage() {
             </p>
             <p className="mt-3 text-base">info@gentle.works</p>
           </div>
-          <Logo className="h-[78px] w-[78px] shrink-0" />
+          <Logo className="hidden lg:block h-[78px] w-[78px] shrink-0" />
         </div>
 
         {/* Divider */}
@@ -49,6 +49,9 @@ export default function ContactUsPage() {
         <div className="mt-8 grow">
           <ContactForm />
         </div>
+
+        {/* Logo — bottom-left on mobile */}
+        <Logo className="lg:hidden h-10 w-10 mt-6" />
       </div>
     </main>
   );

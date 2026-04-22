@@ -1,19 +1,25 @@
-/** Gentle Works logo — inline SVG so fill color can be themed. */
+import Link from "next/link";
+
+/** Gentle Works logo — inline SVG so fill color can be themed.
+ *  Wraps in a link to the homepage by default. Pass `href={null}` to disable. */
 export function Logo({
   className = "",
   color,
+  href = "/",
   ...props
 }: {
   className?: string;
   /** Override fill color. Defaults to the brand default-green (#7a6f47). */
   color?: string;
-} & React.SVGProps<SVGSVGElement>) {
-  return (
+  /** Link destination. Defaults to "/". Pass null to render without a link. */
+  href?: string | null;
+} & Omit<React.SVGProps<SVGSVGElement>, "href">) {
+  const svg = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 360 360"
       aria-hidden="true"
-      className={className}
+      className={href ? undefined : className}
       {...props}
     >
       <path
@@ -22,4 +28,14 @@ export function Logo({
       />
     </svg>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className={className} aria-label="Gentle Works home">
+        {svg}
+      </Link>
+    );
+  }
+
+  return svg;
 }
