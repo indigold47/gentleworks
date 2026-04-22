@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { PortableText } from "next-sanity";
@@ -18,6 +18,7 @@ type TeamViewProps = {
 export function TeamView({ members }: TeamViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
+  const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const filtered =
     filter === "all" ? members : members.filter((m) => m.status === filter);
@@ -25,6 +26,28 @@ export function TeamView({ members }: TeamViewProps) {
   const activeMember = expandedId
     ? members.find((m) => m._id === expandedId)
     : null;
+
+  // Index of the expanded member within the filtered list
+  const activeIdx = expandedId
+    ? filtered.findIndex((m) => m._id === expandedId)
+    : -1;
+
+  // Scroll the expanded member into view
+  useEffect(() => {
+    if (!expandedId) return;
+    const el = memberRefs.current.get(expandedId);
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+  }, [expandedId]);
+
+  // Scrollbar thumb — one unit per member
+  const thumbFraction =
+    activeIdx >= 0 && filtered.length > 1
+      ? activeIdx / (filtered.length - 1)
+      : 0;
 
   function toggle(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -97,9 +120,24 @@ export function TeamView({ members }: TeamViewProps) {
       </div>
 
       {/* Custom scrollbar divider */}
-      <div className="hidden lg:flex flex-col items-center bg-cream">
-        <div className="w-[6px] grow bg-sage-deep/30 rounded-full relative">
-          <div className="absolute top-0 w-full h-24 bg-sage-deep rounded-full" />
+      <div className="hidden lg:flex flex-col items-center bg-cream py-12">
+        <div className="w-[6px] grow bg-sage-deep/30 rounded-full relative overflow-hidden">
+          {(() => {
+            const count = filtered.length;
+            const thumbPct = Math.max(8, 100 / count);
+            const maxOffset = 100 - thumbPct;
+            const thumbTop = activeIdx >= 0 && maxOffset > 0 ? thumbFraction * maxOffset : 0;
+            return (
+              <div
+                className="absolute left-0 w-full bg-sage-deep rounded-full"
+                style={{
+                  height: `${thumbPct}%`,
+                  top: `${thumbTop}%`,
+                  transition: "top 200ms ease-out, height 300ms ease-out",
+                }}
+              />
+            );
+          })()}
         </div>
       </div>
 
@@ -141,7 +179,14 @@ export function TeamView({ members }: TeamViewProps) {
             const isExpanded = expandedId === member._id;
 
             return (
-              <div key={member._id} className="border-b border-rule">
+              <div
+                key={member._id}
+                ref={(el) => {
+                  if (el) memberRefs.current.set(member._id, el);
+                  else memberRefs.current.delete(member._id);
+                }}
+                className="border-b border-rule"
+              >
                 <button
                   onClick={() => toggle(member._id)}
                   className="flex w-full items-center justify-between py-4 text-left transition-colors hover:text-sage"

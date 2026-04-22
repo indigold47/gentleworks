@@ -13,17 +13,8 @@ export const metadata: Metadata = {
 export default function ContactUsPage() {
   return (
     <main id="main-content" className="grid min-h-svh grid-cols-1 lg:grid-cols-2">
-      {/* Left: video panel with nav overlay */}
+      {/* Left: background panel with nav overlay */}
       <div className="relative h-[50svh] lg:sticky lg:top-0 lg:h-svh bg-[#c4b5a3]">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
-          src="/assets/homepage.webm"
-        />
         <SiteNav activeHref="/contact-us" />
       </div>
 
