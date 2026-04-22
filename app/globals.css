@@ -69,6 +69,87 @@ h1.display {
   letter-spacing: -0.02em;
 }
 
+/* ------------------------------------------------------------------ */
+/*  View Transitions                                                    */
+/* ------------------------------------------------------------------ */
+
+/* Shared hero image morph — smooth scale between index and detail */
+::view-transition-group(.hero-morph) {
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-image-pair(.hero-morph) {
+  animation: 500ms cubic-bezier(0.22, 1, 0.36, 1) both hero-crossfade;
+}
+
+@keyframes hero-crossfade {
+  0% { filter: blur(2px); }
+  100% { filter: blur(0); }
+}
+
+/* Project detail enters: slides up and fades in */
+::view-transition-new(.slide-up-enter) {
+  animation:
+    400ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both vt-fade,
+    500ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide-up;
+}
+
+/* Index page exits: fades down and out */
+::view-transition-old(.fade-out-down) {
+  animation:
+    250ms ease-in both vt-fade reverse,
+    300ms ease-in both vt-slide-up reverse;
+}
+
+/* Index page enters when going back: slides in from left */
+::view-transition-new(.slide-from-left) {
+  animation:
+    350ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both vt-fade,
+    400ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide-from-left;
+}
+
+/* Anchor the project detail header during transitions */
+::view-transition-group(project-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(project-header) {
+  display: none;
+}
+::view-transition-new(project-header) {
+  animation: none;
+}
+
+/* Keyframes */
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes vt-slide-up {
+  from {
+    translate: 0 24px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes vt-slide-from-left {
+  from {
+    translate: -40px 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
 /* Honor reduced motion — applies globally */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -78,6 +159,12 @@ h1.display {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import type {
   TagItem,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
+import { Logo } from "@/components/logo";
 import { SiteNav } from "./projects-nav";
 
 /* ------------------------------------------------------------------ */
@@ -444,6 +445,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                   <Link
                     key={project._id}
                     href={`/projects/${project.slug}`}
+                    transitionTypes={["nav-forward"]}
                     onClick={() => setSearchOpen(false)}
                     className="flex items-center gap-4 group"
                   >
@@ -498,6 +500,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
               <Link
                 key={project._id}
                 href={`/projects/${project.slug}`}
+                transitionTypes={["nav-forward"]}
                 className="group"
               >
                 <div className="relative aspect-[4/5] overflow-hidden">
@@ -570,18 +573,20 @@ export function SplitScreen({ projects }: SplitScreenProps) {
         {/* Left: hero image — changes on table row hover */}
         <div className="relative h-[50svh] sticky top-0 lg:h-svh">
           {displayProject && (
-            <Image
-              src={urlFor(displayProject.heroImage)
-                .width(1600)
-                .quality(85)
-                .auto("format")
-                .url()}
-              alt={displayProject.heroImage.alt}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover transition-opacity duration-300"
-              priority
-            />
+            <ViewTransition name={`project-hero-${displayProject.slug}`} share="hero-morph">
+              <Image
+                src={urlFor(displayProject.heroImage)
+                  .width(1600)
+                  .quality(85)
+                  .auto("format")
+                  .url()}
+                alt={displayProject.heroImage.alt}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover transition-opacity duration-300"
+                priority
+              />
+            </ViewTransition>
           )}
           {/* Top gradient scrim for nav text contrast */}
           <div
@@ -590,43 +595,51 @@ export function SplitScreen({ projects }: SplitScreenProps) {
           />
           <SiteNav activeHref="/projects" />
           {mobileToolbar}
+          {/* Inline wordmark logo — bottom-left over the hero image */}
+          <img
+            src="/assets/GentleWorks-Logo-InLine.svg"
+            alt="Gentle Works"
+            className="absolute bottom-6 left-6 h-4 w-auto sm:bottom-8 sm:left-8 lg:bottom-10 lg:left-10 lg:h-5 pointer-events-none"
+          />
         </div>
 
         {/* Right: filters + project index table */}
         <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
           {/* Filter section — hidden on mobile per design */}
-          <div className="relative mb-12 hidden lg:block">
-            {/* Dark olive circle — branding element */}
-            <div
-              aria-hidden
-              className="absolute top-0 right-0 h-12 w-12 rounded-full bg-[#6b6346]"
-            />
+          <div className="mb-12 hidden lg:flex gap-6">
+            {/* Filters — takes remaining space */}
+            <div className="min-w-0 flex-1">
+              {/* "Filter" label with full-width rule */}
+              <div className="border-b border-[#c5bda8] pb-2 mb-4">
+                <p className="display italic text-base text-ink/70">Filter</p>
+              </div>
 
-            {/* "Filter" label with full-width rule */}
-            <div className="border-b border-[#c5bda8] pb-2 mb-4">
-              <p className="display italic text-base text-ink/70">Filter</p>
+              <div className="space-y-4">
+                {filterCategories.map((cat, catIdx) => (
+                  <div
+                    key={cat.key}
+                    className={`flex flex-wrap gap-2 ${
+                      catIdx < filterCategories.length - 1
+                        ? "border-b border-[#d4cdb8] pb-4"
+                        : ""
+                    }`}
+                  >
+                    {cat.options.map((opt) => (
+                      <FilterChip
+                        key={opt.value}
+                        label={opt.label}
+                        active={activeFilters[cat.key].has(opt.value)}
+                        onClick={() => toggleFilter(cat.key, opt.value)}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-4">
-              {filterCategories.map((cat, catIdx) => (
-                <div
-                  key={cat.key}
-                  className={`flex flex-wrap gap-2 ${
-                    catIdx < filterCategories.length - 1
-                      ? "border-b border-[#d4cdb8] pb-4"
-                      : ""
-                  }`}
-                >
-                  {cat.options.map((opt) => (
-                    <FilterChip
-                      key={opt.value}
-                      label={opt.label}
-                      active={activeFilters[cat.key].has(opt.value)}
-                      onClick={() => toggleFilter(cat.key, opt.value)}
-                    />
-                  ))}
-                </div>
-              ))}
+            {/* Logo — own column, vertically centered with the first rule */}
+            <div className="flex shrink-0 items-start pt-1">
+              <Logo className="h-[67px] w-[67px]" />
             </div>
           </div>
 
@@ -662,6 +675,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                   <td className="py-3.5 pr-4">
                     <Link
                       href={`/projects/${project.slug}`}
+                      transitionTypes={["nav-forward"]}
                       className="display text-[clamp(1.15rem,2.5vw,1.5rem)] leading-[1.15]"
                     >
                       {project.title}

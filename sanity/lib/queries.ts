@@ -61,6 +61,16 @@ export const projectBySlugQuery = defineQuery(`
       "url": asset->url,
       "alt": coalesce(alt, "")
     },
+    "sitePlan": sitePlan {
+      image { ..., "alt": coalesce(alt, "") },
+      "videoUrl": video.asset->url,
+      "alt": coalesce(alt, "")
+    },
+    "drawing": drawing {
+      image { ..., "alt": coalesce(alt, "") },
+      "videoUrl": video.asset->url,
+      "alt": coalesce(alt, "")
+    },
     gallery[] {
       ...,
       "alt": coalesce(alt, ""),
@@ -99,6 +109,16 @@ export const allProjectsDetailQuery = defineQuery(`
     },
     "heroVideo": heroVideo {
       "url": asset->url,
+      "alt": coalesce(alt, "")
+    },
+    "sitePlan": sitePlan {
+      image { ..., "alt": coalesce(alt, "") },
+      "videoUrl": video.asset->url,
+      "alt": coalesce(alt, "")
+    },
+    "drawing": drawing {
+      image { ..., "alt": coalesce(alt, "") },
+      "videoUrl": video.asset->url,
       "alt": coalesce(alt, "")
     },
     gallery[] {

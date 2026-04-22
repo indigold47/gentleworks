@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ContactForm } from "@/components/contact-form";
 import { SiteNav } from "@/components/projects/projects-nav";
+import { Logo } from "@/components/logo";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -30,11 +31,7 @@ export default function ContactUsPage() {
             </p>
             <p className="mt-3 text-base">info@gentle.works</p>
           </div>
-          {/* Logo placeholder circle */}
-          <div
-            aria-hidden
-            className="h-14 w-14 shrink-0 rounded-full bg-sage-deep"
-          />
+          <Logo className="h-[78px] w-[78px] shrink-0" />
         </div>
 
         {/* Divider */}

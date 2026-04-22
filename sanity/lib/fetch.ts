@@ -169,10 +169,18 @@ export type ProjectTheme = {
   secondaryColor: string;
 };
 
+export type ProjectMediaField = {
+  image: SanityImage | null;
+  videoUrl: string | null;
+  alt: string;
+};
+
 export type ProjectDetail = ProjectListItem & {
   client: string | null;
   description: PortableTextBlock[];
   heroVideo: SanityVideo | null;
+  sitePlan: ProjectMediaField | null;
+  drawing: ProjectMediaField | null;
   gallery: GalleryItem[] | null;
   credits: {
     architectDesigner?: string;

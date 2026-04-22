@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowDown } from "lucide-react";
 import { PortableText } from "next-sanity";
+import { Logo } from "@/components/logo";
 
 import {
   getProjectBySlug,
@@ -68,24 +70,31 @@ export default async function ProjectPage({
   const secondaryColor = project.theme?.secondaryColor ?? defaultTheme.secondaryColor;
 
   return (
+    <ViewTransition
+      enter={{
+        "nav-forward": "slide-up-enter",
+        default: "none",
+      }}
+      exit={{
+        "nav-back": "fade-out-down",
+        default: "none",
+      }}
+      default="none"
+    >
     <main id="main-content" className="flex flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
       {/* Sticky header bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm">
-        <Link href="/projects" aria-label="Back to projects">
+      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm" style={{ viewTransitionName: "project-header" }}>
+        <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]}>
           <ArrowDown size={20} strokeWidth={1.5} style={{ color: mainColor }} />
         </Link>
         <h1 className="display text-lg sm:text-xl" style={{ color: mainColor }}>
           {project.title}
         </h1>
-        <div
-          aria-hidden
-          className="h-10 w-10 shrink-0 rounded-full"
-          style={{ backgroundColor: mainColor }}
-        />
+        <Logo className="h-14 w-14 shrink-0" color={mainColor} />
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
-      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} gallery={project.gallery}>
+      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} sitePlan={project.sitePlan} drawing={project.drawing} gallery={project.gallery} slug={project.slug}>
         {/* Description + Credits */}
         <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16 lg:py-16">
           {/* Description */}
@@ -196,5 +205,6 @@ export default async function ProjectPage({
         }}
       />
     </main>
+    </ViewTransition>
   );
 }

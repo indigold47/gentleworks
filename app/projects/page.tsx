@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -27,12 +27,24 @@ export default async function ProjectsPage() {
   ]);
 
   return (
-    <main id="main-content" className="flex flex-col">
-      <h1 className="sr-only">Projects</h1>
-      <Suspense>
-        <SplitScreen projects={projects} tags={tags} />
-      </Suspense>
-      <ScrollToTop />
-    </main>
+    <ViewTransition
+      enter={{
+        "nav-back": "slide-from-left",
+        default: "none",
+      }}
+      exit={{
+        "nav-forward": "fade-out-down",
+        default: "none",
+      }}
+      default="none"
+    >
+      <main id="main-content" className="flex flex-col">
+        <h1 className="sr-only">Projects</h1>
+        <Suspense>
+          <SplitScreen projects={projects} tags={tags} />
+        </Suspense>
+        <ScrollToTop />
+      </main>
+    </ViewTransition>
   );
 }

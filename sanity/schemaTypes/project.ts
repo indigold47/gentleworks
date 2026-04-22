@@ -142,6 +142,64 @@ export const project = defineType({
       ],
     }),
     defineField({
+      name: "sitePlan",
+      title: "Site Plan",
+      type: "object",
+      description:
+        "Site plan image or video — always shown as the first gallery row (left side). Supports image or mp4/webm video.",
+      fields: [
+        defineField({
+          name: "image",
+          title: "Image",
+          type: "image",
+          options: { hotspot: true },
+          description: "Upload an image, or leave empty and provide a video instead.",
+        }),
+        defineField({
+          name: "video",
+          title: "Video",
+          type: "file",
+          options: { accept: "video/mp4,video/webm" },
+          description: "Upload a video (mp4/webm). Takes priority over the image if both are provided.",
+        }),
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
+      name: "drawing",
+      title: "Drawing",
+      type: "object",
+      description:
+        "Architectural drawing image or video — always shown as the first gallery row (right side). Supports image or mp4/webm video.",
+      fields: [
+        defineField({
+          name: "image",
+          title: "Image",
+          type: "image",
+          options: { hotspot: true },
+          description: "Upload an image, or leave empty and provide a video instead.",
+        }),
+        defineField({
+          name: "video",
+          title: "Video",
+          type: "file",
+          options: { accept: "video/mp4,video/webm" },
+          description: "Upload a video (mp4/webm). Takes priority over the image if both are provided.",
+        }),
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: "gallery",
       title: "Gallery",
       type: "array",

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteNav } from "@/components/projects/projects-nav";
+import { Logo } from "@/components/logo";
 
 export const metadata: Metadata = {
   title: "About",
@@ -27,11 +28,8 @@ export default function AboutPage() {
 
         {/* Right: about text */}
         <div className="relative flex flex-col px-8 py-12 sm:px-12 lg:px-16 lg:py-16">
-          {/* Olive circle — branding element */}
-          <div
-            aria-hidden
-            className="absolute top-6 right-6 h-12 w-12 rounded-full bg-[#6b6346] lg:top-12 lg:right-12"
-          />
+          {/* Logo — branding element */}
+          <Logo className="absolute top-6 right-6 h-[67px] w-[67px] lg:top-12 lg:right-12" />
 
           {/* Vertical accent bar */}
           <div

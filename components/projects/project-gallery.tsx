@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import { useState, useCallback, useEffect, useRef, type ReactNode, ViewTransition } from "react";
 import Image from "next/image";
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -8,6 +8,7 @@ import type {
   SanityImage,
   SanityVideo,
   GalleryItem as SanityGalleryItem,
+  ProjectMediaField,
   RowHeight,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -23,7 +24,11 @@ type LightboxMedia =
 type ProjectGalleryProps = {
   heroImage: SanityImage;
   heroVideo?: SanityVideo | null;
+  sitePlan?: ProjectMediaField | null;
+  drawing?: ProjectMediaField | null;
   gallery: SanityGalleryItem[] | null;
+  /** Project slug — used for shared-element view transition identity. */
+  slug: string;
   /** Content rendered between the hero and gallery grid (e.g. description, credits). */
   children?: ReactNode;
 };
@@ -289,10 +294,25 @@ function VideoCard({
 /*  ProjectGallery                                                     */
 /* ------------------------------------------------------------------ */
 
+/** Convert a ProjectMediaField to a LightboxMedia entry. */
+function mediaFieldToLightbox(field: ProjectMediaField): LightboxMedia {
+  if (field.videoUrl) {
+    return { type: "video", src: field.videoUrl, alt: field.alt };
+  }
+  return {
+    type: "image",
+    src: urlFor(field.image!).width(2400).quality(90).auto("format").url(),
+    alt: field.alt,
+  };
+}
+
 export function ProjectGallery({
   heroImage,
   heroVideo,
+  sitePlan,
+  drawing,
   gallery,
+  slug,
   children,
 }: ProjectGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -309,7 +329,7 @@ export function ProjectGallery({
     requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
-  // Flat list for lightbox: hero first, then gallery
+  // Flat list for lightbox: hero → site plan → drawing → gallery
   const allMedia: LightboxMedia[] = [
     heroVideo?.url
       ? { type: "video", src: heroVideo.url, alt: heroVideo.alt }
@@ -318,6 +338,8 @@ export function ProjectGallery({
           src: urlFor(heroImage).width(2400).quality(90).auto("format").url(),
           alt: heroImage.alt,
         },
+    ...(sitePlan ? [mediaFieldToLightbox(sitePlan)] : []),
+    ...(drawing ? [mediaFieldToLightbox(drawing)] : []),
     ...(gallery ?? []).map((item): LightboxMedia =>
       isVideo(item)
         ? { type: "video", src: item.videoUrl, alt: item.alt }
@@ -329,32 +351,91 @@ export function ProjectGallery({
     ),
   ];
 
+  // Lightbox index offsets: hero is 0, then sitePlan, then drawing, then gallery
+  const sitePlanLightboxIdx = sitePlan ? 1 : -1;
+  const drawingLightboxIdx = drawing ? (sitePlan ? 2 : 1) : -1;
+  const galleryLightboxOffset = 1 + (sitePlan ? 1 : 0) + (drawing ? 1 : 0);
+
   return (
     <>
       {/* Hero — video takes priority when present */}
       <section className="px-6 sm:px-10 lg:px-16">
-        {heroVideo?.url ? (
-          <VideoCard
-            src={heroVideo.url}
-            alt={heroVideo.alt}
-            aspect="aspect-[16/9] w-full"
-            onClick={() => openLightbox(0)}
-          />
-        ) : (
-          <GalleryCard
-            src={urlFor(heroImage).width(2400).quality(85).auto("format").url()}
-            alt={heroImage.alt}
-            sizes="100vw"
-            priority
-            aspect="aspect-[16/9] w-full"
-            objectPosition={hotspotToPosition(heroImage.hotspot)}
-            onClick={() => openLightbox(0)}
-          />
-        )}
+        <ViewTransition name={`project-hero-${slug}`} share="hero-morph">
+          {heroVideo?.url ? (
+            <VideoCard
+              src={heroVideo.url}
+              alt={heroVideo.alt}
+              aspect="aspect-[16/9] w-full"
+              onClick={() => openLightbox(0)}
+            />
+          ) : (
+            <GalleryCard
+              src={urlFor(heroImage).width(2400).quality(85).auto("format").url()}
+              alt={heroImage.alt}
+              sizes="100vw"
+              priority
+              aspect="aspect-[16/9] w-full"
+              objectPosition={hotspotToPosition(heroImage.hotspot)}
+              onClick={() => openLightbox(0)}
+            />
+          )}
+        </ViewTransition>
       </section>
 
       {/* Slot for description / credits between hero and gallery */}
       {children}
+
+      {/* Site Plan + Drawing — fixed first row */}
+      {(sitePlan || drawing) && (
+        <section className="px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:h-[28vw]">
+            {/* Left: Site Plan */}
+            {sitePlan ? (
+              sitePlan.videoUrl ? (
+                <VideoCard
+                  src={sitePlan.videoUrl}
+                  alt={sitePlan.alt}
+                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  onClick={() => openLightbox(sitePlanLightboxIdx)}
+                />
+              ) : sitePlan.image ? (
+                <GalleryCard
+                  src={urlFor(sitePlan.image).width(1200).quality(85).auto("format").url()}
+                  alt={sitePlan.alt}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  objectPosition={hotspotToPosition(sitePlan.image.hotspot)}
+                  onClick={() => openLightbox(sitePlanLightboxIdx)}
+                />
+              ) : null
+            ) : (
+              <div className="aspect-[4/3] sm:aspect-auto sm:h-full" />
+            )}
+            {/* Right: Drawing */}
+            {drawing ? (
+              drawing.videoUrl ? (
+                <VideoCard
+                  src={drawing.videoUrl}
+                  alt={drawing.alt}
+                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  onClick={() => openLightbox(drawingLightboxIdx)}
+                />
+              ) : drawing.image ? (
+                <GalleryCard
+                  src={urlFor(drawing.image).width(1200).quality(85).auto("format").url()}
+                  alt={drawing.alt}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  objectPosition={hotspotToPosition(drawing.image.hotspot)}
+                  onClick={() => openLightbox(drawingLightboxIdx)}
+                />
+              ) : null
+            ) : (
+              <div className="aspect-[4/3] sm:aspect-auto sm:h-full" />
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Gallery grid */}
       {gallery && gallery.length > 0 && (
@@ -377,7 +458,7 @@ export function ProjectGallery({
                   }`}
                 >
                   {pair.map((item, imgIdx) => {
-                    const flatIdx = rowIdx * 2 + imgIdx + 1;
+                    const flatIdx = rowIdx * 2 + imgIdx + galleryLightboxOffset;
                     if (isVideo(item)) {
                       return (
                         <VideoCard
