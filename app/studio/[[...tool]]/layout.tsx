@@ -1,17 +1,42 @@
 /**
  * Studio layout (server component).
  *
- * Re-exports Studio's own metadata + viewport so the Studio UI renders full
- * bleed with the right initial-scale, instead of inheriting the marketing
- * defaults from the root layout. The <html>/<body> wrapper still comes from
- * the root layout.
+ * Uses `connection()` to opt out of static prerendering — the Studio is a
+ * fully client-side SPA that cannot be meaningfully pre-rendered.
+ *
+ * Metadata + viewport are defined inline rather than re-exported from
+ * "next-sanity/studio" to avoid dynamic API usage (`cookies()`) that
+ * conflicts with Cache Components.
  */
-export { metadata, viewport } from "next-sanity/studio";
+import { Suspense } from "react";
+import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
+
+export const metadata: Metadata = {
+  title: "Sanity Studio",
+  description: "Content management for Gentle Works",
+  robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+async function StudioShell({ children }: { children: React.ReactNode }) {
+  await connection();
+  return <>{children}</>;
+}
 
 export default function StudioLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <Suspense>
+      <StudioShell>{children}</StudioShell>
+    </Suspense>
+  );
 }
