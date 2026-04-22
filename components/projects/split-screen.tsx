@@ -671,12 +671,14 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                   onMouseLeave={() => setHoveredIdx(null)}
                   onFocus={() => setHoveredIdx(i)}
                   onBlur={() => setHoveredIdx(null)}
+                  onClick={() => router.push(`/projects/${project.slug}`)}
                 >
                   <td className="py-3.5 pr-4">
                     <Link
                       href={`/projects/${project.slug}`}
                       transitionTypes={["nav-forward"]}
                       className="display text-[clamp(1.15rem,2.5vw,1.5rem)] leading-[1.15]"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       {project.title}
                     </Link>
