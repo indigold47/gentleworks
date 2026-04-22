@@ -115,8 +115,6 @@ export type SanityImage = {
 };
 
 export type ProjectStatus = "built" | "in-design" | "under-construction" | "unbuilt";
-export type ProjectType = "mixed-use" | "housing" | "commercial" | "civic" | "workplace";
-export type ProjectTagValue = "new-build" | "renovation" | "adaptive-reuse" | "addition-infill" | "interiors";
 
 export type ProjectListItem = {
   _id: string;
@@ -127,13 +125,35 @@ export type ProjectListItem = {
   summary: string;
   featured: boolean | null;
   status: ProjectStatus | null;
-  projectType: ProjectType | null;
-  projectTag: ProjectTagValue | null;
+  projectType: string[] | null;
+  projectTag: string[] | null;
+  qualities: string[] | null;
   heroImage: SanityImage;
   tags: TagItem[];
 };
 
-export type GalleryImage = SanityImage & { caption?: string };
+export type RowHeight = "compact" | "standard" | "cinematic";
+
+export type SanityVideo = {
+  url: string;
+  alt: string;
+};
+
+export type GalleryImage = SanityImage & {
+  caption?: string;
+  rowHeight?: RowHeight;
+};
+
+export type GalleryVideo = {
+  _type: "galleryVideo";
+  _key: string;
+  videoUrl: string;
+  alt: string;
+  caption?: string;
+  rowHeight?: RowHeight;
+};
+
+export type GalleryItem = GalleryImage | GalleryVideo;
 
 type PortableTextBlock = {
   _type: "block";
@@ -152,7 +172,8 @@ export type ProjectTheme = {
 export type ProjectDetail = ProjectListItem & {
   client: string | null;
   description: PortableTextBlock[];
-  gallery: GalleryImage[] | null;
+  heroVideo: SanityVideo | null;
+  gallery: GalleryItem[] | null;
   credits: {
     architectDesigner?: string;
     client?: string;

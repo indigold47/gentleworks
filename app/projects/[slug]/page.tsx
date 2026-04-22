@@ -85,7 +85,7 @@ export default async function ProjectPage({
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
-      <ProjectGallery heroImage={project.heroImage} gallery={project.gallery}>
+      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} gallery={project.gallery}>
         {/* Description + Credits */}
         <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16 lg:py-16">
           {/* Description */}
@@ -98,9 +98,9 @@ export default async function ProjectPage({
             {/* Project info */}
             {([
               ["Year Built", project.year?.toString()],
-              ["Type", [project.projectType, project.projectTag].filter(Boolean).join(", ") || undefined],
+              ["Type", [...(Array.isArray(project.projectType) ? project.projectType : project.projectType ? [project.projectType] : []), ...(Array.isArray(project.projectTag) ? project.projectTag : project.projectTag ? [project.projectTag] : [])].map((v) => v.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ") || undefined],
               ["Location", project.location],
-            ] as const)
+            ] as [string, string | undefined][])
               .filter(([, value]) => value)
               .map(([label, value]) => (
                 <div key={label}>

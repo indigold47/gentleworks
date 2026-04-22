@@ -59,9 +59,11 @@ export const project = defineType({
     }),
     defineField({
       name: "projectType",
-      title: "Type",
-      type: "string",
-      description: "Building type shown in the index filter.",
+      title: "Program Type",
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "Building program types shown in the index filter. Pick from the suggestions or type a custom value.",
       options: {
         list: [
           { title: "Mixed Use", value: "mixed-use" },
@@ -70,14 +72,15 @@ export const project = defineType({
           { title: "Civic", value: "civic" },
           { title: "Workplace", value: "workplace" },
         ],
-        layout: "radio",
       },
     }),
     defineField({
       name: "projectTag",
-      title: "Project Tag",
-      type: "string",
-      description: "Construction category shown in the index filter.",
+      title: "Intervention Type",
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "Construction / intervention categories shown in the index filter. Pick from the suggestions or type a custom value.",
       options: {
         list: [
           { title: "New Build", value: "new-build" },
@@ -86,8 +89,15 @@ export const project = defineType({
           { title: "Addition/Infill", value: "addition-infill" },
           { title: "Interiors", value: "interiors" },
         ],
-        layout: "radio",
       },
+    }),
+    defineField({
+      name: "qualities",
+      title: "Gentle Works Qualities",
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "Free-form qualities that describe this project (e.g. Light-Filled, Community-Oriented). Shown in the index filter.",
     }),
     defineField({
       name: "tags",
@@ -115,6 +125,23 @@ export const project = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "heroVideo",
+      title: "Hero video (optional)",
+      type: "file",
+      description:
+        "Short looping video (mp4 or webm) shown instead of the hero image when provided. Keep under 10 MB for fast loading.",
+      options: { accept: "video/mp4,video/webm" },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Describes the video content for accessibility.",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: "gallery",
       title: "Gallery",
       type: "array",
@@ -134,7 +161,68 @@ export const project = defineType({
               title: "Caption",
               type: "string",
             }),
+            defineField({
+              name: "rowHeight",
+              title: "Row Height",
+              type: "string",
+              description:
+                "Controls the height of this image's row on desktop. Compact for detail shots, Standard for most views, Cinematic for dramatic interiors.",
+              options: {
+                list: [
+                  { title: "Compact", value: "compact" },
+                  { title: "Standard", value: "standard" },
+                  { title: "Cinematic", value: "cinematic" },
+                ],
+                layout: "radio",
+              },
+              initialValue: "standard",
+            }),
           ],
+        },
+        {
+          type: "object",
+          name: "galleryVideo",
+          title: "Video",
+          fields: [
+            defineField({
+              name: "video",
+              title: "Video file",
+              type: "file",
+              options: { accept: "video/mp4,video/webm" },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+            }),
+            defineField({
+              name: "rowHeight",
+              title: "Row Height",
+              type: "string",
+              description:
+                "Controls the height of this video's row on desktop.",
+              options: {
+                list: [
+                  { title: "Compact", value: "compact" },
+                  { title: "Standard", value: "standard" },
+                  { title: "Cinematic", value: "cinematic" },
+                ],
+                layout: "radio",
+              },
+              initialValue: "standard",
+            }),
+          ],
+          preview: {
+            select: { title: "alt" },
+            prepare: ({ title }) => ({ title: title || "Video", subtitle: "Video" }),
+          },
         },
       ],
     }),

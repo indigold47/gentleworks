@@ -8,9 +8,6 @@ import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
 
 import type {
   ProjectDetail,
-  ProjectStatus,
-  ProjectType,
-  ProjectTagValue,
   TagItem,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -26,53 +23,95 @@ type FilterCategory = {
   options: { label: string; value: string }[];
 };
 
-const FILTER_CATEGORIES: FilterCategory[] = [
-  {
-    key: "status",
-    label: "Status",
-    options: [
-      { label: "All", value: "all" },
-      { label: "Built", value: "built" },
-      { label: "In Design", value: "in-design" },
-      { label: "Under Construction", value: "under-construction" },
-      { label: "Unbuilt", value: "unbuilt" },
-    ],
-  },
-  {
-    key: "type",
-    label: "Type",
-    options: [
-      { label: "Mixed Use", value: "mixed-use" },
-      { label: "Housing", value: "housing" },
-      { label: "Commercial", value: "commercial" },
-      { label: "Civic", value: "civic" },
-      { label: "Workplace", value: "workplace" },
-    ],
-  },
-  {
-    key: "tag",
-    label: "Tag",
-    options: [
-      { label: "New Build", value: "new-build" },
-      { label: "Renovation", value: "renovation" },
-      { label: "Adaptive Reuse", value: "adaptive-reuse" },
-      { label: "Addition/Infill", value: "addition-infill" },
-      { label: "Interiors", value: "interiors" },
-    ],
-  },
-];
+/** Prettify a slug-style value into a label: "mixed-use" → "Mixed Use" */
+function slugToLabel(value: string): string {
+  return value
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/** Collect unique values from an array field across all projects.
+ *  Handles both old (single string) and new (string[]) data formats. */
+function collectOptions(
+  projects: ProjectDetail[],
+  field: "projectType" | "projectTag" | "qualities",
+): { label: string; value: string }[] {
+  const seen = new Set<string>();
+  for (const p of projects) {
+    const raw = p[field];
+    if (!raw) continue;
+    // Old data may still be a single string; new data is string[]
+    const values = Array.isArray(raw) ? raw : [raw as unknown as string];
+    for (const v of values) seen.add(v);
+  }
+  return [...seen]
+    .sort((a, b) => a.localeCompare(b))
+    .map((v) => ({ label: slugToLabel(v), value: v }));
+}
+
+/** Build filter categories dynamically from project data. */
+function buildFilterCategories(projects: ProjectDetail[]): FilterCategory[] {
+  return [
+    {
+      key: "status",
+      label: "Status",
+      options: [
+        { label: "All", value: "all" },
+        { label: "Built", value: "built" },
+        { label: "In Design", value: "in-design" },
+        { label: "Under Construction", value: "under-construction" },
+        { label: "Unbuilt", value: "unbuilt" },
+      ],
+    },
+    {
+      key: "type",
+      label: "Program Type",
+      options: collectOptions(projects, "projectType"),
+    },
+    {
+      key: "tag",
+      label: "Intervention Type",
+      options: collectOptions(projects, "projectTag"),
+    },
+    {
+      key: "qualities",
+      label: "Gentle Works Qualities",
+      options: collectOptions(projects, "qualities"),
+    },
+  ];
+}
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
+const FILTER_KEYS = ["status", "type", "tag", "qualities"];
+
 function parseFilters(searchParams: URLSearchParams) {
   const active: Record<string, Set<string>> = {};
-  for (const cat of FILTER_CATEGORIES) {
-    const raw = searchParams.get(cat.key);
-    active[cat.key] = raw ? new Set(raw.split(",")) : new Set<string>();
+  for (const key of FILTER_KEYS) {
+    const raw = searchParams.get(key);
+    active[key] = raw ? new Set(raw.split(",")) : new Set<string>();
   }
   return active;
+}
+
+/** Normalize a field that may be old (single string) or new (string[]). */
+function toArray(value: string[] | string | null | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+/** Check if a project's array field has any overlap with the selected filter values. */
+function matchesArrayFilter(
+  projectValues: string[] | string | null,
+  selected: Set<string>,
+): boolean {
+  if (selected.size === 0) return true;
+  const arr = toArray(projectValues);
+  if (arr.length === 0) return false;
+  return arr.some((v) => selected.has(v));
 }
 
 function filterProjects(
@@ -80,23 +119,20 @@ function filterProjects(
   filters: Record<string, Set<string>>,
 ) {
   return projects.filter((p) => {
-    // Status filter
+    // Status filter (single value, "all" clears)
     const statusSet = filters.status;
     if (statusSet.size > 0 && !statusSet.has("all")) {
       if (!p.status || !statusSet.has(p.status)) return false;
     }
 
-    // Type filter
-    const typeSet = filters.type;
-    if (typeSet.size > 0) {
-      if (!p.projectType || !typeSet.has(p.projectType)) return false;
-    }
+    // Program Type filter (array — match if any overlap)
+    if (!matchesArrayFilter(p.projectType, filters.type)) return false;
 
-    // Tag filter
-    const tagSet = filters.tag;
-    if (tagSet.size > 0) {
-      if (!p.projectTag || !tagSet.has(p.projectTag)) return false;
-    }
+    // Intervention Type filter (array — match if any overlap)
+    if (!matchesArrayFilter(p.projectTag, filters.tag)) return false;
+
+    // Qualities filter (array — match if any overlap)
+    if (!matchesArrayFilter(p.qualities, filters.qualities)) return false;
 
     return true;
   });
@@ -117,8 +153,9 @@ function searchProjects(projects: ProjectDetail[], query: string): ProjectDetail
       p.location,
       p.year?.toString(),
       p.status,
-      p.projectType,
-      p.projectTag,
+      ...toArray(p.projectType),
+      ...toArray(p.projectTag),
+      ...toArray(p.qualities),
       p.client,
       p.summary,
     ];
@@ -183,6 +220,9 @@ export function SplitScreen({ projects }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  // Build filter categories dynamically from all project data
+  const filterCategories = useMemo(() => buildFilterCategories(projects), [projects]);
+
   // Active filters from URL
   const activeFilters = parseFilters(searchParams);
 
@@ -216,6 +256,12 @@ export function SplitScreen({ projects }: SplitScreenProps) {
   }, [searchOpen]);
 
   const filteredProjects = filterProjects(projects, activeFilters);
+
+  // Featured projects fallback — shown when filters yield no results
+  const featuredProjects = useMemo(
+    () => projects.filter((p) => p.featured).slice(0, 3),
+    [projects],
+  );
 
   // Reset wheel index when project list changes
   useEffect(() => {
@@ -479,9 +525,41 @@ export function SplitScreen({ projects }: SplitScreenProps) {
               </Link>
             ))}
             {filteredProjects.length === 0 && (
-              <p className="col-span-2 py-8 text-center text-sm text-muted">
-                No projects match the selected filters.
-              </p>
+              <>
+                <p className="col-span-2 py-8 text-center text-sm text-muted">
+                  No projects match the selected filters.
+                  {featuredProjects.length > 0 &&
+                    " Take a look at some of our featured projects:"}
+                </p>
+                {featuredProjects.length > 0 &&
+                  featuredProjects.map((project) => (
+                    <Link
+                      key={project._id}
+                      href={`/projects/${project.slug}`}
+                      className="group"
+                    >
+                      <div className="relative aspect-[4/5] overflow-hidden">
+                        <Image
+                          src={urlFor(project.heroImage)
+                            .width(600)
+                            .quality(80)
+                            .auto("format")
+                            .url()}
+                          alt={project.heroImage.alt}
+                          fill
+                          sizes="50vw"
+                          className="object-cover transition-opacity duration-200 group-hover:opacity-80"
+                        />
+                      </div>
+                      <h3 className="display mt-2 text-base leading-tight">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs text-ink/50">
+                        {[project.location, project.year].filter(Boolean).join(" · ")}
+                      </p>
+                    </Link>
+                  ))}
+              </>
             )}
           </div>
         </div>
@@ -530,11 +608,11 @@ export function SplitScreen({ projects }: SplitScreenProps) {
             </div>
 
             <div className="space-y-4">
-              {FILTER_CATEGORIES.map((cat, catIdx) => (
+              {filterCategories.map((cat, catIdx) => (
                 <div
                   key={cat.key}
                   className={`flex flex-wrap gap-2 ${
-                    catIdx < FILTER_CATEGORIES.length - 1
+                    catIdx < filterCategories.length - 1
                       ? "border-b border-[#d4cdb8] pb-4"
                       : ""
                   }`}
@@ -604,11 +682,50 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                     className="py-8 text-center text-sm text-muted"
                   >
                     No projects match the selected filters.
+                    {featuredProjects.length > 0 && (
+                      <>
+                        <br />
+                        Take a look at some of our featured projects:
+                      </>
+                    )}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+
+          {/* Featured projects fallback */}
+          {filteredProjects.length === 0 && featuredProjects.length > 0 && (
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredProjects.map((project) => (
+                <Link
+                  key={project._id}
+                  href={`/projects/${project.slug}`}
+                  className="group"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={urlFor(project.heroImage)
+                        .width(600)
+                        .quality(80)
+                        .auto("format")
+                        .url()}
+                      alt={project.heroImage.alt}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover transition-opacity duration-200 group-hover:opacity-80"
+                    />
+                  </div>
+                  <h3 className="display mt-2 text-base leading-tight">
+                    {project.title}
+                  </h3>
+                  <p className="text-xs text-ink/50">
+                    {[project.location, project.year].filter(Boolean).join(" · ")}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* Custom scroll indicator — centered on the split seam, desktop only */}
           {filteredProjects.length > 0 && (() => {

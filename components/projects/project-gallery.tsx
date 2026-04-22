@@ -4,35 +4,61 @@ import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
 import Image from "next/image";
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
 
-import type { SanityImage, GalleryImage } from "@/sanity/lib/fetch";
+import type {
+  SanityImage,
+  SanityVideo,
+  GalleryItem as SanityGalleryItem,
+  RowHeight,
+} from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type GalleryItem = {
-  src: string;
-  alt: string;
-};
+type LightboxMedia =
+  | { type: "image"; src: string; alt: string }
+  | { type: "video"; src: string; alt: string };
 
 type ProjectGalleryProps = {
   heroImage: SanityImage;
-  gallery: GalleryImage[] | null;
-  /** Content rendered between the hero image and gallery grid (e.g. description, credits). */
+  heroVideo?: SanityVideo | null;
+  gallery: SanityGalleryItem[] | null;
+  /** Content rendered between the hero and gallery grid (e.g. description, credits). */
   children?: ReactNode;
 };
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Convert a Sanity hotspot to a CSS object-position value. */
+function hotspotToPosition(hotspot?: SanityImage["hotspot"]): string | undefined {
+  if (!hotspot) return undefined;
+  return `${(hotspot.x * 100).toFixed(1)}% ${(hotspot.y * 100).toFixed(1)}%`;
+}
+
+/** Map CMS row-height choice to a desktop viewport-relative height. */
+const ROW_HEIGHT_MAP: Record<RowHeight, string> = {
+  compact: "sm:h-[20vw]",
+  standard: "sm:h-[28vw]",
+  cinematic: "sm:h-[38vw]",
+};
+
+function isVideo(item: SanityGalleryItem): item is Extract<SanityGalleryItem, { _type: "galleryVideo" }> {
+  return item._type === "galleryVideo";
+}
 
 /* ------------------------------------------------------------------ */
 /*  Lightbox                                                           */
 /* ------------------------------------------------------------------ */
 
 function Lightbox({
-  images,
+  media,
   initialIndex,
   onClose,
 }: {
-  images: GalleryItem[];
+  media: LightboxMedia[];
   initialIndex: number;
   onClose: () => void;
 }) {
@@ -41,12 +67,12 @@ function Lightbox({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const prev = useCallback(() => {
-    setIndex((i) => (i === 0 ? images.length - 1 : i - 1));
-  }, [images.length]);
+    setIndex((i) => (i === 0 ? media.length - 1 : i - 1));
+  }, [media.length]);
 
   const next = useCallback(() => {
-    setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
-  }, [images.length]);
+    setIndex((i) => (i === media.length - 1 ? 0 : i + 1));
+  }, [media.length]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -88,7 +114,7 @@ function Lightbox({
     };
   }, []);
 
-  const current = images[index];
+  const current = media[index];
 
   return (
     <div
@@ -111,11 +137,11 @@ function Lightbox({
 
       {/* Counter */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 text-sm tracking-wide text-cream/60">
-        {index + 1}/{images.length}
+        {index + 1}/{media.length}
       </div>
 
       {/* Prev */}
-      {images.length > 1 && (
+      {media.length > 1 && (
         <button
           type="button"
           onClick={prev}
@@ -126,20 +152,33 @@ function Lightbox({
         </button>
       )}
 
-      {/* Image */}
+      {/* Media */}
       <div className="relative h-[80vh] w-[90vw] max-w-6xl">
-        <Image
-          src={current.src}
-          alt={current.alt}
-          fill
-          sizes="90vw"
-          className="object-contain"
-          priority
-        />
+        {current.type === "video" ? (
+          <video
+            key={current.src}
+            src={current.src}
+            className="h-full w-full object-contain"
+            autoPlay
+            loop
+            muted
+            playsInline
+            aria-label={current.alt}
+          />
+        ) : (
+          <Image
+            src={current.src}
+            alt={current.alt}
+            fill
+            sizes="90vw"
+            className="object-contain"
+            priority
+          />
+        )}
       </div>
 
       {/* Next */}
-      {images.length > 1 && (
+      {media.length > 1 && (
         <button
           type="button"
           onClick={next}
@@ -166,6 +205,7 @@ function GalleryCard({
   sizes,
   priority,
   aspect,
+  objectPosition,
   onClick,
 }: {
   src: string;
@@ -173,6 +213,7 @@ function GalleryCard({
   sizes: string;
   priority?: boolean;
   aspect: string;
+  objectPosition?: string;
   onClick: () => void;
 }) {
   return (
@@ -188,7 +229,50 @@ function GalleryCard({
         fill
         sizes={sizes}
         className="object-cover"
+        style={objectPosition ? { objectPosition } : undefined}
         priority={priority}
+      />
+      {/* Plus icon — visible on hover/focus */}
+      <span
+        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 bg-ink/30 backdrop-blur-sm"
+        aria-hidden="true"
+      >
+        <Plus size={20} strokeWidth={1.5} />
+      </span>
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Video card — autoplay, loop, muted (gif-like)                      */
+/* ------------------------------------------------------------------ */
+
+function VideoCard({
+  src,
+  alt,
+  aspect,
+  onClick,
+}: {
+  src: string;
+  alt: string;
+  aspect: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative ${aspect} overflow-hidden cursor-pointer w-full`}
+      aria-label={`View ${alt} fullscreen`}
+    >
+      <video
+        src={src}
+        className="absolute inset-0 h-full w-full object-cover"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
       />
       {/* Plus icon — visible on hover/focus */}
       <span
@@ -207,6 +291,7 @@ function GalleryCard({
 
 export function ProjectGallery({
   heroImage,
+  heroVideo,
   gallery,
   children,
 }: ProjectGalleryProps) {
@@ -225,29 +310,47 @@ export function ProjectGallery({
   }, []);
 
   // Flat list for lightbox: hero first, then gallery
-  const allImages: GalleryItem[] = [
-    {
-      src: urlFor(heroImage).width(2400).quality(90).auto("format").url(),
-      alt: heroImage.alt,
-    },
-    ...(gallery ?? []).map((img) => ({
-      src: urlFor(img).width(2400).quality(90).auto("format").url(),
-      alt: img.alt,
-    })),
+  const allMedia: LightboxMedia[] = [
+    heroVideo?.url
+      ? { type: "video", src: heroVideo.url, alt: heroVideo.alt }
+      : {
+          type: "image",
+          src: urlFor(heroImage).width(2400).quality(90).auto("format").url(),
+          alt: heroImage.alt,
+        },
+    ...(gallery ?? []).map((item): LightboxMedia =>
+      isVideo(item)
+        ? { type: "video", src: item.videoUrl, alt: item.alt }
+        : {
+            type: "image",
+            src: urlFor(item).width(2400).quality(90).auto("format").url(),
+            alt: item.alt,
+          }
+    ),
   ];
 
   return (
     <>
-      {/* Hero image */}
+      {/* Hero — video takes priority when present */}
       <section className="px-6 sm:px-10 lg:px-16">
-        <GalleryCard
-          src={urlFor(heroImage).width(2400).quality(85).auto("format").url()}
-          alt={heroImage.alt}
-          sizes="100vw"
-          priority
-          aspect="aspect-[16/9] w-full"
-          onClick={() => openLightbox(0)}
-        />
+        {heroVideo?.url ? (
+          <VideoCard
+            src={heroVideo.url}
+            alt={heroVideo.alt}
+            aspect="aspect-[16/9] w-full"
+            onClick={() => openLightbox(0)}
+          />
+        ) : (
+          <GalleryCard
+            src={urlFor(heroImage).width(2400).quality(85).auto("format").url()}
+            alt={heroImage.alt}
+            sizes="100vw"
+            priority
+            aspect="aspect-[16/9] w-full"
+            objectPosition={hotspotToPosition(heroImage.hotspot)}
+            onClick={() => openLightbox(0)}
+          />
+        )}
       </section>
 
       {/* Slot for description / credits between hero and gallery */}
@@ -260,24 +363,44 @@ export function ProjectGallery({
             { length: Math.ceil(gallery.length / 2) },
             (_, rowIdx) => {
               const pair = gallery.slice(rowIdx * 2, rowIdx * 2 + 2);
+              const rowHeight: RowHeight = pair[0].rowHeight ?? "standard";
+              const heightClass = ROW_HEIGHT_MAP[rowHeight];
               return (
                 <div
                   key={rowIdx}
-                  className="grid grid-cols-1 gap-6 sm:grid-cols-2"
+                  className={`grid grid-cols-1 gap-6 ${
+                    pair.length === 2
+                      ? rowIdx % 2 === 0
+                        ? `sm:grid-cols-[3fr_2fr] ${heightClass}`
+                        : `sm:grid-cols-[2fr_3fr] ${heightClass}`
+                      : ""
+                  }`}
                 >
-                  {pair.map((img, imgIdx) => {
+                  {pair.map((item, imgIdx) => {
                     const flatIdx = rowIdx * 2 + imgIdx + 1;
+                    if (isVideo(item)) {
+                      return (
+                        <VideoCard
+                          key={item._key ?? imgIdx}
+                          src={item.videoUrl}
+                          alt={item.alt}
+                          aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                          onClick={() => openLightbox(flatIdx)}
+                        />
+                      );
+                    }
                     return (
                       <GalleryCard
-                        key={img.asset._ref ?? imgIdx}
-                        src={urlFor(img)
+                        key={item.asset._ref ?? imgIdx}
+                        src={urlFor(item)
                           .width(1200)
                           .quality(85)
                           .auto("format")
                           .url()}
-                        alt={img.alt}
+                        alt={item.alt}
                         sizes="(min-width: 640px) 50vw, 100vw"
-                        aspect="aspect-[4/3]"
+                        aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                        objectPosition={hotspotToPosition(item.hotspot)}
                         onClick={() => openLightbox(flatIdx)}
                       />
                     );
@@ -292,7 +415,7 @@ export function ProjectGallery({
       {/* Lightbox modal */}
       {lightboxIndex !== null && (
         <Lightbox
-          images={allImages}
+          media={allMedia}
           initialIndex={lightboxIndex}
           onClose={closeLightbox}
         />

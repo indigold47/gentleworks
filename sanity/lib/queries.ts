@@ -20,6 +20,7 @@ export const allProjectsQuery = defineQuery(`
     status,
     projectType,
     projectTag,
+    qualities,
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -46,6 +47,7 @@ export const projectBySlugQuery = defineQuery(`
     status,
     projectType,
     projectTag,
+    qualities,
     "theme": theme->{
       name,
       "mainColor": mainColor.hex,
@@ -55,9 +57,16 @@ export const projectBySlugQuery = defineQuery(`
       ...,
       "alt": coalesce(alt, "")
     },
+    "heroVideo": heroVideo {
+      "url": asset->url,
+      "alt": coalesce(alt, "")
+    },
     gallery[] {
       ...,
-      "alt": coalesce(alt, "")
+      "alt": coalesce(alt, ""),
+      _type == "galleryVideo" => {
+        "videoUrl": video.asset->url
+      }
     },
     credits,
     "tags": tags[]->{
@@ -83,13 +92,21 @@ export const allProjectsDetailQuery = defineQuery(`
     status,
     projectType,
     projectTag,
+    qualities,
     heroImage {
       ...,
       "alt": coalesce(alt, "")
     },
+    "heroVideo": heroVideo {
+      "url": asset->url,
+      "alt": coalesce(alt, "")
+    },
     gallery[] {
       ...,
-      "alt": coalesce(alt, "")
+      "alt": coalesce(alt, ""),
+      _type == "galleryVideo" => {
+        "videoUrl": video.asset->url
+      }
     },
     credits,
     "tags": tags[]->{
