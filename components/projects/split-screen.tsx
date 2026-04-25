@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo, useTransition, ViewTransition } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -196,8 +196,6 @@ type MobileView = "list" | "grid";
 export function SplitScreen({ projects, filterCategories: cmsCategories }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [, startTransition] = useTransition();
-
   // Build filter categories from CMS data
   const filterCategories = useMemo(
     () => buildFilterCategories(cmsCategories),
@@ -338,9 +336,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
         } else {
           params.set(categoryKey, "all");
         }
-        startTransition(() => {
-          router.replace(`?${params.toString()}`, { scroll: false });
-        });
+        window.history.replaceState(null, "", `?${params.toString()}`);
         return;
       }
 
@@ -361,11 +357,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
         params.set(categoryKey, [...set].join(","));
       }
 
-      startTransition(() => {
-        router.replace(`?${params.toString()}`, { scroll: false });
-      });
+      window.history.replaceState(null, "", `?${params.toString()}`);
     },
-    [searchParams, router, filterCategories],
+    [searchParams, filterCategories],
   );
 
   if (projects.length === 0) {

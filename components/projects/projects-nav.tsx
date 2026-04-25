@@ -50,7 +50,7 @@ export function SiteNav({ activeHref, variant = "light", className }: SiteNavPro
           <div key={item.href} className="flex items-center gap-4">
             <Link
               href={item.href}
-              className={`display italic text-[22px] leading-snug tracking-wide ${v.active} shrink-0 font-bold`}
+              className={`display italic text-[22px] leading-snug tracking-wide ${v.active} shrink-0 font-extrabold`}
             >
               {item.label}
             </Link>
@@ -67,7 +67,7 @@ export function SiteNav({ activeHref, variant = "light", className }: SiteNavPro
             key={item.href}
             href={item.href}
             transitionTypes={["page-nav"]}
-            className={`text-[22px] leading-snug tracking-wide font-normal ${v.idle} transition-colors`}
+            className={`text-[22px] leading-snug tracking-wide font-semibold ${v.idle} transition-colors`}
           >
             {item.label}
           </Link>
