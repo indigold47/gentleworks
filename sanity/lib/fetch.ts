@@ -4,6 +4,7 @@ import type { QueryParams } from "next-sanity";
 import { client } from "./client";
 import {
   aboutPageQuery,
+  allFilterCategoriesQuery,
   allProjectsQuery,
   allProjectsDetailQuery,
   allProjectSlugsQuery,
@@ -46,6 +47,7 @@ async function sanityFetch<T, Q extends string>({
 
 // Shared tags — the webhook invalidates these to refresh cached pages.
 export const PROJECTS_TAG = "projects";
+export const FILTERS_TAG = "filters";
 export const TAGS_TAG = "tags";
 export const TEAM_TAG = "team";
 export const THEMES_TAG = "themes";
@@ -87,6 +89,13 @@ export async function getAllProjectSlugs() {
   });
 }
 
+export async function getAllFilterCategories() {
+  return sanityFetch<FilterCategoryItem[], typeof allFilterCategoriesQuery>({
+    query: allFilterCategoriesQuery,
+    tags: [FILTERS_TAG],
+  });
+}
+
 export async function getAllTags() {
   return sanityFetch<TagItem[], typeof allTagsQuery>({
     query: allTagsQuery,
@@ -112,6 +121,17 @@ export async function getSiteSettings() {
 // These are deliberately narrow and hand-written for now. When we wire up
 // sanity-codegen the generated types will replace these; the call sites can
 // stay the same.
+
+export type FilterCategoryItem = {
+  _id: string;
+  label: string;
+  key: string;
+  projectField: string;
+  singleSelect: boolean | null;
+  options:
+    | { label: string; value: string; useAsFilter: boolean | null }[]
+    | null;
+};
 
 export type TagItem = {
   _id: string;

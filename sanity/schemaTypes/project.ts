@@ -1,4 +1,8 @@
 import { defineField, defineType } from "sanity";
+import {
+  FilterCategoryStringInput,
+  FilterCategoryArrayInput,
+} from "../components/FilterCategoryInput";
 
 /**
  * Project — the single editorial entity powering the portfolio.
@@ -46,16 +50,10 @@ export const project = defineType({
       name: "status",
       title: "Status",
       type: "string",
-      description: "Project status shown in the index filter.",
-      options: {
-        list: [
-          { title: "Built", value: "built" },
-          { title: "In Design", value: "in-design" },
-          { title: "Under Construction", value: "under-construction" },
-          { title: "Unbuilt", value: "unbuilt" },
-        ],
-        layout: "radio",
-      },
+      description:
+        "Project status. Options are managed in Filter Category.",
+      options: { projectField: "status" } as never,
+      components: { input: FilterCategoryStringInput },
     }),
     defineField({
       name: "projectType",
@@ -63,16 +61,9 @@ export const project = defineType({
       type: "array",
       of: [{ type: "string" }],
       description:
-        "Building program types shown in the index filter. Pick from the suggestions or type a custom value.",
-      options: {
-        list: [
-          { title: "Mixed Use", value: "mixed-use" },
-          { title: "Housing", value: "housing" },
-          { title: "Commercial", value: "commercial" },
-          { title: "Civic", value: "civic" },
-          { title: "Workplace", value: "workplace" },
-        ],
-      },
+        "Building program types. Options are managed in Filter Category.",
+      options: { projectField: "projectType" } as never,
+      components: { input: FilterCategoryArrayInput },
     }),
     defineField({
       name: "projectTag",
@@ -80,16 +71,9 @@ export const project = defineType({
       type: "array",
       of: [{ type: "string" }],
       description:
-        "Construction / intervention categories shown in the index filter. Pick from the suggestions or type a custom value.",
-      options: {
-        list: [
-          { title: "New Build", value: "new-build" },
-          { title: "Renovation", value: "renovation" },
-          { title: "Adaptive Reuse", value: "adaptive-reuse" },
-          { title: "Addition/Infill", value: "addition-infill" },
-          { title: "Interiors", value: "interiors" },
-        ],
-      },
+        "Construction / intervention categories. Options are managed in Filter Category.",
+      options: { projectField: "projectTag" } as never,
+      components: { input: FilterCategoryArrayInput },
     }),
     defineField({
       name: "qualities",
@@ -97,7 +81,9 @@ export const project = defineType({
       type: "array",
       of: [{ type: "string" }],
       description:
-        "Free-form qualities that describe this project (e.g. Light-Filled, Community-Oriented). Shown in the index filter.",
+        "Qualities that describe this project. Options are managed in Filter Category.",
+      options: { projectField: "qualities" } as never,
+      components: { input: FilterCategoryArrayInput },
     }),
     defineField({
       name: "tags",

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo, ViewTransition } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, useTransition, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
 
 import type {
+  FilterCategoryItem,
   ProjectDetail,
   TagItem,
 } from "@/sanity/lib/fetch";
@@ -20,79 +21,52 @@ import { SiteNav } from "./projects-nav";
 type FilterCategory = {
   key: string;
   label: string;
+  /** The project field this category reads from (e.g. "status", "projectType"). */
+  projectField: string;
+  singleSelect: boolean;
   options: { label: string; value: string }[];
 };
 
-/** Prettify a slug-style value into a label: "mixed-use" → "Mixed Use" */
-function slugToLabel(value: string): string {
-  return value
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
+/**
+ * Build filter categories from CMS-managed filterCategory documents.
+ *
+ * Only options with `useAsFilter` enabled are included as filter chips.
+ * Single-select categories (like Status) get an "All" option prepended.
+ */
+function buildFilterCategories(
+  cmsCategories: FilterCategoryItem[],
+): FilterCategory[] {
+  return cmsCategories.map((cat) => {
+    const filterable = (cat.options ?? [])
+      .filter((o) => o.useAsFilter !== false && o.value);
+    const options = filterable.map((o) => ({ label: o.label, value: o.value }));
 
-/** Collect unique values from an array field across all projects.
- *  Handles both old (single string) and new (string[]) data formats. */
-function collectOptions(
-  projects: ProjectDetail[],
-  field: "projectType" | "projectTag" | "qualities",
-): { label: string; value: string }[] {
-  const seen = new Set<string>();
-  for (const p of projects) {
-    const raw = p[field];
-    if (!raw) continue;
-    // Old data may still be a single string; new data is string[]
-    const values = Array.isArray(raw) ? raw : [raw as unknown as string];
-    for (const v of values) seen.add(v);
-  }
-  return [...seen]
-    .sort((a, b) => a.localeCompare(b))
-    .map((v) => ({ label: slugToLabel(v), value: v }));
-}
+    if (cat.singleSelect) {
+      options.unshift({ label: "All", value: "all" });
+    }
 
-/** Build filter categories dynamically from project data. */
-function buildFilterCategories(projects: ProjectDetail[]): FilterCategory[] {
-  return [
-    {
-      key: "status",
-      label: "Status",
-      options: [
-        { label: "All", value: "all" },
-        { label: "Built", value: "built" },
-        { label: "In Design", value: "in-design" },
-        { label: "Under Construction", value: "under-construction" },
-        { label: "Unbuilt", value: "unbuilt" },
-      ],
-    },
-    {
-      key: "type",
-      label: "Program Type",
-      options: collectOptions(projects, "projectType"),
-    },
-    {
-      key: "tag",
-      label: "Intervention Type",
-      options: collectOptions(projects, "projectTag"),
-    },
-    {
-      key: "qualities",
-      label: "Gentle Works Qualities",
-      options: collectOptions(projects, "qualities"),
-    },
-  ];
+    return {
+      key: cat.key,
+      label: cat.label,
+      projectField: cat.projectField,
+      singleSelect: !!cat.singleSelect,
+      options,
+    };
+  });
 }
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const FILTER_KEYS = ["status", "type", "tag", "qualities"];
-
-function parseFilters(searchParams: URLSearchParams) {
+function parseFilters(
+  searchParams: URLSearchParams,
+  categories: FilterCategory[],
+) {
   const active: Record<string, Set<string>> = {};
-  for (const key of FILTER_KEYS) {
-    const raw = searchParams.get(key);
-    active[key] = raw ? new Set(raw.split(",")) : new Set<string>();
+  for (const cat of categories) {
+    const raw = searchParams.get(cat.key);
+    active[cat.key] = raw ? new Set(raw.split(",")) : new Set<string>();
   }
   return active;
 }
@@ -117,23 +91,27 @@ function matchesArrayFilter(
 function filterProjects(
   projects: ProjectDetail[],
   filters: Record<string, Set<string>>,
+  categories: FilterCategory[],
 ) {
   return projects.filter((p) => {
-    // Status filter (single value, "all" clears)
-    const statusSet = filters.status;
-    if (statusSet.size > 0 && !statusSet.has("all")) {
-      if (!p.status || !statusSet.has(p.status)) return false;
+    for (const cat of categories) {
+      const selected = filters[cat.key];
+      if (!selected || selected.size === 0) continue;
+
+      // Single-select with "all" clears the filter
+      if (cat.singleSelect && selected.has("all")) continue;
+
+      const projectValue = (p as Record<string, unknown>)[cat.projectField];
+
+      if (cat.singleSelect) {
+        // Single-value field — exact match
+        if (!projectValue || !selected.has(projectValue as string)) return false;
+      } else {
+        // Array field — match if any overlap
+        if (!matchesArrayFilter(projectValue as string[] | string | null, selected))
+          return false;
+      }
     }
-
-    // Program Type filter (array — match if any overlap)
-    if (!matchesArrayFilter(p.projectType, filters.type)) return false;
-
-    // Intervention Type filter (array — match if any overlap)
-    if (!matchesArrayFilter(p.projectTag, filters.tag)) return false;
-
-    // Qualities filter (array — match if any overlap)
-    if (!matchesArrayFilter(p.qualities, filters.qualities)) return false;
-
     return true;
   });
 }
@@ -191,7 +169,7 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex items-center gap-2.5 border px-3.5 py-1.5 text-[15px] tracking-wide transition-colors ${
+      className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[13px] tracking-wide transition-colors ${
         active
           ? "border-[#8a8160] bg-[#8a8160]/50 text-[#3d3926]"
           : "border-[#c5bda8] text-ink/60 hover:bg-[#c5bda8]/40 hover:text-ink/80"
@@ -212,19 +190,24 @@ function FilterChip({
 type SplitScreenProps = {
   projects: ProjectDetail[];
   tags: TagItem[];
+  filterCategories: FilterCategoryItem[];
 };
 
 type MobileView = "list" | "grid";
 
-export function SplitScreen({ projects }: SplitScreenProps) {
+export function SplitScreen({ projects, filterCategories: cmsCategories }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [, startTransition] = useTransition();
 
-  // Build filter categories dynamically from all project data
-  const filterCategories = useMemo(() => buildFilterCategories(projects), [projects]);
+  // Build filter categories from CMS data
+  const filterCategories = useMemo(
+    () => buildFilterCategories(cmsCategories),
+    [cmsCategories],
+  );
 
   // Active filters from URL
-  const activeFilters = parseFilters(searchParams);
+  const activeFilters = parseFilters(searchParams, filterCategories);
 
   // Hovered project index — sticky: stays on last hovered project
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -256,7 +239,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
     }
   }, [searchOpen]);
 
-  const filteredProjects = filterProjects(projects, activeFilters);
+  const filteredProjects = filterProjects(projects, activeFilters, filterCategories);
 
   // Featured projects fallback — shown when filters yield no results
   const featuredProjects = useMemo(
@@ -347,20 +330,24 @@ export function SplitScreen({ projects }: SplitScreenProps) {
       const params = new URLSearchParams(searchParams.toString());
       const current = params.get(categoryKey);
       const set = current ? new Set(current.split(",")) : new Set<string>();
+      const cat = filterCategories.find((c) => c.key === categoryKey);
+      const isSingle = cat?.singleSelect ?? false;
 
-      // "All" in status is special — it clears the status filter
-      if (categoryKey === "status" && value === "all") {
+      // "All" on a single-select category clears the filter
+      if (isSingle && value === "all") {
         if (set.has("all")) {
           params.delete(categoryKey);
         } else {
           params.set(categoryKey, "all");
         }
-        router.replace(`?${params.toString()}`, { scroll: false });
+        startTransition(() => {
+          router.replace(`?${params.toString()}`, { scroll: false });
+        });
         return;
       }
 
-      // For status, remove "all" when selecting a specific value
-      if (categoryKey === "status") {
+      // For single-select, remove "all" when selecting a specific value
+      if (isSingle) {
         set.delete("all");
       }
 
@@ -376,9 +363,11 @@ export function SplitScreen({ projects }: SplitScreenProps) {
         params.set(categoryKey, [...set].join(","));
       }
 
-      router.replace(`?${params.toString()}`, { scroll: false });
+      startTransition(() => {
+        router.replace(`?${params.toString()}`, { scroll: false });
+      });
     },
-    [searchParams, router],
+    [searchParams, router, filterCategories],
   );
 
   if (projects.length === 0) {
@@ -669,21 +658,21 @@ export function SplitScreen({ projects }: SplitScreenProps) {
         {/* Right: filters + project index table */}
         <div className="relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
           {/* Filter section — hidden on mobile per design */}
-          <div className="mb-12 hidden lg:flex gap-6">
+          <div className="mb-12 hidden lg:flex gap-6 lg:pr-20">
             {/* Filters — takes remaining space */}
             <div className="min-w-0 flex-1">
               {/* "Filter" label with full-width rule */}
-              <div className="border-b border-[#c5bda8] pb-2 mb-4">
-                <p className="display italic text-base text-ink/70">Filter</p>
+              <div className="border-b border-[#c5bda8] pb-2 mb-3">
+                <p className="display italic text-sm text-ink/70">Filter</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filterCategories.map((cat, catIdx) => (
                   <div
                     key={cat.key}
-                    className={`flex flex-wrap gap-2 ${
+                    className={`flex flex-wrap gap-1.5 ${
                       catIdx < filterCategories.length - 1
-                        ? "border-b border-[#d4cdb8] pb-4"
+                        ? "border-b border-[#d4cdb8] pb-3"
                         : ""
                     }`}
                   >
@@ -706,13 +695,13 @@ export function SplitScreen({ projects }: SplitScreenProps) {
           <table className="w-full border-collapse text-default-green">
             <thead>
               <tr className="border-b border-default-green/30">
-                <th className="pb-2 text-left text-[13px] font-normal italic opacity-60 w-[55%]">
+                <th className="pb-2 text-left text-[13px] font-normal opacity-60 w-[55%]">
                   Project
                 </th>
-                <th className="pb-2 text-left text-[13px] font-normal italic opacity-60">
+                <th className="pb-2 text-left text-[13px] font-normal opacity-60">
                   Location
                 </th>
-                <th className="pb-2 text-right text-[13px] font-normal italic opacity-60">
+                <th className="pb-2 text-right text-[13px] font-normal opacity-60">
                   Year
                 </th>
               </tr>
@@ -736,7 +725,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                     <Link
                       href={`/projects/${project.slug}`}
                       transitionTypes={["nav-forward"]}
-                      className="display text-[clamp(1.15rem,2.5vw,1.5rem)] leading-[1.15]"
+                      className="display text-[20px] leading-[1.15]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {project.title}

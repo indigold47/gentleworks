@@ -183,6 +183,21 @@ export const siteSettingsQuery = defineQuery(`
   }
 `);
 
+export const allFilterCategoriesQuery = defineQuery(`
+  *[_type == "filterCategory"] | order(coalesce(order, 9999) asc) {
+    _id,
+    label,
+    "key": key.current,
+    projectField,
+    singleSelect,
+    "options": options[] {
+      label,
+      "value": coalesce(value.current, value),
+      useAsFilter
+    }
+  }
+`);
+
 export const allTeamMembersQuery = defineQuery(`
   *[_type == "teamMember"] | order(coalesce(order, 9999) asc, displayName asc) {
     _id,

@@ -12,7 +12,7 @@
  *   URL:     https://<prod-domain>/api/revalidate
  *   Dataset: production
  *   Trigger: Create / Update / Delete
- *   Filter:  _type in ["project", "tag", "teamMember", "theme"]
+ *   Filter:  _type in ["project", "tag", "filterCategory", "teamMember", "theme"]
  *   Projection: {
  *     "_type": _type,
  *     "slug":  slug.current
@@ -25,7 +25,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
 import { revalidateSecret } from "@/sanity/env";
-import { PROJECTS_TAG, TAGS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
+import { FILTERS_TAG, PROJECTS_TAG, TAGS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
 
 type WebhookBody = {
   _type?: string;
@@ -81,6 +81,11 @@ export async function POST(req: NextRequest) {
     }
     case "teamMember": {
       updateTag(TEAM_TAG);
+      break;
+    }
+    case "filterCategory": {
+      // Filter category changes affect the project index filter chips.
+      updateTag(FILTERS_TAG);
       break;
     }
     case "theme": {
