@@ -9,7 +9,6 @@ import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
 import type {
   FilterCategoryItem,
   ProjectDetail,
-  TagItem,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { SiteNav } from "./projects-nav";
@@ -189,7 +188,6 @@ function FilterChip({
 
 type SplitScreenProps = {
   projects: ProjectDetail[];
-  tags: TagItem[];
   filterCategories: FilterCategoryItem[];
 };
 

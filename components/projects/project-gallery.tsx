@@ -8,10 +8,11 @@ import type {
   SanityImage,
   SanityVideo,
   GalleryItem as SanityGalleryItem,
-  ProjectMediaField,
-  RowHeight,
+  GalleryRow as SanityGalleryRow,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
+import { GALLERY_PRESETS } from "@/lib/gallery-presets";
+import type { GalleryPresetId } from "@/lib/gallery-presets";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -24,9 +25,7 @@ type LightboxMedia =
 type ProjectGalleryProps = {
   heroImage: SanityImage;
   heroVideo?: SanityVideo | null;
-  sitePlan?: ProjectMediaField | null;
-  drawing?: ProjectMediaField | null;
-  gallery: SanityGalleryItem[] | null;
+  galleryRows: SanityGalleryRow[] | null;
   /** Project slug — used for shared-element view transition identity. */
   slug: string;
   /** Content rendered between the hero and gallery grid (e.g. description, credits). */
@@ -42,13 +41,6 @@ function hotspotToPosition(hotspot?: SanityImage["hotspot"]): string | undefined
   if (!hotspot) return undefined;
   return `${(hotspot.x * 100).toFixed(1)}% ${(hotspot.y * 100).toFixed(1)}%`;
 }
-
-/** Map CMS row-height choice to a desktop viewport-relative height. */
-const ROW_HEIGHT_MAP: Record<RowHeight, string> = {
-  compact: "sm:h-[20vw]",
-  standard: "sm:h-[28vw]",
-  cinematic: "sm:h-[38vw]",
-};
 
 function isVideo(item: SanityGalleryItem): item is Extract<SanityGalleryItem, { _type: "galleryVideo" }> {
   return item._type === "galleryVideo";
@@ -247,7 +239,8 @@ function GalleryCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative ${aspect} overflow-hidden cursor-pointer w-full ${objectFit === "contain" ? "bg-white/60" : ""}`}
+      className={`group relative overflow-hidden cursor-pointer w-full ${objectFit === "contain" ? "bg-white/60" : ""}`}
+      style={{ aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <Image
@@ -289,7 +282,8 @@ function VideoCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative ${aspect} overflow-hidden cursor-pointer w-full`}
+      className="group relative overflow-hidden cursor-pointer w-full"
+      style={{ aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <video
@@ -316,24 +310,10 @@ function VideoCard({
 /*  ProjectGallery                                                     */
 /* ------------------------------------------------------------------ */
 
-/** Convert a ProjectMediaField to a LightboxMedia entry. */
-function mediaFieldToLightbox(field: ProjectMediaField): LightboxMedia {
-  if (field.videoUrl) {
-    return { type: "video", src: field.videoUrl, alt: field.alt };
-  }
-  return {
-    type: "image",
-    src: urlFor(field.image!).width(3600).quality(95).auto("format").url(),
-    alt: field.alt,
-  };
-}
-
 export function ProjectGallery({
   heroImage,
   heroVideo,
-  sitePlan,
-  drawing,
-  gallery,
+  galleryRows,
   slug,
   children,
 }: ProjectGalleryProps) {
@@ -347,11 +327,10 @@ export function ProjectGallery({
 
   const closeLightbox = useCallback(() => {
     setLightboxIndex(null);
-    // Return focus to the element that opened the lightbox
     requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
-  // Flat list for lightbox: hero → site plan → drawing → gallery
+  // Flat list for lightbox: hero → all gallery row media
   const allMedia: LightboxMedia[] = [
     heroVideo?.url
       ? { type: "video", src: heroVideo.url, alt: heroVideo.alt }
@@ -360,23 +339,25 @@ export function ProjectGallery({
           src: urlFor(heroImage).width(2400).quality(90).auto("format").url(),
           alt: heroImage.alt,
         },
-    ...(sitePlan ? [mediaFieldToLightbox(sitePlan)] : []),
-    ...(drawing ? [mediaFieldToLightbox(drawing)] : []),
-    ...(gallery ?? []).map((item): LightboxMedia =>
-      isVideo(item)
-        ? { type: "video", src: item.videoUrl, alt: item.alt }
-        : {
-            type: "image",
-            src: urlFor(item).width(2400).quality(90).auto("format").url(),
-            alt: item.alt,
-          }
+    ...(galleryRows ?? []).flatMap((row) =>
+      (row.media ?? []).map((item): LightboxMedia =>
+        isVideo(item)
+          ? { type: "video", src: item.videoUrl, alt: item.alt }
+          : {
+              type: "image",
+              src: urlFor(item).width(2400).quality(90).auto("format").url(),
+              alt: item.alt,
+            }
+      )
     ),
   ];
 
-  // Lightbox index offsets: hero is 0, then sitePlan, then drawing, then gallery
-  const sitePlanLightboxIdx = sitePlan ? 1 : -1;
-  const drawingLightboxIdx = drawing ? (sitePlan ? 2 : 1) : -1;
-  const galleryLightboxOffset = 1 + (sitePlan ? 1 : 0) + (drawing ? 1 : 0);
+  // Build a flat index offset for each row (hero is index 0, gallery starts at 1)
+  const rowOffsets = (galleryRows ?? []).reduce<number[]>((acc, _row, i) => {
+    const prev = i === 0 ? 1 : acc[i - 1] + ((galleryRows ?? [])[i - 1].media ?? []).length;
+    acc.push(prev);
+    return acc;
+  }, []);
 
   return (
     <>
@@ -387,7 +368,7 @@ export function ProjectGallery({
             <VideoCard
               src={heroVideo.url}
               alt={heroVideo.alt}
-              aspect="aspect-[16/9] w-full"
+              aspect="5/2"
               onClick={() => openLightbox(0)}
             />
           ) : (
@@ -396,7 +377,7 @@ export function ProjectGallery({
               alt={heroImage.alt}
               sizes="100vw"
               priority
-              aspect="aspect-[16/9] w-full"
+              aspect="5/2"
               objectPosition={hotspotToPosition(heroImage.hotspot)}
               onClick={() => openLightbox(0)}
             />
@@ -407,111 +388,56 @@ export function ProjectGallery({
       {/* Slot for description / credits between hero and gallery */}
       {children}
 
-      {/* Site Plan + Drawing — fixed first row */}
-      {(sitePlan || drawing) && (
-        <section className="px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* Left: Site Plan */}
-            {sitePlan ? (
-              sitePlan.videoUrl ? (
-                <VideoCard
-                  src={sitePlan.videoUrl}
-                  alt={sitePlan.alt}
-                  aspect="aspect-[4/3]"
-                  onClick={() => openLightbox(sitePlanLightboxIdx)}
-                />
-              ) : sitePlan.image ? (
-                <GalleryCard
-                  src={urlFor(sitePlan.image).width(2400).quality(95).auto("format").url()}
-                  alt={sitePlan.alt}
-                  sizes="(min-width: 640px) 50vw, 100vw"
-                  aspect="aspect-[4/3]"
-                  objectPosition={hotspotToPosition(sitePlan.image.hotspot)}
-                  onClick={() => openLightbox(sitePlanLightboxIdx)}
-                />
-              ) : null
-            ) : (
-              <div className="aspect-[4/3]" />
-            )}
-            {/* Right: Drawing */}
-            {drawing ? (
-              drawing.videoUrl ? (
-                <VideoCard
-                  src={drawing.videoUrl}
-                  alt={drawing.alt}
-                  aspect="aspect-[4/3]"
-                  onClick={() => openLightbox(drawingLightboxIdx)}
-                />
-              ) : drawing.image ? (
-                <GalleryCard
-                  src={urlFor(drawing.image).width(2400).quality(95).auto("format").url()}
-                  alt={drawing.alt}
-                  sizes="(min-width: 640px) 50vw, 100vw"
-                  aspect="aspect-[4/3]"
-                  objectPosition={hotspotToPosition(drawing.image.hotspot)}
-                  onClick={() => openLightbox(drawingLightboxIdx)}
-                />
-              ) : null
-            ) : (
-              <div className="aspect-[4/3]" />
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* Gallery grid */}
-      {gallery && gallery.length > 0 && (
+      {/* Gallery rows — preset-driven layout */}
+      {galleryRows && galleryRows.length > 0 && (
         <section className="flex flex-col gap-6 px-6 pt-6 pb-12 sm:px-10 lg:px-16 lg:pb-16">
-          {Array.from(
-            { length: Math.ceil(gallery.length / 2) },
-            (_, rowIdx) => {
-              const pair = gallery.slice(rowIdx * 2, rowIdx * 2 + 2);
-              const rowHeight: RowHeight = pair[0].rowHeight ?? "standard";
-              const heightClass = ROW_HEIGHT_MAP[rowHeight];
-              return (
-                <div
-                  key={rowIdx}
-                  className={`grid grid-cols-1 gap-6 ${
-                    pair.length === 2
-                      ? rowIdx % 2 === 0
-                        ? `sm:grid-cols-[3fr_2fr] ${heightClass}`
-                        : `sm:grid-cols-[2fr_3fr] ${heightClass}`
-                      : ""
-                  }`}
-                >
-                  {pair.map((item, imgIdx) => {
-                    const flatIdx = rowIdx * 2 + imgIdx + galleryLightboxOffset;
+          {galleryRows.map((row, rowIdx) => {
+            const preset = GALLERY_PRESETS[row.preset as GalleryPresetId];
+            if (!preset || !row.media?.length) return null;
+
+            return (
+              <div
+                key={row._key ?? rowIdx}
+                className="grid grid-cols-1 gap-6 sm:[grid-template-columns:var(--preset-cols)]"
+                style={
+                  { "--preset-cols": preset.cols } as React.CSSProperties
+                }
+              >
+                  {row.media.map((item, slotIdx) => {
+                    const flatIdx = rowOffsets[rowIdx] + slotIdx;
+                    const aspect = preset.aspects[slotIdx] ?? "4/3";
+                    const sizes = preset.sizes[slotIdx] ?? "100vw";
+
                     if (isVideo(item)) {
                       return (
                         <VideoCard
-                          key={item._key ?? imgIdx}
+                          key={item._key ?? slotIdx}
                           src={item.videoUrl}
                           alt={item.alt}
-                          aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                          aspect={aspect}
                           onClick={() => openLightbox(flatIdx)}
                         />
                       );
                     }
                     return (
                       <GalleryCard
-                        key={item.asset._ref ?? imgIdx}
+                        key={item.asset?._ref ?? slotIdx}
                         src={urlFor(item)
                           .width(1200)
                           .quality(85)
                           .auto("format")
                           .url()}
                         alt={item.alt}
-                        sizes="(min-width: 640px) 50vw, 100vw"
-                        aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                        sizes={sizes}
+                        aspect={aspect}
                         objectPosition={hotspotToPosition(item.hotspot)}
                         onClick={() => openLightbox(flatIdx)}
                       />
                     );
                   })}
-                </div>
-              );
-            },
-          )}
+              </div>
+            );
+          })}
         </section>
       )}
 

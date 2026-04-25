@@ -111,7 +111,7 @@ export default async function ProjectPage({
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
-      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} sitePlan={project.sitePlan} drawing={project.drawing} gallery={project.gallery} slug={project.slug}>
+      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug}>
         {/* Description + Credits */}
         <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16 lg:py-16">
           {/* Description */}

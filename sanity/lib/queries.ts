@@ -25,11 +25,6 @@ export const allProjectsQuery = defineQuery(`
       ...,
       "alt": coalesce(alt, "")
     },
-    "tags": tags[]->{
-      _id,
-      label,
-      "slug": slug.current
-    }
   }
 `);
 
@@ -61,29 +56,18 @@ export const projectBySlugQuery = defineQuery(`
       "url": asset->url,
       "alt": coalesce(alt, "")
     },
-    "sitePlan": sitePlan {
-      image { ..., "alt": coalesce(alt, "") },
-      "videoUrl": video.asset->url,
-      "alt": coalesce(alt, "")
-    },
-    "drawing": drawing {
-      image { ..., "alt": coalesce(alt, "") },
-      "videoUrl": video.asset->url,
-      "alt": coalesce(alt, "")
-    },
-    gallery[] {
-      ...,
-      "alt": coalesce(alt, ""),
-      _type == "galleryVideo" => {
-        "videoUrl": video.asset->url
+    galleryRows[] {
+      _key,
+      preset,
+      media[] {
+        ...,
+        "alt": coalesce(alt, ""),
+        _type == "galleryVideo" => {
+          "videoUrl": video.asset->url
+        }
       }
     },
     credits,
-    "tags": tags[]->{
-      _id,
-      label,
-      "slug": slug.current
-    }
   }
 `);
 
@@ -111,42 +95,23 @@ export const allProjectsDetailQuery = defineQuery(`
       "url": asset->url,
       "alt": coalesce(alt, "")
     },
-    "sitePlan": sitePlan {
-      image { ..., "alt": coalesce(alt, "") },
-      "videoUrl": video.asset->url,
-      "alt": coalesce(alt, "")
-    },
-    "drawing": drawing {
-      image { ..., "alt": coalesce(alt, "") },
-      "videoUrl": video.asset->url,
-      "alt": coalesce(alt, "")
-    },
-    gallery[] {
-      ...,
-      "alt": coalesce(alt, ""),
-      _type == "galleryVideo" => {
-        "videoUrl": video.asset->url
+    galleryRows[] {
+      _key,
+      preset,
+      media[] {
+        ...,
+        "alt": coalesce(alt, ""),
+        _type == "galleryVideo" => {
+          "videoUrl": video.asset->url
+        }
       }
     },
     credits,
-    "tags": tags[]->{
-      _id,
-      label,
-      "slug": slug.current
-    }
   }
 `);
 
 export const allProjectSlugsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)].slug.current
-`);
-
-export const allTagsQuery = defineQuery(`
-  *[_type == "tag"] | order(coalesce(order, 9999) asc, label asc) {
-    _id,
-    label,
-    "slug": slug.current
-  }
 `);
 
 export const aboutPageQuery = defineQuery(`

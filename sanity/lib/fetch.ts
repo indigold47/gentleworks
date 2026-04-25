@@ -8,7 +8,6 @@ import {
   allProjectsQuery,
   allProjectsDetailQuery,
   allProjectSlugsQuery,
-  allTagsQuery,
   allTeamMembersQuery,
   contactPageQuery,
   projectBySlugQuery,
@@ -48,7 +47,7 @@ async function sanityFetch<T, Q extends string>({
 // Shared tags — the webhook invalidates these to refresh cached pages.
 export const PROJECTS_TAG = "projects";
 export const FILTERS_TAG = "filters";
-export const TAGS_TAG = "tags";
+
 export const TEAM_TAG = "team";
 export const THEMES_TAG = "themes";
 export const ABOUT_TAG = "about";
@@ -96,13 +95,6 @@ export async function getAllFilterCategories() {
   });
 }
 
-export async function getAllTags() {
-  return sanityFetch<TagItem[], typeof allTagsQuery>({
-    query: allTagsQuery,
-    tags: [TAGS_TAG],
-  });
-}
-
 export async function getAllTeamMembers() {
   return sanityFetch<TeamMemberItem[], typeof allTeamMembersQuery>({
     query: allTeamMembersQuery,
@@ -133,12 +125,6 @@ export type FilterCategoryItem = {
     | null;
 };
 
-export type TagItem = {
-  _id: string;
-  label: string;
-  slug: string;
-};
-
 export type SanityImage = {
   _type: "image";
   asset: { _ref: string; _type: "reference" };
@@ -162,10 +148,7 @@ export type ProjectListItem = {
   projectTag: string[] | null;
   qualities: string[] | null;
   heroImage: SanityImage;
-  tags: TagItem[];
 };
-
-export type RowHeight = "compact" | "standard" | "cinematic";
 
 export type SanityVideo = {
   url: string;
@@ -174,7 +157,6 @@ export type SanityVideo = {
 
 export type GalleryImage = SanityImage & {
   caption?: string;
-  rowHeight?: RowHeight;
 };
 
 export type GalleryVideo = {
@@ -183,10 +165,15 @@ export type GalleryVideo = {
   videoUrl: string;
   alt: string;
   caption?: string;
-  rowHeight?: RowHeight;
 };
 
 export type GalleryItem = GalleryImage | GalleryVideo;
+
+export type GalleryRow = {
+  _key: string;
+  preset: string;
+  media: GalleryItem[] | null;
+};
 
 export type PortableTextBlock = {
   _type: "block";
@@ -202,19 +189,11 @@ export type ProjectTheme = {
   secondaryColor: string;
 };
 
-export type ProjectMediaField = {
-  image: SanityImage | null;
-  videoUrl: string | null;
-  alt: string;
-};
-
 export type ProjectDetail = ProjectListItem & {
   client: string | null;
   description: PortableTextBlock[];
   heroVideo: SanityVideo | null;
-  sitePlan: ProjectMediaField | null;
-  drawing: ProjectMediaField | null;
-  gallery: GalleryItem[] | null;
+  galleryRows: GalleryRow[] | null;
   credits: {
     architectDesigner?: string;
     client?: string;

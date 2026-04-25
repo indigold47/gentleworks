@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { PortableText } from "next-sanity";
 
-import type { ProjectListItem, ProjectDetail, TagItem } from "@/sanity/lib/fetch";
+import type { ProjectDetail } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 
 type ProjectSectionProps = {
@@ -50,20 +50,6 @@ export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectio
         {project.description && (
           <div className="mt-8 max-w-lg space-y-4 text-base leading-relaxed">
             <PortableText value={project.description} />
-          </div>
-        )}
-
-        {/* Tags */}
-        {project.tags.length > 0 && (
-          <div className="mt-8 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag._id}
-                className="rounded-full border border-rule px-3 py-1 text-xs uppercase tracking-[0.1em] text-muted"
-              >
-                {tag.label}
-              </span>
-            ))}
           </div>
         )}
 

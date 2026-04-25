@@ -3,6 +3,9 @@ import {
   FilterCategoryStringInput,
   FilterCategoryArrayInput,
 } from "../components/FilterCategoryInput";
+import { GalleryRowPreview } from "../components/GalleryRowPreview";
+import { PRESET_LIST, GALLERY_PRESETS } from "@/lib/gallery-presets";
+import type { GalleryPresetId } from "@/lib/gallery-presets";
 
 /**
  * Project — the single editorial entity powering the portfolio.
@@ -85,14 +88,7 @@ export const project = defineType({
       options: { projectField: "qualities" } as never,
       components: { input: FilterCategoryArrayInput },
     }),
-    defineField({
-      name: "tags",
-      title: "Tags",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "tag" }] }],
-      description: "Legacy tags — used for any additional categorisation.",
-      validation: (rule) => rule.unique(),
-    }),
+
     defineField({
       name: "heroImage",
       title: "Hero image",
@@ -128,144 +124,111 @@ export const project = defineType({
       ],
     }),
     defineField({
-      name: "sitePlan",
-      title: "Site Plan",
-      type: "object",
-      description:
-        "Site plan image or video — always shown as the first gallery row (left side). Supports image or mp4/webm video.",
-      fields: [
-        defineField({
-          name: "image",
-          title: "Image",
-          type: "image",
-          options: { hotspot: true },
-          description: "Upload an image, or leave empty and provide a video instead.",
-        }),
-        defineField({
-          name: "video",
-          title: "Video",
-          type: "file",
-          options: { accept: "video/mp4,video/webm" },
-          description: "Upload a video (mp4/webm). Takes priority over the image if both are provided.",
-        }),
-        defineField({
-          name: "alt",
-          title: "Alt text",
-          type: "string",
-          validation: (rule) => rule.required(),
-        }),
-      ],
-    }),
-    defineField({
-      name: "drawing",
-      title: "Drawing",
-      type: "object",
-      description:
-        "Architectural drawing image or video — always shown as the first gallery row (right side). Supports image or mp4/webm video.",
-      fields: [
-        defineField({
-          name: "image",
-          title: "Image",
-          type: "image",
-          options: { hotspot: true },
-          description: "Upload an image, or leave empty and provide a video instead.",
-        }),
-        defineField({
-          name: "video",
-          title: "Video",
-          type: "file",
-          options: { accept: "video/mp4,video/webm" },
-          description: "Upload a video (mp4/webm). Takes priority over the image if both are provided.",
-        }),
-        defineField({
-          name: "alt",
-          title: "Alt text",
-          type: "string",
-          validation: (rule) => rule.required(),
-        }),
-      ],
-    }),
-    defineField({
-      name: "gallery",
-      title: "Gallery",
+      name: "galleryRows",
+      title: "Gallery Rows",
       type: "array",
+      description:
+        "Build the gallery row by row. Pick a layout preset, then fill in the images/videos for that row.",
       of: [
         {
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: "alt",
-              title: "Alt text",
-              type: "string",
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "caption",
-              title: "Caption",
-              type: "string",
-            }),
-            defineField({
-              name: "rowHeight",
-              title: "Row Height",
-              type: "string",
-              description:
-                "Controls the height of this image's row on desktop. Compact for detail shots, Standard for most views, Cinematic for dramatic interiors.",
-              options: {
-                list: [
-                  { title: "Compact", value: "compact" },
-                  { title: "Standard", value: "standard" },
-                  { title: "Cinematic", value: "cinematic" },
-                ],
-                layout: "radio",
-              },
-              initialValue: "standard",
-            }),
-          ],
-        },
-        {
           type: "object",
-          name: "galleryVideo",
-          title: "Video",
+          name: "galleryRow",
+          title: "Gallery Row",
           fields: [
             defineField({
-              name: "video",
-              title: "Video file",
-              type: "file",
-              options: { accept: "video/mp4,video/webm" },
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "alt",
-              title: "Alt text",
+              name: "preset",
+              title: "Layout Preset",
               type: "string",
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "caption",
-              title: "Caption",
-              type: "string",
-            }),
-            defineField({
-              name: "rowHeight",
-              title: "Row Height",
-              type: "string",
-              description:
-                "Controls the height of this video's row on desktop.",
+              description: "Choose how images are arranged in this row.",
               options: {
-                list: [
-                  { title: "Compact", value: "compact" },
-                  { title: "Standard", value: "standard" },
-                  { title: "Cinematic", value: "cinematic" },
-                ],
-                layout: "radio",
+                list: PRESET_LIST.map(({ value, title }) => ({
+                  title,
+                  value,
+                })),
               },
-              initialValue: "standard",
+              validation: (rule) => rule.required(),
+              initialValue: "two-landscape",
+            }),
+            defineField({
+              name: "media",
+              title: "Media",
+              type: "array",
+              description:
+                "Add images or videos for this row. The number of items must match the selected preset.",
+              of: [
+                {
+                  type: "image",
+                  options: { hotspot: true },
+                  fields: [
+                    defineField({
+                      name: "alt",
+                      title: "Alt text",
+                      type: "string",
+                      validation: (rule) => rule.required(),
+                    }),
+                    defineField({
+                      name: "caption",
+                      title: "Caption",
+                      type: "string",
+                    }),
+                  ],
+                },
+                {
+                  type: "object",
+                  name: "galleryVideo",
+                  title: "Video",
+                  fields: [
+                    defineField({
+                      name: "video",
+                      title: "Video file",
+                      type: "file",
+                      options: { accept: "video/mp4,video/webm" },
+                      validation: (rule) => rule.required(),
+                    }),
+                    defineField({
+                      name: "alt",
+                      title: "Alt text",
+                      type: "string",
+                      validation: (rule) => rule.required(),
+                    }),
+                    defineField({
+                      name: "caption",
+                      title: "Caption",
+                      type: "string",
+                    }),
+                  ],
+                  preview: {
+                    select: { title: "alt" },
+                    prepare: ({ title }) => ({
+                      title: title || "Video",
+                      subtitle: "Video",
+                    }),
+                  },
+                },
+              ],
+              validation: (rule) =>
+                rule.custom((media, context) => {
+                  const parent = context.parent as
+                    | { preset?: string }
+                    | undefined;
+                  if (!parent?.preset) return true;
+                  const preset =
+                    GALLERY_PRESETS[parent.preset as GalleryPresetId];
+                  if (!preset) return true;
+                  const count = Array.isArray(media) ? media.length : 0;
+                  if (count !== preset.slots) {
+                    return `This preset requires exactly ${preset.slots} media item${preset.slots === 1 ? "" : "s"}, but ${count} provided.`;
+                  }
+                  return true;
+                }),
             }),
           ],
           preview: {
-            select: { title: "alt" },
-            prepare: ({ title }) => ({ title: title || "Video", subtitle: "Video" }),
+            select: { preset: "preset", media: "media" },
+          },
+          components: {
+            preview: (props: Record<string, unknown>) =>
+              GalleryRowPreview(props as { preset?: string; media?: unknown[] }),
           },
         },
       ],
