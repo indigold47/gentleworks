@@ -120,7 +120,7 @@ export function TeamView({ members }: TeamViewProps) {
       </div>
 
       {/* Custom scrollbar divider */}
-      <div className="hidden lg:flex flex-col items-center bg-cream py-12">
+      <div className="hidden lg:flex flex-col items-center bg-cream py-12 sticky top-0 h-svh">
         <div className="w-[14px] grow bg-sage-deep/30 rounded-full relative overflow-hidden">
           {(() => {
             const count = filtered.length;
@@ -141,15 +141,15 @@ export function TeamView({ members }: TeamViewProps) {
         </div>
       </div>
 
-      {/* Bottom/Right panel: team list — scrolls independently */}
-      <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:py-10 lg:overflow-y-auto bg-cream">
-        {/* Header */}
+      {/* Bottom/Right panel: team list — fixed height on desktop, inner scroll */}
+      <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:pt-24 lg:pb-12 bg-cream lg:sticky lg:top-0 lg:h-svh lg:overflow-hidden">
+        {/* Header — pinned, doesn't scroll */}
         <div className="mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex items-center gap-0 border-b border-rule pb-1 mb-2">
+        {/* Filter tabs — pinned, doesn't scroll */}
+        <div className="flex items-center gap-0 border-b border-rule pb-1 mb-0">
           <span className="text-sm text-muted mr-auto">People</span>
           {(["all", "present", "past"] as const).map((f, i) => (
             <button
@@ -168,6 +168,8 @@ export function TeamView({ members }: TeamViewProps) {
           ))}
         </div>
 
+        {/* Scrollable team list — contained within the panel */}
+        <div className="lg:overflow-y-auto lg:flex-1 lg:-mx-12 lg:px-12 mt-2">
         {/* Accordion list */}
         <div className="flex flex-col">
           {filtered.map((member) => {
@@ -187,7 +189,7 @@ export function TeamView({ members }: TeamViewProps) {
                   className="flex w-full items-center justify-between py-4 text-left transition-colors hover:text-sage"
                   aria-expanded={isExpanded}
                 >
-                  <span className="display text-xl lg:text-2xl">
+                  <span className="display text-xl lg:text-[22px]">
                     {member.displayName}
                   </span>
                   {isExpanded ? (
@@ -222,6 +224,7 @@ export function TeamView({ members }: TeamViewProps) {
               </div>
             );
           })}
+        </div>
         </div>
 
       </div>

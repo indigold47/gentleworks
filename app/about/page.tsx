@@ -61,9 +61,9 @@ export default async function AboutPage() {
           </div>
 
           {/* Right: about text */}
-          <div className="relative flex flex-col px-8 py-12 sm:px-12 lg:px-16 lg:py-16">
+          <div className="relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
 
-            <div className="max-w-lg display text-[clamp(1.25rem,2.2vw,1.75rem)] leading-[1.45] text-ink/80">
+            <div className="max-w-lg display text-[22px] text-ink/80" style={{ lineHeight: 1.2 }}>
               <h1 className="sr-only">About Gentle Works</h1>
 
               {data?.body ? (

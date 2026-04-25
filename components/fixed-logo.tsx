@@ -12,13 +12,13 @@ const LOGO_PATH =
 
 function FixedLogoInner() {
   const pathname = usePathname();
-  if (!LOGO_PAGES.includes(pathname)) return null;
+  const visible = LOGO_PAGES.includes(pathname);
 
   return (
     <Link
       href="/"
       aria-label="Gentle Works home"
-      className="fixed z-50 top-12 right-12 h-[67px] w-[67px] max-lg:top-auto max-lg:right-auto max-lg:bottom-6 max-lg:left-6 max-lg:h-10 max-lg:w-10 transition-transform duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg]"
+      className={`fixed z-50 top-12 right-12 h-[67px] w-[67px] max-lg:top-auto max-lg:right-auto max-lg:bottom-6 max-lg:left-6 max-lg:h-10 max-lg:w-10 transition-all duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg] ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
