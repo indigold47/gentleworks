@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Libre_Baskerville } from "next/font/google";
+import { FixedLogo } from "@/components/fixed-logo";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,10 +9,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+const libreBaskerville = Libre_Baskerville({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -76,7 +78,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${inter.variable} ${libreBaskerville.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <a
@@ -85,6 +87,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <FixedLogo />
         {children}
         <script
           type="application/ld+json"

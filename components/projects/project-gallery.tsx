@@ -68,20 +68,38 @@ function Lightbox({
   onClose: () => void;
 }) {
   const [index, setIndex] = useState(initialIndex);
+  const [closing, setClosing] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const pendingIndex = useRef<number | null>(null);
+
+  const handleClose = useCallback(() => {
+    setClosing(true);
+    setTimeout(onClose, 800);
+  }, [onClose]);
+
+  const navigateTo = useCallback((nextIndex: number) => {
+    if (transitioning) return;
+    pendingIndex.current = nextIndex;
+    setTransitioning(true);
+    setTimeout(() => {
+      setIndex(pendingIndex.current!);
+      setTransitioning(false);
+    }, 300);
+  }, [transitioning]);
 
   const prev = useCallback(() => {
-    setIndex((i) => (i === 0 ? media.length - 1 : i - 1));
-  }, [media.length]);
+    navigateTo(index === 0 ? media.length - 1 : index - 1);
+  }, [index, media.length, navigateTo]);
 
   const next = useCallback(() => {
-    setIndex((i) => (i === media.length - 1 ? 0 : i + 1));
-  }, [media.length]);
+    navigateTo(index === media.length - 1 ? 0 : index + 1);
+  }, [index, media.length, navigateTo]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
       if (e.key === "ArrowLeft") prev();
       if (e.key === "ArrowRight") next();
 
@@ -104,7 +122,7 @@ function Lightbox({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose, prev, next]);
+  }, [handleClose, prev, next]);
 
   // Focus close button on mount
   useEffect(() => {
@@ -124,7 +142,8 @@ function Lightbox({
   return (
     <div
       ref={dialogRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95"
+      className={`fixed inset-0 z-50 flex items-center justify-center ${closing ? "animate-[fadeOut_800ms_var(--ease)_both]" : "animate-[fadeIn_600ms_var(--ease)_both]"}`}
+      style={{ backgroundColor: "color-mix(in srgb, var(--theme-main) 95%, transparent 5%)" }}
       role="dialog"
       aria-modal="true"
       aria-label="Image gallery"
@@ -133,7 +152,7 @@ function Lightbox({
       <button
         ref={closeRef}
         type="button"
-        onClick={onClose}
+        onClick={handleClose}
         className="absolute top-5 right-5 z-10 flex h-10 w-10 items-center justify-center text-cream/80 transition-colors hover:text-cream"
         aria-label="Close gallery"
       >
@@ -158,7 +177,7 @@ function Lightbox({
       )}
 
       {/* Media */}
-      <div className="relative h-[80vh] w-[90vw] max-w-6xl">
+      <div className={`relative h-[80vh] w-[90vw] max-w-6xl transition-opacity duration-300 ${closing ? "animate-[scaleOut_800ms_var(--ease)_both]" : "animate-[scaleIn_700ms_var(--ease)_100ms_both]"} ${transitioning ? "opacity-0" : "opacity-100"}`} style={{ transitionTimingFunction: "var(--ease)" }}>
         {current.type === "video" ? (
           <video
             key={current.src}
@@ -172,6 +191,7 @@ function Lightbox({
           />
         ) : (
           <Image
+            key={current.src}
             src={current.src}
             alt={current.alt}
             fill
@@ -195,7 +215,7 @@ function Lightbox({
       )}
 
       {/* Backdrop click */}
-      <div className="absolute inset-0 -z-10" onClick={onClose} aria-hidden />
+      <div className="absolute inset-0 -z-10" onClick={handleClose} aria-hidden />
     </div>
   );
 }
@@ -211,6 +231,7 @@ function GalleryCard({
   priority,
   aspect,
   objectPosition,
+  objectFit = "cover",
   onClick,
 }: {
   src: string;
@@ -219,13 +240,14 @@ function GalleryCard({
   priority?: boolean;
   aspect: string;
   objectPosition?: string;
+  objectFit?: "cover" | "contain";
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative ${aspect} overflow-hidden cursor-pointer w-full`}
+      className={`group relative ${aspect} overflow-hidden cursor-pointer w-full ${objectFit === "contain" ? "bg-white/60" : ""}`}
       aria-label={`View ${alt} fullscreen`}
     >
       <Image
@@ -233,16 +255,16 @@ function GalleryCard({
         alt={alt}
         fill
         sizes={sizes}
-        className="object-cover"
+        className={objectFit === "contain" ? "object-contain p-2" : "object-cover"}
         style={objectPosition ? { objectPosition } : undefined}
         priority={priority}
       />
-      {/* Plus icon — visible on hover/focus */}
+      {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 bg-ink/30 backdrop-blur-sm"
+        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 bg-ink/30 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
         aria-hidden="true"
       >
-        <Plus size={20} strokeWidth={1.5} />
+        <Plus size={20} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );
@@ -279,12 +301,12 @@ function VideoCard({
         playsInline
         aria-hidden="true"
       />
-      {/* Plus icon — visible on hover/focus */}
+      {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 bg-ink/30 backdrop-blur-sm"
+        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 bg-ink/30 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
         aria-hidden="true"
       >
-        <Plus size={20} strokeWidth={1.5} />
+        <Plus size={20} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );
@@ -301,7 +323,7 @@ function mediaFieldToLightbox(field: ProjectMediaField): LightboxMedia {
   }
   return {
     type: "image",
-    src: urlFor(field.image!).width(2400).quality(90).auto("format").url(),
+    src: urlFor(field.image!).width(3600).quality(95).auto("format").url(),
     alt: field.alt,
   };
 }
@@ -388,28 +410,28 @@ export function ProjectGallery({
       {/* Site Plan + Drawing — fixed first row */}
       {(sitePlan || drawing) && (
         <section className="px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:h-[28vw]">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {/* Left: Site Plan */}
             {sitePlan ? (
               sitePlan.videoUrl ? (
                 <VideoCard
                   src={sitePlan.videoUrl}
                   alt={sitePlan.alt}
-                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  aspect="aspect-[4/3]"
                   onClick={() => openLightbox(sitePlanLightboxIdx)}
                 />
               ) : sitePlan.image ? (
                 <GalleryCard
-                  src={urlFor(sitePlan.image).width(1200).quality(85).auto("format").url()}
+                  src={urlFor(sitePlan.image).width(2400).quality(95).auto("format").url()}
                   alt={sitePlan.alt}
                   sizes="(min-width: 640px) 50vw, 100vw"
-                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  aspect="aspect-[4/3]"
                   objectPosition={hotspotToPosition(sitePlan.image.hotspot)}
                   onClick={() => openLightbox(sitePlanLightboxIdx)}
                 />
               ) : null
             ) : (
-              <div className="aspect-[4/3] sm:aspect-auto sm:h-full" />
+              <div className="aspect-[4/3]" />
             )}
             {/* Right: Drawing */}
             {drawing ? (
@@ -417,21 +439,21 @@ export function ProjectGallery({
                 <VideoCard
                   src={drawing.videoUrl}
                   alt={drawing.alt}
-                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  aspect="aspect-[4/3]"
                   onClick={() => openLightbox(drawingLightboxIdx)}
                 />
               ) : drawing.image ? (
                 <GalleryCard
-                  src={urlFor(drawing.image).width(1200).quality(85).auto("format").url()}
+                  src={urlFor(drawing.image).width(2400).quality(95).auto("format").url()}
                   alt={drawing.alt}
                   sizes="(min-width: 640px) 50vw, 100vw"
-                  aspect="aspect-[4/3] sm:aspect-auto sm:h-full"
+                  aspect="aspect-[4/3]"
                   objectPosition={hotspotToPosition(drawing.image.hotspot)}
                   onClick={() => openLightbox(drawingLightboxIdx)}
                 />
               ) : null
             ) : (
-              <div className="aspect-[4/3] sm:aspect-auto sm:h-full" />
+              <div className="aspect-[4/3]" />
             )}
           </div>
         </section>
@@ -439,7 +461,7 @@ export function ProjectGallery({
 
       {/* Gallery grid */}
       {gallery && gallery.length > 0 && (
-        <section className="flex flex-col gap-6 px-6 pb-12 sm:px-10 lg:px-16 lg:pb-16">
+        <section className="flex flex-col gap-6 px-6 pt-6 pb-12 sm:px-10 lg:px-16 lg:pb-16">
           {Array.from(
             { length: Math.ceil(gallery.length / 2) },
             (_, rowIdx) => {

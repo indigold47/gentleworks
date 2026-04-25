@@ -29,10 +29,12 @@ export default async function ProjectsPage() {
   return (
     <ViewTransition
       enter={{
+        "page-nav": "page-enter",
         "nav-back": "slide-from-left",
         default: "none",
       }}
       exit={{
+        "page-nav": "page-exit",
         "nav-forward": "fade-out-down",
         default: "none",
       }}

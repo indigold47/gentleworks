@@ -149,6 +149,40 @@ export const allTagsQuery = defineQuery(`
   }
 `);
 
+export const aboutPageQuery = defineQuery(`
+  *[_type == "aboutPage"][0] {
+    heroImage {
+      ...,
+      "alt": coalesce(alt, "")
+    },
+    body
+  }
+`);
+
+export const contactPageQuery = defineQuery(`
+  *[_type == "contactPage"][0] {
+    heroImage {
+      ...,
+      "alt": coalesce(alt, "")
+    },
+    addressLine1,
+    addressLine2,
+    email,
+    introText
+  }
+`);
+
+export const siteSettingsQuery = defineQuery(`
+  *[_type == "siteSettings"][0] {
+    copyrightYear,
+    addressLine1,
+    addressLine2,
+    phone,
+    email,
+    mapsUrl
+  }
+`);
+
 export const allTeamMembersQuery = defineQuery(`
   *[_type == "teamMember"] | order(coalesce(order, 9999) asc, displayName asc) {
     _id,

@@ -19,7 +19,7 @@ export function Logo({
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 360 360"
       aria-hidden="true"
-      className={href ? undefined : className}
+      className={href ? "h-full w-full" : className}
       {...props}
     >
       <path
@@ -31,7 +31,7 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className={className} aria-label="Gentle Works home">
+      <Link href={href} className={`block ${className} transition-transform duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg]`} aria-label="Gentle Works home">
         {svg}
       </Link>
     );

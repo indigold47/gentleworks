@@ -48,13 +48,13 @@
 
   /* Fonts (wired from next/font in app/layout.tsx) */
   --font-sans: var(--font-inter);
-  --font-display: var(--font-instrument-serif);
+  /* --font-display is set directly by next/font via the variable option */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -85,6 +85,26 @@ h1.display {
 @keyframes hero-crossfade {
   0% { filter: blur(2px); }
   100% { filter: blur(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scaleOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 /* Project detail enters: slides up and fades in */
@@ -118,6 +138,28 @@ h1.display {
 }
 ::view-transition-new(project-header) {
   animation: none;
+}
+
+/* ---- Page navigation (between About / Projects / Team / Contact) ---- */
+
+/* Old page dissolves out */
+::view-transition-old(.page-exit) {
+  animation: 500ms cubic-bezier(0.4, 0, 0.2, 1) both vt-dissolve-out;
+}
+
+/* New page dissolves in — overlaps with exit for a smooth crossfade */
+::view-transition-new(.page-enter) {
+  animation: 600ms cubic-bezier(0.0, 0, 0.2, 1) both vt-dissolve-in;
+}
+
+@keyframes vt-dissolve-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes vt-dissolve-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Keyframes */

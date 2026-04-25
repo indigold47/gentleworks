@@ -11,6 +11,7 @@ import { visionTool } from "@sanity/vision";
 import { colorInput } from "@sanity/color-input";
 
 import { apiVersion, dataset, projectId } from "./sanity/env";
+import { structure } from "./sanity/lib/deskStructure";
 import { schemaTypes } from "./sanity/schemaTypes";
 
 export default defineConfig({
@@ -20,12 +21,27 @@ export default defineConfig({
   projectId,
   dataset,
   plugins: [
-    structureTool(),
+    structureTool({ structure }),
     colorInput(),
     // Vision is the GROQ query playground — invaluable during schema work.
     visionTool({ defaultApiVersion: apiVersion }),
   ],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    // Hide singletons from the "Create new document" menu — they're
+    // accessible only via their dedicated desk items.
+    newDocumentOptions: (prev, { creationContext }) => {
+      if (creationContext.type === "global") {
+        return prev.filter(
+          (item) =>
+            !["aboutPage", "contactPage", "siteSettings"].includes(
+              item.templateId
+            )
+        );
+      }
+      return prev;
+    },
   },
 });

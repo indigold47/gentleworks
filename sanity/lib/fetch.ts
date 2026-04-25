@@ -3,12 +3,15 @@ import type { QueryParams } from "next-sanity";
 
 import { client } from "./client";
 import {
+  aboutPageQuery,
   allProjectsQuery,
   allProjectsDetailQuery,
   allProjectSlugsQuery,
   allTagsQuery,
   allTeamMembersQuery,
+  contactPageQuery,
   projectBySlugQuery,
+  siteSettingsQuery,
 } from "./queries";
 
 /**
@@ -46,6 +49,9 @@ export const PROJECTS_TAG = "projects";
 export const TAGS_TAG = "tags";
 export const TEAM_TAG = "team";
 export const THEMES_TAG = "themes";
+export const ABOUT_TAG = "about";
+export const CONTACT_TAG = "contact";
+export const SETTINGS_TAG = "settings";
 
 export function projectTag(slug: string) {
   return `project:${slug}`;
@@ -92,6 +98,13 @@ export async function getAllTeamMembers() {
   return sanityFetch<TeamMemberItem[], typeof allTeamMembersQuery>({
     query: allTeamMembersQuery,
     tags: [TEAM_TAG],
+  });
+}
+
+export async function getSiteSettings() {
+  return sanityFetch<SiteSettingsData | null, typeof siteSettingsQuery>({
+    query: siteSettingsQuery,
+    tags: [SETTINGS_TAG],
   });
 }
 
@@ -155,7 +168,7 @@ export type GalleryVideo = {
 
 export type GalleryItem = GalleryImage | GalleryVideo;
 
-type PortableTextBlock = {
+export type PortableTextBlock = {
   _type: "block";
   _key: string;
   children: { _type: string; text?: string; [key: string]: unknown }[];
@@ -198,6 +211,42 @@ export type ProjectDetail = ProjectListItem & {
     cinematographer?: string;
   } | null;
   theme: ProjectTheme | null;
+};
+
+export async function getAboutPage() {
+  return sanityFetch<AboutPageData | null, typeof aboutPageQuery>({
+    query: aboutPageQuery,
+    tags: [ABOUT_TAG],
+  });
+}
+
+export async function getContactPage() {
+  return sanityFetch<ContactPageData | null, typeof contactPageQuery>({
+    query: contactPageQuery,
+    tags: [CONTACT_TAG],
+  });
+}
+
+export type AboutPageData = {
+  heroImage: SanityImage;
+  body: PortableTextBlock[];
+};
+
+export type SiteSettingsData = {
+  copyrightYear: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  phone: string | null;
+  email: string | null;
+  mapsUrl: string | null;
+};
+
+export type ContactPageData = {
+  heroImage: SanityImage | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  email: string | null;
+  introText: string | null;
 };
 
 export type TeamMemberItem = {

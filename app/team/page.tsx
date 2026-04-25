@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 
 import { TeamView } from "@/components/team/team-view";
 import { getAllTeamMembers } from "@/sanity/lib/fetch";
@@ -14,8 +15,14 @@ export default async function TeamPage() {
   const members = await getAllTeamMembers();
 
   return (
-    <main id="main-content">
-      <TeamView members={members} />
-    </main>
+    <ViewTransition
+      enter={{ "page-nav": "page-enter", default: "none" }}
+      exit={{ "page-nav": "page-exit", default: "none" }}
+      default="none"
+    >
+      <main id="main-content">
+        <TeamView members={members} />
+      </main>
+    </ViewTransition>
   );
 }

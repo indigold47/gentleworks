@@ -6,7 +6,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { PortableText } from "next-sanity";
 
 import { SiteNav } from "@/components/projects/projects-nav";
-import { Logo } from "@/components/logo";
 import type { TeamMemberItem } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -55,7 +54,7 @@ export function TeamView({ members }: TeamViewProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[1fr_6px_1fr]">
+    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_14px_1fr]">
       {/* Top/Left panel: nav + selected member photo */}
       <div className="relative sticky top-0 z-10 h-[33svh] lg:h-svh bg-cream lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: side-by-side grid — nav left, photo right */}
@@ -122,7 +121,7 @@ export function TeamView({ members }: TeamViewProps) {
 
       {/* Custom scrollbar divider */}
       <div className="hidden lg:flex flex-col items-center bg-cream py-12">
-        <div className="w-[6px] grow bg-sage-deep/30 rounded-full relative overflow-hidden">
+        <div className="w-[14px] grow bg-sage-deep/30 rounded-full relative overflow-hidden">
           {(() => {
             const count = filtered.length;
             const thumbPct = Math.max(8, 100 / count);
@@ -143,11 +142,10 @@ export function TeamView({ members }: TeamViewProps) {
       </div>
 
       {/* Bottom/Right panel: team list — scrolls independently */}
-      <div className="flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:py-10 lg:overflow-y-auto bg-cream">
+      <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:py-10 lg:overflow-y-auto bg-cream">
         {/* Header */}
-        <div className="flex items-start justify-between mb-1">
+        <div className="mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
-          <Logo className="hidden lg:block h-[78px] w-[78px] shrink-0" />
         </div>
 
         {/* Filter tabs */}
@@ -226,8 +224,6 @@ export function TeamView({ members }: TeamViewProps) {
           })}
         </div>
 
-        {/* Logo — bottom-left on mobile */}
-        <Logo className="lg:hidden h-10 w-10 mt-6" />
       </div>
     </div>
   );

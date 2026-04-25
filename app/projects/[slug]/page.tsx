@@ -9,6 +9,7 @@ import { Logo } from "@/components/logo";
 import {
   getProjectBySlug,
   getAllProjectSlugs,
+  getSiteSettings,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { ProjectGallery } from "@/components/projects/project-gallery";
@@ -63,8 +64,24 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const [project, settings] = await Promise.all([
+    getProjectBySlug(slug),
+    getSiteSettings(),
+  ]);
   if (!project) notFound();
+
+  const footerDefaults = {
+    copyrightYear: "2026",
+    addressLine1: "900 DeKalb Ave, Suite E",
+    addressLine2: "Atlanta, GA 30307",
+    email: "info@gentle.works",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=900+DeKalb+Ave+Suite+E+Atlanta+GA+30307",
+  };
+  const footerYear = settings?.copyrightYear ?? footerDefaults.copyrightYear;
+  const footerAddr1 = settings?.addressLine1 ?? footerDefaults.addressLine1;
+  const footerAddr2 = settings?.addressLine2 ?? footerDefaults.addressLine2;
+  const footerEmail = settings?.email ?? footerDefaults.email;
+  const footerMapsUrl = settings?.mapsUrl ?? footerDefaults.mapsUrl;
 
   const mainColor = project.theme?.mainColor ?? defaultTheme.mainColor;
   const secondaryColor = project.theme?.secondaryColor ?? defaultTheme.secondaryColor;
@@ -162,21 +179,24 @@ export default async function ProjectPage({
             <div>
               <p className="text-sm">Gentle Works</p>
               <p className="text-xs opacity-60">
-                &copy; 2026
+                &copy; {footerYear}
               </p>
             </div>
           </div>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=900+DeKalb+Ave+Suite+E+Atlanta+GA+30307"
+            href={footerMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-center hover:opacity-70 transition-opacity"
           >
-            <p>900 DeKalb Ave, Suite E</p>
-            <p>Atlanta, GA 30307</p>
+            <p>{footerAddr1}</p>
+            <p>{footerAddr2}</p>
           </a>
           <div className="text-sm text-right">
-            <a href="mailto:info@gentle.works" className="block hover:opacity-70 transition-opacity">info@gentle.works</a>
+            {settings?.phone && (
+              <a href={`tel:${settings.phone}`} className="block hover:opacity-70 transition-opacity">{settings.phone}</a>
+            )}
+            <a href={`mailto:${footerEmail}`} className="block hover:opacity-70 transition-opacity">{footerEmail}</a>
           </div>
         </div>
       </footer>

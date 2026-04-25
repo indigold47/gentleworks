@@ -11,7 +11,6 @@ import type {
   TagItem,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
-import { Logo } from "@/components/logo";
 import { SiteNav } from "./projects-nav";
 
 /* ------------------------------------------------------------------ */
@@ -227,8 +226,9 @@ export function SplitScreen({ projects }: SplitScreenProps) {
   // Active filters from URL
   const activeFilters = parseFilters(searchParams);
 
-  // Hovered project index — default to first project
+  // Hovered project index — sticky: stays on last hovered project
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [stickyIdx, setStickyIdx] = useState<number | null>(null);
 
   // Wheel-activated project index
   const [wheelIdx, setWheelIdx] = useState(0);
@@ -306,10 +306,36 @@ export function SplitScreen({ projects }: SplitScreenProps) {
     row?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [wheelIdx]);
 
-  // The image to display: hovered project wins, then wheel-active, then first
+  // The image to display: hovered wins, then sticky (last hovered), then wheel, then first
   const safeWheelIdx = Math.min(wheelIdx, filteredProjects.length - 1);
-  const activeIdx = hoveredIdx ?? safeWheelIdx;
+  const activeIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
   const displayProject = filteredProjects[activeIdx] ?? filteredProjects[0];
+
+  // Crossfade: two always-mounted layers that alternate opacity
+  const [layerA, setLayerA] = useState(displayProject);
+  const [layerB, setLayerB] = useState<ProjectDetail | null>(null);
+  const activeLayerRef = useRef<"a" | "b">("a");
+  const [activeLayer, setActiveLayer] = useState<"a" | "b">("a");
+  const prevDisplayId = useRef(displayProject?._id);
+
+  // Only swap layers when the display project actually changes
+  const displayId = displayProject?._id;
+  useEffect(() => {
+    if (!displayId || displayId === prevDisplayId.current) return;
+    prevDisplayId.current = displayId;
+
+    const current = activeLayerRef.current;
+    if (current === "a") {
+      setLayerB(displayProject);
+      activeLayerRef.current = "b";
+      setActiveLayer("b");
+    } else {
+      setLayerA(displayProject);
+      activeLayerRef.current = "a";
+      setActiveLayer("a");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayId]);
 
   // Scrollbar thumb position: driven by active project index
   const thumbFraction =
@@ -569,32 +595,65 @@ export function SplitScreen({ projects }: SplitScreenProps) {
       )}
 
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
-      <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-2 ${isGrid ? "hidden lg:grid" : ""}`}>
+      <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr] ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
         <div className="relative h-[50svh] sticky top-0 z-10 overflow-hidden lg:h-svh">
-          {displayProject && (
-            <ViewTransition name={`project-hero-${displayProject.slug}`} share="hero-morph">
-              <div className="absolute inset-0">
+          {/* Layer A */}
+          {layerA && (
+            <div
+              className="absolute inset-0 transition-opacity duration-[1200ms]"
+              style={{
+                opacity: activeLayer === "a" ? 1 : 0,
+                transitionTimingFunction: "var(--ease)",
+                zIndex: activeLayer === "a" ? 2 : 1,
+              }}
+            >
+              <ViewTransition name={activeLayer === "a" ? `project-hero-${layerA.slug}` : undefined} share={activeLayer === "a" ? "hero-morph" : undefined}>
                 <Image
-                  src={urlFor(displayProject.heroImage)
+                  src={urlFor(layerA.heroImage)
                     .width(1600)
                     .quality(85)
                     .auto("format")
                     .url()}
-                  alt={displayProject.heroImage.alt}
+                  alt={layerA.heroImage.alt}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover transition-opacity duration-300"
+                  className="object-cover"
                   priority
                 />
-                {/* Top gradient scrim for nav text contrast — inside ViewTransition so it doesn't leak into the morph snapshot */}
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
-                />
-              </div>
-            </ViewTransition>
+              </ViewTransition>
+            </div>
           )}
+          {/* Layer B */}
+          {layerB && (
+            <div
+              className="absolute inset-0 transition-opacity duration-[1200ms]"
+              style={{
+                opacity: activeLayer === "b" ? 1 : 0,
+                transitionTimingFunction: "var(--ease)",
+                zIndex: activeLayer === "b" ? 2 : 1,
+              }}
+            >
+              <ViewTransition name={activeLayer === "b" ? `project-hero-${layerB.slug}` : undefined} share={activeLayer === "b" ? "hero-morph" : undefined}>
+                <Image
+                  src={urlFor(layerB.heroImage)
+                    .width(1600)
+                    .quality(85)
+                    .auto("format")
+                    .url()}
+                  alt={layerB.heroImage.alt}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </ViewTransition>
+            </div>
+          )}
+          {/* Top gradient scrim for nav text contrast */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
+          />
           <SiteNav activeHref="/projects" />
           {mobileToolbar}
           {/* Inline wordmark logo — bottom-left over the hero image */}
@@ -608,7 +667,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
         </div>
 
         {/* Right: filters + project index table */}
-        <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
+        <div className="relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
           {/* Filter section — hidden on mobile per design */}
           <div className="mb-12 hidden lg:flex gap-6">
             {/* Filters — takes remaining space */}
@@ -641,10 +700,6 @@ export function SplitScreen({ projects }: SplitScreenProps) {
               </div>
             </div>
 
-            {/* Logo — own column, vertically centered with the first rule */}
-            <div className="flex shrink-0 items-start pt-1">
-              <Logo className="h-[67px] w-[67px]" />
-            </div>
           </div>
 
           {/* Project index table */}
@@ -671,9 +726,9 @@ export function SplitScreen({ projects }: SplitScreenProps) {
                       ? "bg-[#b5ad8e]/30"
                       : ""
                   }`}
-                  onMouseEnter={() => setHoveredIdx(i)}
+                  onMouseEnter={() => { setHoveredIdx(i); setStickyIdx(i); }}
                   onMouseLeave={() => setHoveredIdx(null)}
-                  onFocus={() => setHoveredIdx(i)}
+                  onFocus={() => { setHoveredIdx(i); setStickyIdx(i); }}
                   onBlur={() => setHoveredIdx(null)}
                   onClick={() => router.push(`/projects/${project.slug}`)}
                 >
@@ -747,11 +802,6 @@ export function SplitScreen({ projects }: SplitScreenProps) {
             </div>
           )}
 
-          {/* Logo — bottom-left on mobile, hidden on desktop (shown in filter row instead) */}
-          <div className="mt-6 lg:hidden">
-            <Logo className="h-10 w-10" />
-          </div>
-
           {/* Custom scroll indicator — centered on the split seam, desktop only */}
           {filteredProjects.length > 0 && (() => {
             const count = filteredProjects.length;
@@ -762,7 +812,7 @@ export function SplitScreen({ projects }: SplitScreenProps) {
             return (
               <div
                 aria-hidden
-                className="hidden lg:block fixed left-1/2 top-1/2 w-[10px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden"
+                className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden"
                 style={{ height: 750 }}
               >
                 <div
