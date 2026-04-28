@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Libre_Baskerville } from "next/font/google";
+import { Inter } from "next/font/google";
 import { FixedLogo } from "@/components/fixed-logo";
 import { Analytics } from "@/components/analytics";
 import "./globals.css";
@@ -7,14 +7,6 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  display: "swap",
-});
-
-const libreBaskerville = Libre_Baskerville({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -79,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${libreBaskerville.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <a

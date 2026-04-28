@@ -255,29 +255,25 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     setWheelIdx(0);
   }, [filteredProjects.length]);
 
-  // Wheel-based project cycling — each scroll tick advances one project
+  // Wheel-based project cycling — accumulates scroll delta for smooth, slow scrolling
   useEffect(() => {
-    let lastWheelTime = 0;
-    const THROTTLE_MS = 300;
+    let accumulator = 0;
+    const THRESHOLD = 350; // pixels of scroll needed to advance one project
 
     function onWheel(e: WheelEvent) {
-      // Only hijack scroll on desktop split-screen
       if (window.innerWidth < 1024) return;
-
-      const now = Date.now();
-      if (now - lastWheelTime < THROTTLE_MS) {
-        e.preventDefault();
-        return;
-      }
-
-      const direction = e.deltaY > 0 ? 1 : -1;
-      setWheelIdx((prev) => {
-        const next = prev + direction;
-        return Math.max(0, Math.min(filteredProjects.length - 1, next));
-      });
-
-      lastWheelTime = now;
       e.preventDefault();
+
+      accumulator += e.deltaY;
+
+      if (Math.abs(accumulator) >= THRESHOLD) {
+        const steps = Math.trunc(accumulator / THRESHOLD);
+        accumulator -= steps * THRESHOLD;
+        setWheelIdx((prev) => {
+          const next = prev + steps;
+          return Math.max(0, Math.min(filteredProjects.length - 1, next));
+        });
+      }
     }
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -675,7 +671,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
         </div>
 
         {/* Right: filters + project index table */}
-        <div className="relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
+        <div className="bg-textured relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
           {/* Filter section — hidden on mobile per design */}
           <div className="mb-12 hidden lg:flex gap-6 lg:pr-20">
             {/* Filters — takes remaining space */}

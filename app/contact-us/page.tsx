@@ -58,7 +58,7 @@ export default async function ContactUsPage() {
         </div>
 
         {/* Right: contact info + form */}
-        <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-12" style={mainColor ? { color: mainColor } : undefined}>
+        <div className="bg-textured relative flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-12" style={mainColor ? { color: mainColor } : undefined}>
           {/* Header: address */}
           <div>
             <p className="text-base leading-snug">

@@ -18,7 +18,7 @@ function FixedLogoInner() {
     <Link
       href="/"
       aria-label="Gentle Works home"
-      className={`fixed z-50 top-12 right-12 h-10 w-10 max-lg:top-auto max-lg:right-auto max-lg:bottom-6 max-lg:left-6 transition-all duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg] ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      className={`fixed z-50 top-5 right-6 sm:right-10 lg:right-16 h-10 w-10 max-lg:top-auto max-lg:right-auto max-lg:bottom-6 max-lg:left-6 transition-transform duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg] ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

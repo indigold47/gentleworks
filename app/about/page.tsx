@@ -67,7 +67,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Right: about text */}
-          <div className="relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
+          <div className="bg-textured relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
 
             <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "25px", ...(mainColor ? { color: mainColor } : {}) }}>
               <h1 className="sr-only">About Gentle Works</h1>
