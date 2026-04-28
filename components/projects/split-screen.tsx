@@ -820,12 +820,38 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
             return (
               <div
-                aria-hidden
-                className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden"
+                role="scrollbar"
+                aria-controls="project-table"
+                aria-valuenow={activeIdx}
+                aria-valuemin={0}
+                aria-valuemax={count - 1}
+                aria-orientation="vertical"
+                className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
                 style={{ height: 750 }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const track = e.currentTarget;
+                  const rect = track.getBoundingClientRect();
+
+                  const setFromY = (clientY: number) => {
+                    const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+                    const idx = Math.round(fraction * (count - 1));
+                    setWheelIdx(idx);
+                  };
+
+                  setFromY(e.clientY);
+
+                  const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+                  const onUp = () => {
+                    window.removeEventListener("mousemove", onMove);
+                    window.removeEventListener("mouseup", onUp);
+                  };
+                  window.addEventListener("mousemove", onMove);
+                  window.addEventListener("mouseup", onUp);
+                }}
               >
                 <div
-                  className="absolute left-0 w-full rounded-full bg-default-green"
+                  className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
                   style={{
                     height: `${thumbPct}%`,
                     top: `${thumbTop}%`,

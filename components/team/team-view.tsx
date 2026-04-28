@@ -121,9 +121,34 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
         )}
       </div>
 
-      {/* Custom scrollbar divider */}
+      {/* Custom scrollbar divider — draggable */}
       <div className="hidden lg:flex flex-col items-center bg-cream py-12 sticky top-0 h-svh">
-        <div className="w-[14px] grow bg-sage-deep/30 rounded-full relative overflow-hidden">
+        <div
+          className="w-[14px] grow bg-sage-deep/30 rounded-full relative overflow-hidden cursor-pointer"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            const track = e.currentTarget;
+            const rect = track.getBoundingClientRect();
+            const count = filtered.length;
+
+            const setFromY = (clientY: number) => {
+              const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+              const idx = Math.round(fraction * (count - 1));
+              const member = filtered[idx];
+              if (member) setExpandedId(member._id);
+            };
+
+            setFromY(e.clientY);
+
+            const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+            const onUp = () => {
+              window.removeEventListener("mousemove", onMove);
+              window.removeEventListener("mouseup", onUp);
+            };
+            window.addEventListener("mousemove", onMove);
+            window.addEventListener("mouseup", onUp);
+          }}
+        >
           {(() => {
             const count = filtered.length;
             const thumbPct = Math.max(8, 100 / count);
@@ -131,7 +156,7 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
             const thumbTop = activeIdx >= 0 && maxOffset > 0 ? thumbFraction * maxOffset : 0;
             return (
               <div
-                className="absolute left-0 w-full bg-sage-deep rounded-full"
+                className="absolute left-0 w-full bg-sage-deep rounded-full pointer-events-none"
                 style={{
                   height: `${thumbPct}%`,
                   top: `${thumbTop}%`,
