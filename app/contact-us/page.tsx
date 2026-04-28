@@ -33,6 +33,7 @@ export default async function ContactUsPage() {
   const addressLine2 = data?.addressLine2 ?? FALLBACK.addressLine2;
   const email = data?.email ?? FALLBACK.email;
   const introText = data?.introText ?? FALLBACK.introText;
+  const mainColor = data?.theme?.mainColor;
 
   return (
     <ViewTransition
@@ -43,6 +44,7 @@ export default async function ContactUsPage() {
       <main
         id="main-content"
         className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]"
+        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
       >
         {/* Left: background panel with nav overlay */}
         <div className="relative h-[50svh] lg:sticky lg:top-0 lg:h-svh bg-[#c4b5a3]">
@@ -52,11 +54,11 @@ export default async function ContactUsPage() {
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
           )}
-          <SiteNav activeHref="/contact-us" />
+          <SiteNav activeHref="/contact-us" themeColor={mainColor} />
         </div>
 
         {/* Right: contact info + form */}
-        <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-12">
+        <div className="relative flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-12" style={mainColor ? { color: mainColor } : undefined}>
           {/* Header: address */}
           <div>
             <p className="text-base leading-snug">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 
 import { TeamView } from "@/components/team/team-view";
-import { getAllTeamMembers } from "@/sanity/lib/fetch";
+import { getAllTeamMembers, getTeamPage } from "@/sanity/lib/fetch";
 
 export const metadata: Metadata = {
   title: "Our Team",
@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  const members = await getAllTeamMembers();
+  const [members, pageData] = await Promise.all([
+    getAllTeamMembers(),
+    getTeamPage(),
+  ]);
+
+  const mainColor = pageData?.theme?.mainColor;
 
   return (
     <ViewTransition
@@ -20,8 +25,11 @@ export default async function TeamPage() {
       exit={{ "page-nav": "page-exit", default: "none" }}
       default="none"
     >
-      <main id="main-content">
-        <TeamView members={members} />
+      <main
+        id="main-content"
+        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+      >
+        <TeamView members={members} themeColor={mainColor} />
       </main>
     </ViewTransition>
   );

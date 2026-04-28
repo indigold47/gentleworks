@@ -43,27 +43,33 @@ export default async function AboutPage() {
     ? urlFor(data.heroImage).width(1600).quality(80).auto("format").url()
     : FALLBACK_IMAGE_URL;
 
+  const mainColor = data?.theme?.mainColor;
+
   return (
     <ViewTransition
       enter={{ "page-nav": "page-enter", default: "none" }}
       exit={{ "page-nav": "page-exit", default: "none" }}
       default="none"
     >
-      <main id="main-content" className="flex flex-col">
+      <main
+        id="main-content"
+        className="flex flex-col"
+        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+      >
         <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]">
           {/* Left: image + nav */}
           <div className="relative h-[50svh] sticky top-0 lg:h-svh bg-[#e8ddd4]">
             <div
-              className="absolute inset-0 bg-cover bg-center opacity-30"
+              className="absolute inset-0 bg-cover bg-center opacity-75"
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
-            <SiteNav activeHref="/about" variant="dark" />
+            <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
           </div>
 
           {/* Right: about text */}
           <div className="relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
 
-            <div className="max-w-lg display text-[22px] text-ink/80" style={{ lineHeight: 1.2 }}>
+            <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "25px", ...(mainColor ? { color: mainColor } : {}) }}>
               <h1 className="sr-only">About Gentle Works</h1>
 
               {data?.body ? (

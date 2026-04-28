@@ -19,6 +19,8 @@ type SiteNavProps = {
   variant?: "light" | "dark";
   /** Override the nav container classes (e.g. to remove absolute positioning). */
   className?: string;
+  /** Optional CMS theme color — overrides the variant palette for text/arrow. */
+  themeColor?: string;
 };
 
 const variants = {
@@ -39,8 +41,13 @@ const variants = {
  * Sits on top of a left-side image panel.
  * Active item renders in italic serif with a horizontal arrow line.
  */
-export function SiteNav({ activeHref, variant = "light", className }: SiteNavProps) {
+export function SiteNav({ activeHref, variant = "light", className, themeColor }: SiteNavProps) {
   const v = variants[variant];
+
+  // When a CMS theme color is provided, use inline styles instead of class-based colors.
+  const activeStyle = themeColor ? { color: themeColor } : undefined;
+  const arrowStyle = themeColor ? { color: themeColor, opacity: 0.7 } : undefined;
+  const idleStyle = themeColor ? { color: themeColor, opacity: 0.8 } : undefined;
 
   return (
     <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-1 px-6 pt-6 sm:px-10 sm:pt-10 lg:px-12 lg:pt-12"}>
@@ -50,12 +57,13 @@ export function SiteNav({ activeHref, variant = "light", className }: SiteNavPro
           <div key={item.href} className="flex items-center gap-4">
             <Link
               href={item.href}
-              className={`display italic text-[22px] leading-snug tracking-wide ${v.active} shrink-0 font-extrabold`}
+              className={`display italic text-[22px] leading-snug tracking-wide ${themeColor ? "" : v.active} shrink-0 font-extrabold`}
+              style={activeStyle}
             >
               {item.label}
             </Link>
             {/* Arrow line — hidden on mobile, shown on lg+ */}
-            <span className={`hidden lg:flex items-center grow min-w-0 ${v.arrow}`} aria-hidden>
+            <span className={`hidden lg:flex items-center grow min-w-0 ${themeColor ? "" : v.arrow}`} style={arrowStyle} aria-hidden>
               <span className="block h-px grow bg-current" />
               <svg className="shrink-0 h-[10px] w-[10px] -ml-px" viewBox="0 0 10 10" fill="none">
                 <path d="M2 1.5 L8 5 L2 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -67,7 +75,8 @@ export function SiteNav({ activeHref, variant = "light", className }: SiteNavPro
             key={item.href}
             href={item.href}
             transitionTypes={["page-nav"]}
-            className={`text-[22px] leading-snug tracking-wide font-semibold ${v.idle} transition-colors`}
+            className={`text-[22px] leading-snug tracking-wide font-semibold hover:italic ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`}
+            style={idleStyle}
           >
             {item.label}
           </Link>

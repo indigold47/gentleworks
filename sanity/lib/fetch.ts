@@ -11,7 +11,9 @@ import {
   allTeamMembersQuery,
   contactPageQuery,
   projectBySlugQuery,
+  projectsPageQuery,
   siteSettingsQuery,
+  teamPageQuery,
 } from "./queries";
 
 /**
@@ -52,6 +54,8 @@ export const TEAM_TAG = "team";
 export const THEMES_TAG = "themes";
 export const ABOUT_TAG = "about";
 export const CONTACT_TAG = "contact";
+export const TEAM_PAGE_TAG = "teamPage";
+export const PROJECTS_PAGE_TAG = "projectsPage";
 export const SETTINGS_TAG = "settings";
 
 export function projectTag(slug: string) {
@@ -226,9 +230,29 @@ export async function getContactPage() {
   });
 }
 
+export async function getTeamPage() {
+  return sanityFetch<PageThemeData | null, typeof teamPageQuery>({
+    query: teamPageQuery,
+    tags: [TEAM_PAGE_TAG],
+  });
+}
+
+export async function getProjectsPage() {
+  return sanityFetch<PageThemeData | null, typeof projectsPageQuery>({
+    query: projectsPageQuery,
+    tags: [PROJECTS_PAGE_TAG],
+  });
+}
+
+/** Minimal singleton data — just a theme reference. */
+export type PageThemeData = {
+  theme: ProjectTheme | null;
+};
+
 export type AboutPageData = {
   heroImage: SanityImage;
   body: PortableTextBlock[];
+  theme: ProjectTheme | null;
 };
 
 export type SiteSettingsData = {
@@ -246,6 +270,7 @@ export type ContactPageData = {
   addressLine2: string | null;
   email: string | null;
   introText: string | null;
+  theme: ProjectTheme | null;
 };
 
 export type TeamMemberItem = {

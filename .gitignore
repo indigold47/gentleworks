@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Amplitude wizard
+.amplitude-events.json
+.claude/skills/integration-*/
+.claude/skills/add-analytics-instrumentation/
+.claude/skills/amplitude-chart-dashboard-plan/
+.claude/skills/amplitude-quickstart-taxonomy-agent/
+.env.local

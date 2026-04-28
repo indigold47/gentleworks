@@ -107,7 +107,7 @@ export default async function ProjectPage({
         <h1 className="display text-lg sm:text-xl" style={{ color: mainColor }}>
           {project.title}
         </h1>
-        <Logo className="h-14 w-14 shrink-0" color={mainColor} />
+        <Logo className="h-10 w-10 shrink-0" color={mainColor} />
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}

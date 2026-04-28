@@ -13,9 +13,10 @@ type Filter = "all" | "present" | "past";
 
 type TeamViewProps = {
   members: TeamMemberItem[];
+  themeColor?: string;
 };
 
-export function TeamView({ members }: TeamViewProps) {
+export function TeamView({ members, themeColor }: TeamViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -66,6 +67,7 @@ export function TeamView({ members }: TeamViewProps) {
               activeHref="/team"
               variant="dark"
               className="flex flex-col gap-1 px-6 pt-6 pb-4 sm:px-10"
+              themeColor={themeColor}
             />
           </div>
 
@@ -95,7 +97,7 @@ export function TeamView({ members }: TeamViewProps) {
 
         {/* Desktop: absolute nav overlay */}
         <div className="hidden lg:block">
-          <SiteNav activeHref="/team" variant="dark" />
+          <SiteNav activeHref="/team" variant="dark" themeColor={themeColor} />
         </div>
 
         {/* Desktop: photo at bottom of panel */}

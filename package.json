@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.41.1",
+    "@amplitude/engagement-browser": "^1.0.9",
+    "@amplitude/plugin-session-replay-browser": "^1.28.0",
     "@sanity/color-input": "^6.0.4",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^5.20.0",
@@ -27,7 +30,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "Explore the portfolio of Gentle Works — architecture, interior design, and adaptive reuse projects across Atlanta and beyond.",
   alternates: { canonical: "https://gentle.works/projects" },
 };
-import { getAllFilterCategories, getAllProjectsDetail } from "@/sanity/lib/fetch";
+import { getAllFilterCategories, getAllProjectsDetail, getProjectsPage } from "@/sanity/lib/fetch";
 import { SplitScreen } from "@/components/projects/split-screen";
 import { ScrollToTop } from "@/components/scroll-to-top";
 
@@ -21,10 +21,13 @@ import { ScrollToTop } from "@/components/scroll-to-top";
  * client-side filter state synced to the URL.
  */
 export default async function ProjectsPage() {
-  const [projects, filterCategories] = await Promise.all([
+  const [projects, filterCategories, pageData] = await Promise.all([
     getAllProjectsDetail(),
     getAllFilterCategories(),
+    getProjectsPage(),
   ]);
+
+  const mainColor = pageData?.theme?.mainColor;
 
   return (
     <ViewTransition
@@ -40,10 +43,14 @@ export default async function ProjectsPage() {
       }}
       default="none"
     >
-      <main id="main-content" className="flex flex-col">
+      <main
+        id="main-content"
+        className="flex flex-col"
+        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+      >
         <h1 className="sr-only">Projects</h1>
         <Suspense>
-          <SplitScreen projects={projects} filterCategories={filterCategories} />
+          <SplitScreen projects={projects} filterCategories={filterCategories} themeColor={mainColor} />
         </Suspense>
         <ScrollToTop />
       </main>

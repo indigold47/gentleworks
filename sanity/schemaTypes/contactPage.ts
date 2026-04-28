@@ -12,6 +12,14 @@ export const contactPage = defineType({
   type: "document",
   fields: [
     defineField({
+      name: "theme",
+      title: "Color Theme",
+      type: "reference",
+      to: [{ type: "theme" }],
+      description:
+        "Optional color theme — controls text and logo color on this page.",
+    }),
+    defineField({
       name: "heroImage",
       title: "Hero Image",
       type: "image",

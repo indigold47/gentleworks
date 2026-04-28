@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import * as amplitude from "@amplitude/analytics-browser";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -35,6 +36,10 @@ export function ContactForm() {
         throw new Error(body.error ?? "Something went wrong");
       }
 
+      amplitude.track("contact inquired", {
+        subject: data.subject || "",
+        has_message: Boolean(data.message),
+      });
       setStatus("sent");
       form.reset();
     } catch (err) {

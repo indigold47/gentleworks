@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
+import * as amplitude from "@amplitude/analytics-browser";
 
 import type {
   FilterCategoryItem,
@@ -157,10 +158,13 @@ function searchProjects(projects: ProjectDetail[], query: string): ProjectDetail
 function FilterChip({
   label,
   active,
+  highlighted,
   onClick,
 }: {
   label: string;
   active: boolean;
+  /** True when the hovered project matches this filter value. */
+  highlighted?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -171,7 +175,9 @@ function FilterChip({
       className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[13px] tracking-wide transition-colors ${
         active
           ? "border-[#8a8160] bg-[#8a8160]/50 text-[#3d3926]"
-          : "border-[#c5bda8] text-ink/60 hover:bg-[#c5bda8]/40 hover:text-ink/80"
+          : highlighted
+            ? "border-[#c5bda8] bg-[#7b6f47]/30 text-ink/80"
+            : "border-[#c5bda8] text-ink/60 hover:bg-[#c5bda8]/40 hover:text-ink/80"
       }`}
     >
       {label}
@@ -189,11 +195,12 @@ function FilterChip({
 type SplitScreenProps = {
   projects: ProjectDetail[];
   filterCategories: FilterCategoryItem[];
+  themeColor?: string;
 };
 
 type MobileView = "list" | "grid";
 
-export function SplitScreen({ projects, filterCategories: cmsCategories }: SplitScreenProps) {
+export function SplitScreen({ projects, filterCategories: cmsCategories, themeColor }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   // Build filter categories from CMS data
@@ -290,6 +297,20 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
   const activeIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
   const displayProject = filteredProjects[activeIdx] ?? filteredProjects[0];
 
+  // Compute which filter values the hovered project matches — used to highlight chips.
+  const hoveredProject = hoveredIdx !== null ? filteredProjects[hoveredIdx] : null;
+  const highlightedValues = useMemo(() => {
+    if (!hoveredProject) return new Set<string>();
+    const values = new Set<string>();
+    for (const cat of filterCategories) {
+      const field = (hoveredProject as Record<string, unknown>)[cat.projectField];
+      for (const v of toArray(field as string[] | string | null)) {
+        values.add(`${cat.key}:${v}`);
+      }
+    }
+    return values;
+  }, [hoveredProject, filterCategories]);
+
   // Crossfade: two always-mounted layers that alternate opacity
   const [layerA, setLayerA] = useState(displayProject);
   const [layerB, setLayerB] = useState<ProjectDetail | null>(null);
@@ -345,7 +366,8 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
         set.delete("all");
       }
 
-      if (set.has(value)) {
+      const wasActive = set.has(value);
+      if (wasActive) {
         set.delete(value);
       } else {
         set.add(value);
@@ -358,6 +380,11 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
       }
 
       window.history.replaceState(null, "", `?${params.toString()}`);
+      amplitude.track("project filter applied", {
+        filter_category: categoryKey,
+        filter_value: value,
+        filter_action: wasActive ? "removed" : "applied",
+      });
     },
     [searchParams, filterCategories],
   );
@@ -497,7 +524,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
         <div className="lg:hidden min-h-svh">
           {/* Nav header with dark background */}
           <div className="relative bg-ink px-6 pt-6 pb-8 sm:px-10">
-            <SiteNav activeHref="/projects" className="relative z-10 flex flex-col gap-1" />
+            <SiteNav activeHref="/projects" className="relative z-10 flex flex-col gap-1" themeColor={themeColor} />
             {mobileToolbar}
           </div>
 
@@ -635,7 +662,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
             aria-hidden
             className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
           />
-          <SiteNav activeHref="/projects" />
+          <SiteNav activeHref="/projects" themeColor={themeColor} />
           {mobileToolbar}
           {/* Inline wordmark logo — bottom-left over the hero image */}
           <Link href="/" className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 lg:bottom-10 lg:left-10 z-10">
@@ -673,6 +700,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories }: Split
                         key={opt.value}
                         label={opt.label}
                         active={activeFilters[cat.key].has(opt.value)}
+                        highlighted={highlightedValues.has(`${cat.key}:${opt.value}`)}
                         onClick={() => toggleFilter(cat.key, opt.value)}
                       />
                     ))}

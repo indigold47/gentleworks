@@ -1,0 +1,25 @@
+{
+  "dashboardUrl": "https://app.amplitude.com/analytics/gentle-170888/dashboard/xkps62qp",
+  "dashboardId": "xkps62qp",
+  "charts": [
+    {
+      "id": "d6f0fz5v",
+      "title": "Site Traffic — Daily Active Visitors",
+      "type": "eventsSegmentation",
+      "funnel": "Acquisition"
+    },
+    {
+      "id": "8aureqny",
+      "title": "New Visitors Over Time",
+      "type": "eventsSegmentation",
+      "funnel": "Acquisition"
+    },
+    {
+      "id": "8nfvu0s9",
+      "title": "Visitor Retention (7-Day)",
+      "type": "retention",
+      "funnel": "Retention"
+    }
+  ],
+  "createdAt": "2026-04-28T00:00:00Z"
+}

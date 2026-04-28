@@ -28,12 +28,20 @@ export const aboutPage = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "theme",
+      title: "Color Theme",
+      type: "reference",
+      to: [{ type: "theme" }],
+      description:
+        "Optional color theme — controls text and logo color on this page.",
+    }),
+    defineField({
       name: "body",
       title: "Body Text",
       type: "array",
       of: [{ type: "block" }],
       description:
-        "Rich text shown on the right side of the About page. Use italics for the studio name.",
+        "Rich text shown on the right side of the About page.",
       validation: (rule) => rule.required(),
     }),
   ],

@@ -116,6 +116,11 @@ export const allProjectSlugsQuery = defineQuery(`
 
 export const aboutPageQuery = defineQuery(`
   *[_type == "aboutPage"][0] {
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    },
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -126,6 +131,11 @@ export const aboutPageQuery = defineQuery(`
 
 export const contactPageQuery = defineQuery(`
   *[_type == "contactPage"][0] {
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    },
     heroImage {
       ...,
       "alt": coalesce(alt, "")
@@ -159,6 +169,26 @@ export const allFilterCategoriesQuery = defineQuery(`
       label,
       "value": coalesce(value.current, value),
       useAsFilter
+    }
+  }
+`);
+
+export const teamPageQuery = defineQuery(`
+  *[_type == "teamPage"][0] {
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    }
+  }
+`);
+
+export const projectsPageQuery = defineQuery(`
+  *[_type == "projectsPage"][0] {
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
     }
   }
 `);

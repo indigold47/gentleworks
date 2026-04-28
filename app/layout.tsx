@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Libre_Baskerville } from "next/font/google";
 import { FixedLogo } from "@/components/fixed-logo";
+import { Analytics } from "@/components/analytics";
 import "./globals.css";
 
 const inter = Inter({
@@ -88,6 +89,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <FixedLogo />
+        <Analytics />
         {children}
         <script
           type="application/ld+json"
