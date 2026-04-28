@@ -100,7 +100,7 @@ export default async function ProjectPage({
     >
     <main id="main-content" className="flex flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
       {/* Sticky header bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm" style={{ viewTransitionName: "project-header" }}>
+      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm">
         <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]}>
           <ArrowDown size={20} strokeWidth={1.5} style={{ color: mainColor }} />
         </Link>
