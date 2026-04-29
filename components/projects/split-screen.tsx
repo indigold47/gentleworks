@@ -851,7 +851,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   style={{
                     height: `${thumbPct}%`,
                     top: `${thumbTop}%`,
-                    transition: "top 200ms ease-out, height 300ms ease-out",
+                    transition: "top 600ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                 />
               </div>
