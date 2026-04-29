@@ -428,7 +428,7 @@ export function ProjectGallery({
             return (
               <div
                 key={row._key ?? rowIdx}
-                className="grid grid-cols-1 gap-6 sm:[grid-template-columns:var(--preset-cols)]"
+                className="grid grid-cols-1 gap-6 lg:[grid-template-columns:var(--preset-cols)]"
                 style={
                   { "--preset-cols": preset.cols } as React.CSSProperties
                 }

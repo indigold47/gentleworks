@@ -48,9 +48,22 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
   const activeStyle = themeColor ? { color: themeColor } : undefined;
   const arrowStyle = themeColor ? { color: themeColor, opacity: 0.7 } : undefined;
   const idleStyle = themeColor ? { color: themeColor, opacity: 0.8 } : undefined;
+  const arrowColor = themeColor ?? (variant === "light" ? "#f5f1ea" : "#7b6f47");
 
   return (
     <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-1 px-6 pt-6 sm:px-10 sm:pt-10 lg:px-12 lg:pt-12"}>
+      {/* Glassmorphism panel — only when nav sits over an image (light variant, default position) */}
+      {variant === "light" && !className && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-48 backdrop-blur-md pointer-events-none"
+          style={{
+            zIndex: -1,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 60%, transparent 100%)",
+            WebkitBackdropFilter: "blur(12px)",
+          }}
+        />
+      )}
       {navItems.map((item) => {
         const isActive = item.href === activeHref;
         return (
@@ -75,8 +88,8 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
-                <line x1="28.84" y1="32.52" x2="627.02" y2="32.52" fill="none" stroke={themeColor ?? "#7b6f47"} strokeMiterlimit="10" strokeWidth="1.3" />
-                <path d="M618.14,38.76c-.19-.3-.1-.7.2-.9l8.39-5.34-8.39-5.34c-.3-.19-.39-.6-.2-.9.19-.3.6-.39.9-.2l9.25,5.89c.19.12.3.33.3.55s-.11.43-.3.55l-9.25,5.89c-.11.07-.23.1-.35.1-.21,0-.42-.11-.55-.3Z" fill={themeColor ?? "#7b6f47"} />
+                <line x1="28.84" y1="32.52" x2="627.02" y2="32.52" fill="none" stroke={arrowColor} strokeMiterlimit="10" strokeWidth="1.3" />
+                <path d="M618.14,38.76c-.19-.3-.1-.7.2-.9l8.39-5.34-8.39-5.34c-.3-.19-.39-.6-.2-.9.19-.3.6-.39.9-.2l9.25,5.89c.19.12.3.33.3.55s-.11.43-.3.55l-9.25,5.89c-.11.07-.23.1-.35.1-.21,0-.42-.11-.55-.3Z" fill={arrowColor} />
               </svg>
             )}
           </div>

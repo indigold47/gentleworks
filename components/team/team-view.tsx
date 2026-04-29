@@ -146,10 +146,17 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
         </div>
 
         {/* Desktop: photo at bottom of panel */}
-        {(activeMember || teamGifUrl) && (
-          <div className="hidden lg:flex flex-col items-start px-12 pb-12">
+        <div className="hidden lg:flex flex-col items-start px-12 pb-12">
+          <AnimatePresence mode="wait">
             {activeMember ? (
-              <>
+              <motion.div
+                key={activeMember._id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="flex flex-col items-start"
+              >
                 <p className="text-sm mb-2">{activeMember.fullName}</p>
                 {activeMember.picture ? (
                   <div className="relative w-[400px] h-[500px] overflow-hidden">
@@ -170,12 +177,20 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                   alt="Gentle Works"
                   className="mt-4 w-[300px]"
                 />
-              </>
-            ) : (
-              <TeamMedia url={teamGifUrl!} className="w-[400px] h-[500px] object-cover" />
-            )}
-          </div>
-        )}
+              </motion.div>
+            ) : teamGifUrl ? (
+              <motion.div
+                key="gif"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
+                <TeamMedia url={teamGifUrl} className="w-[400px] h-[500px] object-cover" />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Custom scrollbar — fixed, matching projects page */}

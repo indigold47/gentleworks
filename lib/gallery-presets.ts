@@ -53,8 +53,8 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
   },
   "landscape-two-wide": {
     slots: 3,
-    label: "Landscape + Two Wide (4:3 + 8:3 + 8:3)",
-    aspects: ["4/3", "8/3", "8/3"],
+    label: "Landscape + Two Wide (4:3 + 3:8 + 3:8)",
+    aspects: ["4/3", "3/8", "3/8"],
     cols: "1fr 2fr 2fr",
     sizes: [
       "(min-width: 640px) 20vw, 100vw",
@@ -64,8 +64,8 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
   },
   "two-wide-landscape": {
     slots: 3,
-    label: "Two Wide + Landscape (8:3 + 8:3 + 4:3)",
-    aspects: ["8/3", "8/3", "4/3"],
+    label: "Two Wide + Landscape (3:8 + 3:8 + 4:3)",
+    aspects: ["3/8", "3/8", "4/3"],
     cols: "2fr 2fr 1fr",
     sizes: [
       "(min-width: 640px) 40vw, 100vw",
