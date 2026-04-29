@@ -59,6 +59,38 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
     setExiting(false);
   }, [startAt]);
 
+  // Scroll down on / triggers the transition to about
+  useEffect(() => {
+    if (startAt !== "home") return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0 && !exiting) {
+        setExiting(true);
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const startY = e.touches[0].clientY;
+
+      const handleTouchEnd = (e2: TouchEvent) => {
+        const endY = e2.changedTouches[0].clientY;
+        if (startY - endY > 50 && !exiting) {
+          setExiting(true);
+        }
+        window.removeEventListener("touchend", handleTouchEnd);
+      };
+
+      window.addEventListener("touchend", handleTouchEnd);
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+    };
+  }, [startAt, exiting]);
+
   // On /about: render only the about section, no hero, no scroll back
   if (startAt === "about") {
     return (
@@ -95,10 +127,22 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
     );
   }
 
+  // On SPA navigation (push/traverse) enter from the about position so it feels
+  // like scrolling up. On direct load or reload stay at the hero (y: 0).
+  let initialY = "0%";
+  if (typeof window !== "undefined") {
+    const nav = (window as unknown as { navigation?: { currentEntry?: { navigationType?: string } } }).navigation;
+    const navType = nav?.currentEntry?.navigationType;
+    if (navType === "push" || navType === "traverse") {
+      initialY = "-50%";
+    }
+  }
+
   // On /: render hero + about, animate between them
   return (
     <motion.div
       className="fixed inset-0 h-[200dvh] w-full"
+      initial={{ y: initialY }}
       animate={exiting ? { y: "-50%" } : { y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       onAnimationComplete={() => {

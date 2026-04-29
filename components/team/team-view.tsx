@@ -81,7 +81,7 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]">
+    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
       <div className="bg-textured relative sticky top-0 z-10 h-[33svh] lg:h-svh lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: side-by-side grid — nav left, photo right */}
@@ -101,6 +101,7 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
           <div className="flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
             {activeMember?.picture ? (
               <>
+                <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
                 <div className="relative w-[200px] h-[250px] overflow-hidden">
                   <Image
                     src={urlFor(activeMember.picture).width(400).quality(85).auto("format").url()}
@@ -110,12 +111,11 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
                     className="object-cover"
                   />
                 </div>
-                <p className="text-xs text-ink mt-1.5 text-right">{activeMember.fullName}</p>
               </>
             ) : activeMember ? (
               <>
+                <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
                 <div className="w-[200px] h-[250px] bg-muted/30" />
-                <p className="text-xs text-ink mt-1.5 text-right">{activeMember.fullName}</p>
               </>
             ) : null}
           </div>
@@ -129,6 +129,7 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
         {/* Desktop: photo at bottom of panel */}
         {activeMember && (
           <div className="hidden lg:flex flex-col items-start px-12 pb-12">
+            <p className="text-sm mb-2">{activeMember.fullName}</p>
             {activeMember.picture ? (
               <div className="relative w-[200px] h-[250px] overflow-hidden">
                 <Image
@@ -142,7 +143,12 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
             ) : (
               <div className="w-[200px] h-[250px] bg-muted/30" />
             )}
-            <p className="text-sm text-ink mt-2">{activeMember.fullName}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/Gentle-works-green.svg"
+              alt="Gentle Works"
+              className="mt-4 w-[200px]"
+            />
           </div>
         )}
       </div>
@@ -215,8 +221,8 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
               aria-pressed={filter === f}
               className={`text-xs capitalize tracking-wide transition-colors ${
                 filter === f
-                  ? "text-ink"
-                  : "text-muted hover:text-ink"
+                  ? ""
+                  : "text-muted hover:opacity-100"
               } ${i > 0 ? "ml-1" : ""}`}
             >
               {i > 0 && <span className="text-muted mx-1" aria-hidden>·</span>}
@@ -258,10 +264,10 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
 
                 {isExpanded && (
                   <div className="pb-6">
-                    <p className="display italic text-base text-sage mb-4">
+                    <p className="display italic text-base mb-4">
                       {member.role}
                     </p>
-                    <div className="text-sm leading-relaxed text-ink space-y-4">
+                    <div className="text-sm leading-relaxed space-y-4">
                       <PortableText value={member.description} />
                     </div>
                     {member.email && (
@@ -269,7 +275,7 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
                         You can email them at{" "}
                         <a
                           href={`mailto:${member.email}`}
-                          className="text-sage underline underline-offset-2 hover:text-sage-deep transition-colors"
+                          className="underline underline-offset-2 opacity-100 hover:opacity-70 transition-opacity"
                         >
                           {member.email}
                         </a>

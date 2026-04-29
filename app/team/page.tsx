@@ -27,7 +27,7 @@ export default async function TeamPage() {
     >
       <main
         id="main-content"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+        style={{ "--page-theme-main": mainColor ?? "#7b6f47" } as React.CSSProperties}
       >
         <TeamView members={members} themeColor={mainColor} />
       </main>

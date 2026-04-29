@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef, type ReactNode, ViewTransition } from "react";
 import Image from "next/image";
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 import type {
   SanityImage,
@@ -307,6 +308,35 @@ function VideoCard({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scroll-reveal wrapper                                              */
+/* ------------------------------------------------------------------ */
+
+function AnimatedGalleryItem({
+  children,
+  delay,
+}: {
+  children: ReactNode;
+  delay: number;
+}) {
+  const prefersReduced = useReducedMotion();
+
+  return (
+    <motion.div
+      initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+      whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-25%" }}
+      transition={{
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+        delay,
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  ProjectGallery                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -410,29 +440,31 @@ export function ProjectGallery({
 
                     if (isVideo(item)) {
                       return (
-                        <VideoCard
-                          key={item._key ?? slotIdx}
-                          src={item.videoUrl}
-                          alt={item.alt}
-                          aspect={aspect}
-                          onClick={() => openLightbox(flatIdx)}
-                        />
+                        <AnimatedGalleryItem key={item._key ?? slotIdx} delay={slotIdx * 0.1}>
+                          <VideoCard
+                            src={item.videoUrl}
+                            alt={item.alt}
+                            aspect={aspect}
+                            onClick={() => openLightbox(flatIdx)}
+                          />
+                        </AnimatedGalleryItem>
                       );
                     }
                     return (
-                      <GalleryCard
-                        key={item.asset?._ref ?? slotIdx}
-                        src={urlFor(item)
-                          .width(1200)
-                          .quality(85)
-                          .auto("format")
-                          .url()}
-                        alt={item.alt}
-                        sizes={sizes}
-                        aspect={aspect}
-                        objectPosition={hotspotToPosition(item.hotspot)}
-                        onClick={() => openLightbox(flatIdx)}
-                      />
+                      <AnimatedGalleryItem key={item.asset?._ref ?? slotIdx} delay={slotIdx * 0.1}>
+                        <GalleryCard
+                          src={urlFor(item)
+                            .width(1200)
+                            .quality(85)
+                            .auto("format")
+                            .url()}
+                          alt={item.alt}
+                          sizes={sizes}
+                          aspect={aspect}
+                          objectPosition={hotspotToPosition(item.hotspot)}
+                          onClick={() => openLightbox(flatIdx)}
+                        />
+                      </AnimatedGalleryItem>
                     );
                   })}
               </div>
