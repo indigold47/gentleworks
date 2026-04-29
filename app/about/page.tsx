@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { PortableText } from "next-sanity";
 import { ViewTransition } from "react";
 
-import { SiteNav } from "@/components/projects/projects-nav";
+import { HomeAboutView } from "@/components/home-about-view";
 import { getAboutPage } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -13,28 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://gentle.works/about" },
 };
 
-/* ── Hardcoded fallback (used when Sanity isn't connected yet) ── */
 const FALLBACK_IMAGE_URL =
   "https://images.squarespace-cdn.com/content/v1/64da8e1294f20c35f1d5e9ca/3165763e-5418-49cd-a0a5-c652b5f4158c/KI_optimist+hall-7-web+copy.jpg";
-
-const FALLBACK_BODY = [
-  {
-    p: (
-      <>
-        <em>Gentle Works</em> is an Atlanta, Georgia-based design practice
-        offering architecture, planning, and interior design services to clients
-        who share our commitment to the pursuit of a humane and enduring built
-        environment.
-      </>
-    ),
-  },
-  {
-    p: "We approach our work with optimism and curiosity, striving to design spaces which are not only beautiful, but sympathetic and responsive to the cultural, environmental, and economic conditions in which we find them.",
-  },
-  {
-    p: "We take small and large projects alike, but in every case we seek to craft places that serve people, to enrich the experience of everyday life, to foster social connection and commerce, and to leave a built legacy flexible enough to respond to human needs and desires not yet considered.",
-  },
-];
 
 export default async function AboutPage() {
   const data = await getAboutPage();
@@ -51,40 +30,12 @@ export default async function AboutPage() {
       exit={{ "page-nav": "page-exit", default: "none" }}
       default="none"
     >
-      <main
-        id="main-content"
-        className="flex flex-col"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
-      >
-        <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]">
-          {/* Left: image + nav */}
-          <div className="relative h-[50svh] sticky top-0 lg:h-svh bg-[#e8ddd4]">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-75"
-              style={{ backgroundImage: `url('${heroUrl}')` }}
-            />
-            <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
-          </div>
-
-          {/* Right: about text */}
-          <div className="bg-textured relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
-
-            <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "25px", ...(mainColor ? { color: mainColor } : {}) }}>
-              <h1 className="sr-only">About Gentle Works</h1>
-
-              {data?.body ? (
-                <PortableText value={data.body} />
-              ) : (
-                FALLBACK_BODY.map((item, i) => (
-                  <p key={i} className={i > 0 ? "mt-8" : undefined}>
-                    {item.p}
-                  </p>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </main>
+      <HomeAboutView
+        startAt="about"
+        heroUrl={heroUrl}
+        mainColor={mainColor}
+        aboutBody={data?.body ?? null}
+      />
     </ViewTransition>
   );
 }

@@ -68,12 +68,16 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
               {item.label}
             </Link>
             {isActive && (
-              <span className={`hidden lg:flex items-center grow min-w-0 ${themeColor ? "" : v.arrow}`} style={arrowStyle} aria-hidden>
-                <span className="block h-px grow bg-current" />
-                <svg className="shrink-0 h-[10px] w-[10px] -ml-px" viewBox="0 0 10 10" fill="none">
-                  <path d="M2 1.5 L8 5 L2 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
+              <svg
+                className="hidden lg:block grow min-w-0 h-[14px] ml-2"
+                viewBox="28.84 26 599.4 13"
+                preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <line x1="28.84" y1="32.52" x2="627.02" y2="32.52" fill="none" stroke={themeColor ?? "#7b6f47"} strokeMiterlimit="10" strokeWidth="1.3" />
+                <path d="M618.14,38.76c-.19-.3-.1-.7.2-.9l8.39-5.34-8.39-5.34c-.3-.19-.39-.6-.2-.9.19-.3.6-.39.9-.2l9.25,5.89c.19.12.3.33.3.55s-.11.43-.3.55l-9.25,5.89c-.11.07-.23.1-.35.1-.21,0-.42-.11-.55-.3Z" fill={themeColor ?? "#7b6f47"} />
+              </svg>
             )}
           </div>
         );

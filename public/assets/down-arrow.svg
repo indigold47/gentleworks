@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="toggles_v1" data-name="toggles v1" xmlns="http://www.w3.org/2000/svg" viewBox="13 42 29 100">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #7c7048;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+        stroke-width: 2.5px;
+      }
+
+      .cls-2 {
+        fill: #7c7048;
+      }
+    </style>
+  </defs>
+  <g id="about_-_Anna" data-name="about - Anna">
+    <g>
+      <line class="cls-1" x1="27.17" y1="44.08" x2="27.17" y2="138.66"/>
+      <path class="cls-2" d="M15.17,121.57c.58-.37,1.35-.2,1.73.38l10.27,16.13,10.27-16.13c.37-.58,1.15-.75,1.73-.38.58.37.75,1.15.38,1.73l-11.33,17.79c-.23.36-.63.58-1.05.58s-.83-.22-1.05-.58l-11.33-17.79c-.13-.21-.2-.44-.2-.67,0-.41.21-.82.58-1.06Z"/>
+    </g>
+  </g>
+</svg>

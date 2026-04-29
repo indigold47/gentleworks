@@ -53,6 +53,22 @@
 }
 
 body {
+  cursor: url("/assets/cursor.svg") 12 4, auto;
+}
+
+a,
+button,
+[role="button"],
+label[for],
+select,
+summary,
+[type="checkbox"],
+[type="radio"],
+[class*="cursor-pointer"] {
+  cursor: url("/assets/cursor.svg") 12 4, pointer;
+}
+
+body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-display);

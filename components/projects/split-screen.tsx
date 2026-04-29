@@ -174,10 +174,10 @@ function FilterChip({
       aria-pressed={active}
       className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[13px] tracking-wide transition-colors ${
         active
-          ? "border-[#8a8160] bg-[#8a8160]/50 text-[#3d3926]"
+          ? "border-[#7b6f47] bg-[#7b6f47] text-[#faf7f6]"
           : highlighted
-            ? "border-[#c5bda8] bg-[#7b6f47]/30 text-ink/80"
-            : "border-[#c5bda8] text-ink/60 hover:bg-[#c5bda8]/40 hover:text-ink/80"
+            ? "border-[#c5bda8] bg-[#7b6f47]/30 text-[#7b6f47]"
+            : "border-[#c5bda8] text-[#7b6f47] hover:bg-[#c5bda8]/40 hover:text-[#7b6f47]"
       }`}
     >
       {label}
