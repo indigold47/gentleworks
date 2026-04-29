@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PortableText } from "next-sanity";
 import { motion } from "motion/react";
@@ -44,6 +44,19 @@ type HomeAboutViewProps = {
 export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAboutViewProps) {
   const router = useRouter();
   const [exiting, setExiting] = useState(false);
+  const scrollPanelRef = useRef<HTMLDivElement>(null);
+  const [scrollFraction, setScrollFraction] = useState(0);
+
+  useEffect(() => {
+    const el = scrollPanelRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      setScrollFraction(max > 0 ? el.scrollTop / max : 0);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [startAt]);
 
   const handleArrowClick = useCallback(
     (e: React.MouseEvent) => {
@@ -108,8 +121,11 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
             <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
           </div>
 
-          <div className="bg-textured relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto">
-            <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "25px", ...(mainColor ? { color: mainColor } : {}) }}>
+          <div
+            ref={scrollPanelRef}
+            className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto"
+          >
+            <div className="max-w-lg display text-[25px] lg:text-[30px] leading-[110%] text-ink/80 lg:mt-[400px]" style={mainColor ? { color: mainColor } : undefined}>
               <h1 className="sr-only">About Gentle Works</h1>
               {aboutBody ? (
                 <PortableText value={aboutBody} />
@@ -122,6 +138,47 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
               )}
             </div>
           </div>
+        </div>
+
+        {/* Custom scrollbar — same position as project index and team page */}
+        <div
+          role="scrollbar"
+          aria-orientation="vertical"
+          aria-valuenow={Math.round(scrollFraction * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cream z-10 overflow-hidden cursor-pointer"
+          style={{
+            height: 750,
+            border: `1px solid ${mainColor ? mainColor + "4D" : "rgba(122,111,71,0.3)"}`,
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const setFromY = (clientY: number) => {
+              const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+              const el = scrollPanelRef.current;
+              if (el) el.scrollTop = fraction * (el.scrollHeight - el.clientHeight);
+            };
+            setFromY(e.clientY);
+            const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+            const onUp = () => {
+              window.removeEventListener("mousemove", onMove);
+              window.removeEventListener("mouseup", onUp);
+            };
+            window.addEventListener("mousemove", onMove);
+            window.addEventListener("mouseup", onUp);
+          }}
+        >
+          <div
+            className="absolute left-0 w-full rounded-full pointer-events-none"
+            style={{
+              height: "25%",
+              top: `${scrollFraction * 75}%`,
+              background: mainColor ?? "#7a6f47",
+              transition: "top 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+            }}
+          />
         </div>
       </main>
     );

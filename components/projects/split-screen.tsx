@@ -660,12 +660,12 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           />
           <SiteNav activeHref="/projects" themeColor={themeColor} />
           {mobileToolbar}
-          {/* Inline wordmark logo — bottom-left over the hero image */}
-          <Link href="/" className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 lg:bottom-10 lg:left-10 z-10">
+          {/* Inline wordmark logo — bottom-left, matching team page positioning */}
+          <Link href="/" className="absolute bottom-12 left-12 z-10">
             <img
               src="/assets/GentleWorks-Logo-InLine.svg"
               alt="Gentle Works"
-              className="h-4 w-auto lg:h-5"
+              className="w-[350px] max-w-[60vw] h-auto"
             />
           </Link>
         </div>

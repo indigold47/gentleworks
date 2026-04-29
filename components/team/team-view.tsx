@@ -159,7 +159,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
               >
                 <p className="text-sm mb-2">{activeMember.fullName}</p>
                 {activeMember.picture ? (
-                  <div className="relative w-[400px] h-[500px] overflow-hidden">
+                  <div className="relative w-[350px] h-[420px] overflow-hidden">
                     <Image
                       src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                       alt={activeMember.picture.alt}
@@ -169,13 +169,13 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                     />
                   </div>
                 ) : (
-                  <div className="w-[400px] h-[500px] bg-muted/30" />
+                  <div className="w-[350px] h-[420px] bg-muted/30" />
                 )}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/assets/Gentle-works-green.svg"
                   alt="Gentle Works"
-                  className="mt-4 w-[300px]"
+                  className="mt-4 w-[350px]"
                 />
               </motion.div>
             ) : teamGifUrl ? (
@@ -186,7 +186,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <TeamMedia url={teamGifUrl} className="w-[400px] h-[500px] object-cover" />
+                <TeamMedia url={teamGifUrl} className="w-[350px] h-[420px] object-cover" />
               </motion.div>
             ) : null}
           </AnimatePresence>

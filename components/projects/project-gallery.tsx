@@ -29,6 +29,8 @@ type ProjectGalleryProps = {
   galleryRows: SanityGalleryRow[] | null;
   /** Project slug — used for shared-element view transition identity. */
   slug: string;
+  /** Theme color — used for plus icon background and lightbox backdrop. */
+  themeColor?: string;
   /** Content rendered between the hero and gallery grid (e.g. description, credits). */
   children?: ReactNode;
 };
@@ -225,6 +227,7 @@ function GalleryCard({
   aspect,
   objectPosition,
   objectFit = "cover",
+  themeColor,
   onClick,
 }: {
   src: string;
@@ -234,6 +237,7 @@ function GalleryCard({
   aspect: string;
   objectPosition?: string;
   objectFit?: "cover" | "contain";
+  themeColor?: string;
   onClick: () => void;
 }) {
   return (
@@ -255,10 +259,11 @@ function GalleryCard({
       />
       {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 bg-ink/30 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
+        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
+        style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)" }}
         aria-hidden="true"
       >
-        <Plus size={20} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
+        <Plus size={30} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );
@@ -272,11 +277,13 @@ function VideoCard({
   src,
   alt,
   aspect,
+  themeColor,
   onClick,
 }: {
   src: string;
   alt: string;
   aspect: string;
+  themeColor?: string;
   onClick: () => void;
 }) {
   return (
@@ -298,10 +305,11 @@ function VideoCard({
       />
       {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center text-cream/90 bg-ink/30 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
+        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
+        style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)" }}
         aria-hidden="true"
       >
-        <Plus size={20} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
+        <Plus size={30} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );
@@ -345,6 +353,7 @@ export function ProjectGallery({
   heroVideo,
   galleryRows,
   slug,
+  themeColor,
   children,
 }: ProjectGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -392,13 +401,14 @@ export function ProjectGallery({
   return (
     <>
       {/* Hero — video takes priority when present */}
-      <section className="px-6 sm:px-10 lg:px-[85px]">
+      <section className="px-6 sm:px-10 lg:px-[110px]">
         <ViewTransition name={`project-hero-${slug}`} share="hero-morph">
           {heroVideo?.url ? (
             <VideoCard
               src={heroVideo.url}
               alt={heroVideo.alt}
               aspect="5/2"
+              themeColor={themeColor}
               onClick={() => openLightbox(0)}
             />
           ) : (
@@ -408,6 +418,7 @@ export function ProjectGallery({
               sizes="100vw"
               priority
               aspect="5/2"
+              themeColor={themeColor}
               objectPosition={hotspotToPosition(heroImage.hotspot)}
               onClick={() => openLightbox(0)}
             />
@@ -420,7 +431,7 @@ export function ProjectGallery({
 
       {/* Gallery rows — preset-driven layout */}
       {galleryRows && galleryRows.length > 0 && (
-        <section className="flex flex-col gap-6 px-6 pt-6 pb-12 sm:px-10 lg:px-[85px] lg:pt-[40px] lg:pb-16">
+        <section className="flex flex-col gap-6 lg:gap-[45px] px-6 pt-6 pb-12 sm:px-10 lg:px-[110px] lg:pt-[40px] lg:pb-16">
           {galleryRows.map((row, rowIdx) => {
             const preset = GALLERY_PRESETS[row.preset as GalleryPresetId];
             if (!preset || !row.media?.length) return null;
@@ -428,7 +439,7 @@ export function ProjectGallery({
             return (
               <div
                 key={row._key ?? rowIdx}
-                className="grid grid-cols-1 gap-6 lg:[grid-template-columns:var(--preset-cols)]"
+                className="grid grid-cols-1 gap-6 lg:gap-[45px] lg:[grid-template-columns:var(--preset-cols)]"
                 style={
                   { "--preset-cols": preset.cols } as React.CSSProperties
                 }
@@ -445,6 +456,7 @@ export function ProjectGallery({
                             src={item.videoUrl}
                             alt={item.alt}
                             aspect={aspect}
+                            themeColor={themeColor}
                             onClick={() => openLightbox(flatIdx)}
                           />
                         </AnimatedGalleryItem>
@@ -461,6 +473,7 @@ export function ProjectGallery({
                           alt={item.alt}
                           sizes={sizes}
                           aspect={aspect}
+                          themeColor={themeColor}
                           objectPosition={hotspotToPosition(item.hotspot)}
                           onClick={() => openLightbox(flatIdx)}
                         />

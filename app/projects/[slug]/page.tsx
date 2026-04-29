@@ -111,11 +111,11 @@ export default async function ProjectPage({
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
-      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug}>
+      <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug} themeColor={mainColor}>
         {/* Description + Credits */}
-        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-[85px] lg:pt-16 lg:pb-0">
+        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-[45px] lg:px-[110px] lg:pt-16 lg:pb-0">
           {/* Description */}
-          <div className="max-w-xl text-base leading-relaxed" style={{ color: mainColor }}>
+          <div className="text-base leading-relaxed" style={{ color: mainColor }}>
             <PortableText value={project.description} />
           </div>
 
@@ -168,7 +168,7 @@ export default async function ProjectPage({
       </ProjectGallery>
 
       {/* Footer */}
-      <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[85px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
+      <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[110px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <ArrowDown
