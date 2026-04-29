@@ -179,7 +179,8 @@ export const teamPageQuery = defineQuery(`
       name,
       "mainColor": mainColor.hex,
       "secondaryColor": secondaryColor.hex
-    }
+    },
+    "teamGifUrl": teamGif.asset->url
   }
 `);
 

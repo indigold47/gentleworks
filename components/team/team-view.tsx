@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { PortableText } from "next-sanity";
 
@@ -11,13 +12,33 @@ import { urlFor } from "@/sanity/lib/image";
 
 type Filter = "all" | "present" | "past";
 
+function TeamMedia({ url, className }: { url: string; className: string }) {
+  if (url.includes(".mp4")) {
+    return (
+      <video
+        src={url}
+        className={className}
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-label="The Gentle Works team"
+      />
+    );
+  }
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="The Gentle Works team" className={className} />;
+}
+
 type TeamViewProps = {
   members: TeamMemberItem[];
   themeColor?: string;
+  teamGifUrl?: string | null;
 };
 
-export function TeamView({ members, themeColor }: TeamViewProps) {
+export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
@@ -102,12 +123,12 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
             {activeMember?.picture ? (
               <>
                 <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
-                <div className="relative w-[200px] h-[250px] overflow-hidden">
+                <div className="relative w-[400px] h-[500px] overflow-hidden">
                   <Image
-                    src={urlFor(activeMember.picture).width(400).quality(85).auto("format").url()}
+                    src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                     alt={activeMember.picture.alt}
                     fill
-                    sizes="200px"
+                    sizes="400px"
                     className="object-cover"
                   />
                 </div>
@@ -115,8 +136,10 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
             ) : activeMember ? (
               <>
                 <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
-                <div className="w-[200px] h-[250px] bg-muted/30" />
+                <div className="w-[400px] h-[500px] bg-muted/30" />
               </>
+            ) : teamGifUrl ? (
+              <TeamMedia url={teamGifUrl} className="w-[400px] h-[500px] object-cover" />
             ) : null}
           </div>
         </div>
@@ -127,28 +150,34 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
         </div>
 
         {/* Desktop: photo at bottom of panel */}
-        {activeMember && (
+        {(activeMember || teamGifUrl) && (
           <div className="hidden lg:flex flex-col items-start px-12 pb-12">
-            <p className="text-sm mb-2">{activeMember.fullName}</p>
-            {activeMember.picture ? (
-              <div className="relative w-[200px] h-[250px] overflow-hidden">
-                <Image
-                  src={urlFor(activeMember.picture).width(400).quality(85).auto("format").url()}
-                  alt={activeMember.picture.alt}
-                  fill
-                  sizes="200px"
-                  className="object-cover"
+            {activeMember ? (
+              <>
+                <p className="text-sm mb-2">{activeMember.fullName}</p>
+                {activeMember.picture ? (
+                  <div className="relative w-[400px] h-[500px] overflow-hidden">
+                    <Image
+                      src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
+                      alt={activeMember.picture.alt}
+                      fill
+                      sizes="400px"
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-[400px] h-[500px] bg-muted/30" />
+                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/Gentle-works-green.svg"
+                  alt="Gentle Works"
+                  className="mt-4 w-[300px]"
                 />
-              </div>
+              </>
             ) : (
-              <div className="w-[200px] h-[250px] bg-muted/30" />
+              <TeamMedia url={teamGifUrl!} className="w-[400px] h-[500px] object-cover" />
             )}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/Gentle-works-green.svg"
-              alt="Gentle Works"
-              className="mt-4 w-[200px]"
-            />
           </div>
         )}
       </div>
@@ -249,10 +278,15 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
               >
                 <button
                   onClick={() => toggle(member._id)}
-                  className="flex w-full items-center justify-between py-4 text-left transition-colors hover:text-sage"
+                  onMouseEnter={() => setHoveredId(member._id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="flex w-full items-center justify-between py-4 text-left"
                   aria-expanded={isExpanded}
                 >
-                  <span className="display text-xl lg:text-[22px]">
+                  <span
+                    className="display text-xl lg:text-[22px]"
+                    style={{ fontWeight: isExpanded || hoveredId === member._id ? 600 : 400 }}
+                  >
                     {member.displayName}
                   </span>
                   {isExpanded ? (
@@ -262,28 +296,42 @@ export function TeamView({ members, themeColor }: TeamViewProps) {
                   )}
                 </button>
 
-                {isExpanded && (
-                  <div className="pb-6">
-                    <p className="display italic text-base mb-4">
-                      {member.role}
-                    </p>
-                    <div className="text-sm leading-relaxed space-y-4">
-                      <PortableText value={member.description} />
-                    </div>
-                    {member.email && (
-                      <p className="text-sm mt-4">
-                        You can email them at{" "}
-                        <a
-                          href={`mailto:${member.email}`}
-                          className="underline underline-offset-2 opacity-100 hover:opacity-70 transition-opacity"
-                        >
-                          {member.email}
-                        </a>
-                        .
-                      </p>
-                    )}
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {isExpanded && (
+                    <motion.div
+                      key="content"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{
+                        height: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+                        opacity: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+                      }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <div className="pb-6">
+                        <p className="display italic text-base mb-4">
+                          {member.role}
+                        </p>
+                        <div className="text-sm leading-relaxed space-y-4">
+                          <PortableText value={member.description} />
+                        </div>
+                        {member.email && (
+                          <p className="text-sm mt-4">
+                            You can email them at{" "}
+                            <a
+                              href={`mailto:${member.email}`}
+                              className="underline underline-offset-2 opacity-100 hover:opacity-70 transition-opacity"
+                            >
+                              {member.email}
+                            </a>
+                            .
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}

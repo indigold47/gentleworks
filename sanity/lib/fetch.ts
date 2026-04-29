@@ -231,7 +231,7 @@ export async function getContactPage() {
 }
 
 export async function getTeamPage() {
-  return sanityFetch<PageThemeData | null, typeof teamPageQuery>({
+  return sanityFetch<TeamPageData | null, typeof teamPageQuery>({
     query: teamPageQuery,
     tags: [TEAM_PAGE_TAG],
   });
@@ -247,6 +247,11 @@ export async function getProjectsPage() {
 /** Minimal singleton data — just a theme reference. */
 export type PageThemeData = {
   theme: ProjectTheme | null;
+};
+
+export type TeamPageData = {
+  theme: ProjectTheme | null;
+  teamGifUrl: string | null;
 };
 
 export type AboutPageData = {

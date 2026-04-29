@@ -18,6 +18,16 @@ export const teamPage = defineType({
       description:
         "Optional color theme — controls text and logo color on this page.",
     }),
+    defineField({
+      name: "teamGif",
+      title: "Team Photo / GIF",
+      type: "file",
+      description:
+        "Shown on the left panel before a team member is selected. Upload a GIF, still image, or MP4 — the file is served as-is to preserve animation.",
+      options: {
+        accept: "image/*, video/mp4",
+      },
+    }),
   ],
   preview: {
     prepare: () => ({

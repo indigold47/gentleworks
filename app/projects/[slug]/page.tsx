@@ -100,7 +100,7 @@ export default async function ProjectPage({
     >
     <main id="main-content" className="flex flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
       {/* Sticky header bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16 bg-cream/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-[85px] bg-cream/80 backdrop-blur-sm">
         <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]}>
           <ArrowDown size={20} strokeWidth={1.5} style={{ color: mainColor }} />
         </Link>
@@ -113,7 +113,7 @@ export default async function ProjectPage({
       {/* Hero + Gallery with lightbox — description/credits sit between */}
       <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug}>
         {/* Description + Credits */}
-        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16 lg:py-16">
+        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-[85px] lg:pt-16 lg:pb-0">
           {/* Description */}
           <div className="max-w-xl text-base leading-relaxed" style={{ color: mainColor }}>
             <PortableText value={project.description} />
@@ -168,7 +168,7 @@ export default async function ProjectPage({
       </ProjectGallery>
 
       {/* Footer */}
-      <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-16" style={{ color: mainColor, backgroundColor: secondaryColor }}>
+      <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[85px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <ArrowDown

@@ -392,7 +392,7 @@ export function ProjectGallery({
   return (
     <>
       {/* Hero — video takes priority when present */}
-      <section className="px-6 sm:px-10 lg:px-16">
+      <section className="px-6 sm:px-10 lg:px-[85px]">
         <ViewTransition name={`project-hero-${slug}`} share="hero-morph">
           {heroVideo?.url ? (
             <VideoCard
@@ -420,7 +420,7 @@ export function ProjectGallery({
 
       {/* Gallery rows — preset-driven layout */}
       {galleryRows && galleryRows.length > 0 && (
-        <section className="flex flex-col gap-6 px-6 pt-6 pb-12 sm:px-10 lg:px-16 lg:pb-16">
+        <section className="flex flex-col gap-6 px-6 pt-6 pb-12 sm:px-10 lg:px-[85px] lg:pt-[40px] lg:pb-16">
           {galleryRows.map((row, rowIdx) => {
             const preset = GALLERY_PRESETS[row.preset as GalleryPresetId];
             if (!preset || !row.media?.length) return null;
