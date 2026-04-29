@@ -105,41 +105,37 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
     <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
       <div className="bg-textured relative sticky top-0 z-10 h-[33svh] lg:h-svh lg:flex lg:flex-col lg:justify-end">
-        {/* Mobile: side-by-side grid — nav left, photo right */}
+        {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
         {/* Desktop: nav is absolute overlay, photo at bottom */}
-        <div className="grid grid-cols-2 h-full lg:hidden">
-          {/* Nav column — relative positioning on mobile */}
-          <div className="flex flex-col justify-center">
-            <SiteNav
-              activeHref="/team"
-              variant="dark"
-              className="flex flex-col gap-1 px-6 pt-6 pb-4 sm:px-10"
-              themeColor={themeColor}
-            />
-          </div>
+        <div className="lg:hidden">
+          <SiteNav
+            activeHref="/team"
+            variant="dark"
+            themeColor={themeColor}
+          />
 
-          {/* Photo column */}
-          <div className="flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
+          {/* Photo — absolute, right half of panel */}
+          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
             {activeMember?.picture ? (
               <>
-                <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
-                <div className="relative w-[400px] h-[500px] overflow-hidden">
+                <p className="text-xs mb-1.5 text-right shrink-0">{activeMember.fullName}</p>
+                <div className="relative flex-1 min-h-0 w-full overflow-hidden">
                   <Image
                     src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                     alt={activeMember.picture.alt}
                     fill
-                    sizes="400px"
-                    className="object-cover"
+                    sizes="(max-width: 1023px) 45vw, 400px"
+                    className="object-cover object-top"
                   />
                 </div>
               </>
             ) : activeMember ? (
               <>
-                <p className="text-xs mb-1.5 text-right">{activeMember.fullName}</p>
-                <div className="w-[400px] h-[500px] bg-muted/30" />
+                <p className="text-xs mb-1.5 text-right shrink-0">{activeMember.fullName}</p>
+                <div className="flex-1 min-h-0 w-full bg-muted/30" />
               </>
             ) : teamGifUrl ? (
-              <TeamMedia url={teamGifUrl} className="w-[400px] h-[500px] object-cover" />
+              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-cover" />
             ) : null}
           </div>
         </div>

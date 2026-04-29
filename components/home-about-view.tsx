@@ -160,6 +160,20 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
           }}
         />
 
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/GentleWorks-Logo-InLine.svg"
+          alt="Gentle Works"
+          className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:top-10 lg:left-10 z-10 w-[450px] max-w-[60vw] h-auto brightness-0 invert"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/Gentle-Works-Logo.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute top-6 right-6 sm:top-8 sm:right-8 lg:top-10 lg:right-10 z-10 h-[60px] w-[60px] brightness-0 invert"
+        />
+
         <a
           href="/about"
           onClick={handleArrowClick}
