@@ -104,6 +104,18 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
     };
   }, [startAt, exiting]);
 
+  // Forward wheel events from anywhere on the page into the scroll panel (left image side, etc.)
+  useEffect(() => {
+    if (startAt !== "about") return;
+    const onWheel = (e: WheelEvent) => {
+      const el = scrollPanelRef.current;
+      if (!el || el.contains(e.target as Node)) return;
+      el.scrollTop += e.deltaY;
+    };
+    window.addEventListener("wheel", onWheel, { passive: true });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [startAt]);
+
   // On /about: render only the about section, no hero, no scroll back
   if (startAt === "about") {
     return (
@@ -121,22 +133,33 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
             <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
           </div>
 
-          <div
-            ref={scrollPanelRef}
-            className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-y-auto"
-          >
-            <div className="max-w-lg display text-[25px] lg:text-[30px] leading-[110%] text-ink/80 lg:mt-[400px]" style={mainColor ? { color: mainColor } : undefined}>
-              <h1 className="sr-only">About Gentle Works</h1>
-              {aboutBody ? (
-                <PortableText value={aboutBody} />
-              ) : (
-                FALLBACK_BODY.map((item, i) => (
-                  <p key={item.key} className={i > 0 ? "mt-8" : undefined}>
-                    {item.p}
-                  </p>
-                ))
-              )}
+          <div className="relative lg:sticky lg:top-0 lg:h-svh">
+            <div
+              ref={scrollPanelRef}
+              className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:h-full lg:overflow-y-auto"
+            >
+              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80 lg:mt-[400px]" style={{ lineHeight: "1.1", ...(mainColor ? { color: mainColor } : {}) }}>
+                <h1 className="sr-only">About Gentle Works</h1>
+                {aboutBody ? (
+                  <PortableText value={aboutBody} />
+                ) : (
+                  FALLBACK_BODY.map((item, i) => (
+                    <p key={item.key} className={i > 0 ? "mt-8" : undefined}>
+                      {item.p}
+                    </p>
+                  ))
+                )}
+              </div>
             </div>
+            {/* Scroll hint — fades out as the user starts scrolling */}
+            <div
+              aria-hidden="true"
+              className="hidden lg:block absolute bottom-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
+              style={{
+                background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
+                opacity: Math.max(0, 1 - scrollFraction * 6),
+              }}
+            />
           </div>
         </div>
 

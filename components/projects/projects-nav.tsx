@@ -50,20 +50,14 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
   const idleStyle = themeColor ? { color: themeColor, opacity: 0.8 } : undefined;
   const arrowColor = themeColor ?? (variant === "light" ? "#f5f1ea" : "#7b6f47");
 
+  // Glass bubble applies on all pages that use default positioning (no className override).
+  // Light variant (over dark image): dark tinted glass. Dark variant (over light bg): white-tinted glass.
+  const showGlassBubble = !className;
+  const glassBg = variant === "light" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.35)";
+  const glassBorder = variant === "light" ? "border-white/10" : "border-black/10";
+
   return (
     <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-1 px-6 pt-6 sm:px-10 sm:pt-10 lg:px-12 lg:pt-12"}>
-      {/* Glassmorphism panel — only when nav sits over an image (light variant, default position) */}
-      {variant === "light" && !className && (
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-48 backdrop-blur-md pointer-events-none"
-          style={{
-            zIndex: -1,
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 60%, transparent 100%)",
-            WebkitBackdropFilter: "blur(12px)",
-          }}
-        />
-      )}
       {navItems.map((item) => {
         const isActive = item.href === activeHref;
         return (
@@ -75,8 +69,11 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
                 isActive
                   ? `italic font-extrabold ${themeColor ? "" : v.active}`
                   : `not-italic hover:italic font-semibold hover:font-extrabold ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`
-              }`}
-              style={isActive ? activeStyle : idleStyle}
+              } ${showGlassBubble ? `inline-flex items-center backdrop-blur-md rounded-full px-3 py-0.5 border ${glassBorder}` : ""}`}
+              style={{
+                ...(isActive ? activeStyle : idleStyle),
+                ...(showGlassBubble ? { background: glassBg } : {}),
+              }}
             >
               {item.label}
             </Link>

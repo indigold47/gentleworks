@@ -13,6 +13,7 @@ import {
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { ProjectGallery } from "@/components/projects/project-gallery";
+import { FadeInLeft } from "@/components/projects/fade-in-left";
 
 /** Fallback when no theme is assigned in the CMS. */
 const defaultTheme = { mainColor: "#6b5c4a", secondaryColor: "#e8e0d8" };
@@ -104,9 +105,11 @@ export default async function ProjectPage({
         <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]}>
           <ArrowDown size={20} strokeWidth={1.5} style={{ color: mainColor }} />
         </Link>
-        <h1 className="display text-lg sm:text-xl" style={{ color: mainColor }}>
-          {project.title}
-        </h1>
+        <FadeInLeft onMount delay={0.1}>
+          <h1 className="display text-lg sm:text-xl" style={{ color: mainColor }}>
+            {project.title}
+          </h1>
+        </FadeInLeft>
         <Logo className="h-[60px] w-[60px] shrink-0" color={mainColor} />
       </header>
 
@@ -115,11 +118,14 @@ export default async function ProjectPage({
         {/* Description + Credits */}
         <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-[45px] lg:px-[110px] lg:pt-16 lg:pb-0">
           {/* Description */}
-          <div className="text-base leading-relaxed" style={{ color: mainColor }}>
-            <PortableText value={project.description} />
-          </div>
+          <FadeInLeft>
+            <div className="text-base leading-relaxed" style={{ color: mainColor }}>
+              <PortableText value={project.description} />
+            </div>
+          </FadeInLeft>
 
           {/* Project info + Credits grid */}
+          <FadeInLeft delay={0.1}>
           <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm self-start">
             {/* Project info */}
             {([
@@ -164,6 +170,7 @@ export default async function ProjectPage({
                   </div>
                 ))}
           </dl>
+          </FadeInLeft>
         </section>
       </ProjectGallery>
 
