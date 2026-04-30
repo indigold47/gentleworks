@@ -185,8 +185,15 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="flex flex-col items-start"
               >
                 <TeamMedia url={teamGifUrl} className="w-[350px] h-[420px] object-cover" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/Gentle-works-green.svg"
+                  alt="Gentle Works"
+                  className="mt-4 w-[350px]"
+                />
               </motion.div>
             ) : null}
           </AnimatePresence>

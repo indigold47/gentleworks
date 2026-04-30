@@ -18,8 +18,8 @@ export function FadeInLeft({ children, className, delay = 0, onMount = false }: 
     return (
       <motion.div
         className={className}
-        initial={prefersReduced ? false : { opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={prefersReduced ? false : { opacity: 0, filter: "blur(12px)" }}
+        animate={{ opacity: 1, filter: "blur(0px)" }}
         transition={{ duration: 5, ease: [0.4, 0, 0.2, 1], delay }}
       >
         {children}
@@ -30,8 +30,8 @@ export function FadeInLeft({ children, className, delay = 0, onMount = false }: 
   return (
     <motion.div
       className={className}
-      initial={prefersReduced ? false : { opacity: 0, x: -60 }}
-      whileInView={prefersReduced ? undefined : { opacity: 1, x: 0 }}
+      initial={prefersReduced ? false : { opacity: 0, filter: "blur(12px)" }}
+      whileInView={prefersReduced ? undefined : { opacity: 1, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "150px" }}
       transition={{ duration: 5, ease: [0.4, 0, 0.2, 1], delay }}
     >

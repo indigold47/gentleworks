@@ -176,7 +176,7 @@ export default async function ProjectPage({
 
       {/* Footer */}
       <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[110px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <ArrowDown
               size={16}
@@ -190,21 +190,21 @@ export default async function ProjectPage({
               </p>
             </div>
           </div>
-          <a
-            href={footerMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-center hover:opacity-70 transition-opacity"
-          >
-            <p>{footerAddr1}</p>
-            <p>{footerAddr2}</p>
-          </a>
-          <div className="text-sm text-right">
+          <div className="text-sm text-right sm:text-right sm:order-last">
             {settings?.phone && (
               <a href={`tel:${settings.phone}`} className="block hover:opacity-70 transition-opacity">{settings.phone}</a>
             )}
             <a href={`mailto:${footerEmail}`} className="block hover:opacity-70 transition-opacity">{footerEmail}</a>
           </div>
+          <a
+            href={footerMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="col-span-2 text-sm text-center hover:opacity-70 transition-opacity sm:col-span-1"
+          >
+            <p>{footerAddr1}</p>
+            <p>{footerAddr2}</p>
+          </a>
         </div>
       </footer>
 
