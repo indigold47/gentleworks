@@ -293,8 +293,11 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   const activeIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
   const displayProject = filteredProjects[activeIdx] ?? filteredProjects[0];
 
+  // Effective highlight index: live hover > sticky (last hovered) > nothing
+  const effectiveHighlightIdx = hoveredIdx ?? stickyIdx;
+
   // Compute which filter values the hovered project matches — used to highlight chips.
-  const hoveredProject = hoveredIdx !== null ? filteredProjects[hoveredIdx] : null;
+  const hoveredProject = effectiveHighlightIdx !== null ? filteredProjects[effectiveHighlightIdx] : null;
   const highlightedValues = useMemo(() => {
     if (!hoveredProject) return new Set<string>();
     const values = new Set<string>();
@@ -727,7 +730,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                 <tr
                   key={project._id}
                   className={`border-b border-[#d4cdb8] cursor-pointer transition-colors ${
-                    hoveredIdx === i || (hoveredIdx === null && safeWheelIdx === i)
+                    effectiveHighlightIdx === i || (effectiveHighlightIdx === null && safeWheelIdx === i)
                       ? "bg-[#b5ad8e]/30"
                       : ""
                   }`}

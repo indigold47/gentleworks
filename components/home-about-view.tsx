@@ -125,7 +125,7 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
         style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
       >
         <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]">
-          <div className="relative h-[50svh] sticky top-0 lg:h-svh bg-[#e8ddd4]">
+          <div className="relative h-[50svh] sticky top-0 z-10 lg:h-svh bg-[#e8ddd4]">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-75"
               style={{ backgroundImage: `url('${heroUrl}')` }}
@@ -151,7 +151,16 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
                 )}
               </div>
             </div>
-            {/* Scroll hint — fades out as the user starts scrolling */}
+            {/* Top fade — appears as user scrolls away from the top */}
+            <div
+              aria-hidden="true"
+              className="hidden lg:block absolute top-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
+              style={{
+                background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)",
+                opacity: Math.min(1, scrollFraction * 8),
+              }}
+            />
+            {/* Bottom fade — hints there's more content, fades out near end */}
             <div
               aria-hidden="true"
               className="hidden lg:block absolute bottom-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"

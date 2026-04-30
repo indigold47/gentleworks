@@ -47,7 +47,7 @@ export default async function ContactUsPage() {
         style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
       >
         {/* Left: background panel with nav overlay */}
-        <div className="relative h-[50svh] lg:sticky lg:top-0 lg:h-svh bg-[#c4b5a3]">
+        <div className="relative h-[50svh] sticky top-0 z-10 lg:h-svh bg-[#c4b5a3]">
           {heroUrl && (
             <div
               className="absolute inset-0 bg-cover bg-center"
