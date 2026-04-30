@@ -249,24 +249,42 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
           }}
         />
 
+        {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}
+        <div className="absolute inset-x-0 top-0 z-10 hidden lg:flex items-center justify-between px-[25px] pt-5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/GentleWorks-Logo-InLine.svg"
+            alt="Gentle Works"
+            className="w-[450px] max-w-[55vw] h-auto brightness-0 invert"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/Gentle-Works-Logo.svg"
+            alt=""
+            aria-hidden="true"
+            className="h-[60px] w-[60px] brightness-0 invert"
+          />
+        </div>
+        {/* ── Mobile: centered wordmark at top ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/GentleWorks-Logo-InLine.svg"
           alt="Gentle Works"
-          className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:top-10 lg:left-10 z-10 w-[450px] max-w-[60vw] h-auto brightness-0 invert"
+          className="lg:hidden absolute top-[60px] left-1/2 -translate-x-1/2 z-10 w-[75vw] h-auto brightness-0 invert"
         />
+        {/* ── Mobile: circular logo at bottom-left (mirrors FixedLogo on other pages) ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/Gentle-Works-Logo.svg"
           alt=""
           aria-hidden="true"
-          className="absolute top-6 right-6 sm:top-8 sm:right-8 lg:top-10 lg:right-10 z-10 h-[60px] w-[60px] brightness-0 invert"
+          className="lg:hidden absolute bottom-6 left-6 z-10 h-[60px] w-[60px] brightness-0 invert"
         />
 
         <a
           href="/about"
           onClick={handleArrowClick}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 hover:opacity-80 transition-opacity animate-bounce cursor-pointer"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-12 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity animate-bounce cursor-pointer"
           aria-label="About Gentle Works"
         >
           <img src="/assets/down-arrow.svg" alt="" className="h-[82px] w-auto brightness-0 invert" />
@@ -276,20 +294,20 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
           href="https://www.instagram.com/gentleworks/"
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-12 left-6 z-10 hover:opacity-80 transition-opacity"
+          className="hidden lg:block absolute bottom-5 left-[25px] z-10 hover:opacity-80 transition-opacity"
           aria-label="Instagram"
         >
-          <img src="/assets/instagram.svg" alt="" className="h-[30px] w-[30px] brightness-0 invert" />
+          <img src="/assets/instagram.svg" alt="" className="h-[45px] w-[45px] brightness-0 invert" />
         </a>
 
         <a
           href="https://www.linkedin.com/company/gentleworks/about/"
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-12 right-6 z-10 hover:opacity-80 transition-opacity"
+          className="hidden lg:block absolute bottom-5 right-[25px] z-10 hover:opacity-80 transition-opacity"
           aria-label="LinkedIn"
         >
-          <img src="/assets/linkedin.svg" alt="" className="h-[30px] w-[30px] brightness-0 invert" />
+          <img src="/assets/linkedin.svg" alt="" className="h-[45px] w-[45px] brightness-0 invert" />
         </a>
       </main>
 
