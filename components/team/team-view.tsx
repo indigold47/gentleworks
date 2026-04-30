@@ -71,8 +71,10 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
       ? activeIdx / (filtered.length - 1)
       : 0;
 
-  // Wheel-based member cycling — accumulates scroll delta for smooth, slow scrolling
+  // Wheel-based member cycling — disabled when a member is expanded so the user can scroll to read
   useEffect(() => {
+    if (expandedId !== null) return;
+
     let accumulator = 0;
     const THRESHOLD = 350;
 
@@ -95,7 +97,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [filtered]);
+  }, [filtered, expandedId]);
 
   function toggle(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
