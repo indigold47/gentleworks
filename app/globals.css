@@ -65,7 +65,15 @@ summary,
 [type="checkbox"],
 [type="radio"],
 [class*="cursor-pointer"] {
-  cursor: url("/assets/cursor.svg") 12 4, pointer;
+  cursor: url("/assets/cursor.svg") 24 8, pointer;
+}
+
+/* Lock the custom cursor universally — prevents any browser-native cursor swap */
+*,
+*:hover,
+*:active,
+*:focus {
+  cursor: url("/assets/cursor.svg") 24 8, auto !important;
 }
 
 body {
