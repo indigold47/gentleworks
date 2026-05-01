@@ -44,6 +44,50 @@ export const aboutPage = defineType({
         "Rich text shown on the right side of the About page.",
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: "bottomImage",
+      title: "Bottom Image",
+      type: "image",
+      description: "Optional image displayed below the body text.",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+        }),
+      ],
+    }),
+    defineField({
+      name: "bottomVideoUrl",
+      title: "Bottom Video URL",
+      type: "url",
+      description: "Optional video URL displayed below the body text (used instead of, or alongside, the bottom image).",
+    }),
+    defineField({
+      name: "additionalSections",
+      title: "Additional Text Sections",
+      type: "array",
+      description: "Extra text blocks appended below the main body and media.",
+      of: [
+        {
+          type: "object",
+          title: "Text Section",
+          fields: [
+            defineField({
+              name: "body",
+              title: "Text",
+              type: "array",
+              of: [{ type: "block" }],
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            prepare: () => ({ title: "Text Section" }),
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     prepare: () => ({

@@ -11,6 +11,7 @@ import type { StructureResolver } from "sanity/structure";
  */
 
 const SINGLETONS = [
+  { type: "homePage", title: "Home Page" },
   { type: "aboutPage", title: "About Page" },
   { type: "contactPage", title: "Contact Page" },
   { type: "siteSettings", title: "Site Settings" },

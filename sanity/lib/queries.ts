@@ -114,6 +114,21 @@ export const allProjectSlugsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)].slug.current
 `);
 
+export const homePageQuery = defineQuery(`
+  *[_type == "homePage"][0] {
+    "heroMedia": heroMedia[] {
+      _type,
+      _key,
+      videoUrl,
+      alt,
+      image {
+        ...,
+        "alt": ""
+      }
+    }
+  }
+`);
+
 export const aboutPageQuery = defineQuery(`
   *[_type == "aboutPage"][0] {
     "theme": theme->{
@@ -125,7 +140,15 @@ export const aboutPageQuery = defineQuery(`
       ...,
       "alt": coalesce(alt, "")
     },
-    body
+    body,
+    bottomImage {
+      ...,
+      "alt": coalesce(alt, "")
+    },
+    bottomVideoUrl,
+    additionalSections[] {
+      body
+    }
   }
 `);
 
@@ -203,6 +226,7 @@ export const allTeamMembersQuery = defineQuery(`
     role,
     description,
     email,
+    pronoun,
     status,
     picture {
       ...,

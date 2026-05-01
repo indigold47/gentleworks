@@ -3,6 +3,7 @@ import type { SchemaTypeDefinition } from "sanity";
 import { aboutPage } from "./aboutPage";
 import { contactPage } from "./contactPage";
 import { filterCategory } from "./filterCategory";
+import { homePage } from "./homePage";
 import { project } from "./project";
 import { projectsPage } from "./projectsPage";
 import { siteSettings } from "./siteSettings";
@@ -14,6 +15,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   aboutPage,
   contactPage,
   filterCategory,
+  homePage,
   project,
   projectsPage,
   siteSettings,

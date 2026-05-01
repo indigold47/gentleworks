@@ -57,7 +57,7 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
   const glassBorder = variant === "light" ? "border-white/10" : "border-black/10";
 
   return (
-    <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-1 px-6 pt-6 sm:px-10 sm:pt-10 lg:px-12 lg:pt-12"}>
+    <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-3 px-6 pt-6 sm:px-10 sm:pt-10 lg:px-12 lg:pt-12"}>
       {navItems.map((item) => {
         const isActive = item.href === activeHref;
         return (
@@ -65,17 +65,23 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
             <Link
               href={item.href}
               transitionTypes={isActive ? undefined : ["page-nav"]}
-              className={`display text-[22px] leading-snug tracking-wide shrink-0 ${
+              className={`group display text-[22px] leading-snug tracking-wide shrink-0 ${
                 isActive
-                  ? `italic font-extrabold ${themeColor ? "" : v.active}`
-                  : `not-italic hover:italic font-semibold hover:font-extrabold ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`
-              } ${showGlassBubble ? `inline-flex items-center backdrop-blur-md rounded-full px-3 py-0.5 border ${glassBorder}` : ""}`}
+                  ? `font-extrabold ${themeColor ? "" : v.active}`
+                  : `font-semibold ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`
+              } ${showGlassBubble ? `inline-flex flex-col items-start backdrop-blur-md rounded-full px-2 py-1.5 border ${glassBorder}` : ""}`}
               style={{
                 ...(isActive ? activeStyle : idleStyle),
                 ...(showGlassBubble ? { background: glassBg } : {}),
               }}
             >
-              {item.label}
+              {/* Hidden non-italic span reserves upright width so the pill never shrinks when text goes italic */}
+              {showGlassBubble && (
+                <span aria-hidden className="block h-0 overflow-hidden not-italic select-none">{item.label}</span>
+              )}
+              <span className={isActive ? "italic" : "not-italic group-hover:italic"}>
+                {item.label}
+              </span>
             </Link>
             {isActive && (
               <svg

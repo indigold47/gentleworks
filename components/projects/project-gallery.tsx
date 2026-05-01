@@ -259,11 +259,15 @@ function GalleryCard({
       />
       {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
-        style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)" }}
+        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
         aria-hidden="true"
       >
-        <Plus size={30} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
+        {/* glass background layer */}
+        <span
+          className="absolute inset-0 backdrop-blur-md border border-white/20"
+          style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)", opacity: 0.45 }}
+        />
+        <Plus size={30} strokeWidth={1.5} className="relative transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );
@@ -305,11 +309,15 @@ function VideoCard({
       />
       {/* Plus icon — always visible, scales up on hover */}
       <span
-        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 backdrop-blur-sm transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
-        style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)" }}
+        className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center text-cream/90 transition-transform duration-300 ease-out group-hover:scale-125 group-focus-visible:scale-125"
         aria-hidden="true"
       >
-        <Plus size={30} strokeWidth={1.5} className="transition-transform duration-300 ease-out group-hover:rotate-90" />
+        {/* glass background layer */}
+        <span
+          className="absolute inset-0 backdrop-blur-md border border-white/20"
+          style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)", opacity: 0.45 }}
+        />
+        <Plus size={30} strokeWidth={1.5} className="relative transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
     </button>
   );

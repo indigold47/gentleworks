@@ -6,7 +6,8 @@ import { PortableText } from "next-sanity";
 import { motion } from "motion/react";
 
 import { SiteNav } from "@/components/projects/projects-nav";
-import type { AboutPageData } from "@/sanity/lib/fetch";
+import { HomeVideoCarousel } from "@/components/home-video-carousel";
+import type { AboutPageData, HomeMediaItem } from "@/sanity/lib/fetch";
 
 const FALLBACK_IMAGE_URL =
   "https://images.squarespace-cdn.com/content/v1/64da8e1294f20c35f1d5e9ca/3165763e-5418-49cd-a0a5-c652b5f4158c/KI_optimist+hall-7-web+copy.jpg";
@@ -36,14 +37,22 @@ const FALLBACK_BODY = [
 type HomeAboutViewProps = {
   /** "home" = start at hero, "about" = start at about section */
   startAt: "home" | "about";
-  heroUrl: string;
+  heroMedia?: HomeMediaItem[];
+  heroUrl?: string;
   mainColor?: string;
   aboutBody: AboutPageData["body"] | null;
 };
 
-export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAboutViewProps) {
+export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, aboutBody }: HomeAboutViewProps) {
   const router = useRouter();
   const [exiting, setExiting] = useState(false);
+
+  // Hoist the theme color to :root so the fixed logo (rendered outside <main>) can inherit it.
+  useEffect(() => {
+    if (!mainColor) return;
+    document.documentElement.style.setProperty("--page-theme-main", mainColor);
+    return () => document.documentElement.style.removeProperty("--page-theme-main");
+  }, [mainColor]);
   const scrollPanelRef = useRef<HTMLDivElement>(null);
   const [scrollFraction, setScrollFraction] = useState(0);
 
@@ -138,7 +147,15 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
               ref={scrollPanelRef}
               className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:h-full lg:overflow-y-auto"
             >
-              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80 lg:mt-[400px]" style={{ lineHeight: "1.1", ...(mainColor ? { color: mainColor } : {}) }}>
+              <div className="flex gap-4 mb-8 lg:mt-[400px]">
+                <a href="https://www.instagram.com/gentleworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
+                  <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/instagram.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/instagram.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
+                </a>
+                <a href="https://www.linkedin.com/company/gentleworks/about/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
+                  <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/linkedin.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/linkedin.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
+                </a>
+              </div>
+              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
                 <h1 className="sr-only">About Gentle Works</h1>
                 {aboutBody ? (
                   <PortableText value={aboutBody} />
@@ -208,7 +225,7 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
               height: "25%",
               top: `${scrollFraction * 75}%`,
               background: mainColor ?? "#7a6f47",
-              transition: "top 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              transition: "top 80ms linear",
             }}
           />
         </div>
@@ -240,14 +257,7 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
     >
       {/* ── First screen: hero ── */}
       <main id="main-content" className="relative h-dvh w-full overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://images.squarespace-cdn.com/content/v1/64da8e1294f20c35f1d5e9ca/3165763e-5418-49cd-a0a5-c652b5f4158c/KI_optimist+hall-7-web+copy.jpg')",
-          }}
-        />
+        <HomeVideoCarousel items={heroMedia} />
 
         {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}
         <div className="absolute inset-x-0 top-0 z-10 hidden lg:flex items-center justify-between px-[25px] pt-5">
@@ -290,25 +300,6 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
           <img src="/assets/down-arrow.svg" alt="" className="h-[82px] w-auto brightness-0 invert" />
         </a>
 
-        <a
-          href="https://www.instagram.com/gentleworks/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:block absolute bottom-5 left-[25px] z-10 hover:opacity-80 transition-opacity"
-          aria-label="Instagram"
-        >
-          <img src="/assets/instagram.svg" alt="" className="h-[45px] w-[45px] brightness-0 invert" />
-        </a>
-
-        <a
-          href="https://www.linkedin.com/company/gentleworks/about/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:block absolute bottom-5 right-[25px] z-10 hover:opacity-80 transition-opacity"
-          aria-label="LinkedIn"
-        >
-          <img src="/assets/linkedin.svg" alt="" className="h-[45px] w-[45px] brightness-0 invert" />
-        </a>
       </main>
 
       {/* ── Second screen: about (revealed during scroll animation) ── */}
@@ -325,7 +316,15 @@ export function HomeAboutView({ startAt, heroUrl, mainColor, aboutBody }: HomeAb
         </div>
 
         <div className="bg-textured relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12">
-          <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "25px", ...(mainColor ? { color: mainColor } : {}) }}>
+          <div className="flex gap-4 mb-8">
+            <a href="https://www.instagram.com/gentleworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
+              <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/instagram.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/instagram.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
+            </a>
+            <a href="https://www.linkedin.com/company/gentleworks/about/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
+              <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/linkedin.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/linkedin.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
+            </a>
+          </div>
+          <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
             {aboutBody ? (
               <PortableText value={aboutBody} />
             ) : (

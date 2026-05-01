@@ -10,6 +10,7 @@ import {
   allProjectSlugsQuery,
   allTeamMembersQuery,
   contactPageQuery,
+  homePageQuery,
   projectBySlugQuery,
   projectsPageQuery,
   siteSettingsQuery,
@@ -49,6 +50,7 @@ async function sanityFetch<T, Q extends string>({
 // Shared tags — the webhook invalidates these to refresh cached pages.
 export const PROJECTS_TAG = "projects";
 export const FILTERS_TAG = "filters";
+export const HOME_TAG = "home";
 
 export const TEAM_TAG = "team";
 export const THEMES_TAG = "themes";
@@ -216,6 +218,13 @@ export type ProjectDetail = ProjectListItem & {
   theme: ProjectTheme | null;
 };
 
+export async function getHomePage() {
+  return sanityFetch<HomePageData | null, typeof homePageQuery>({
+    query: homePageQuery,
+    tags: [HOME_TAG],
+  });
+}
+
 export async function getAboutPage() {
   return sanityFetch<AboutPageData | null, typeof aboutPageQuery>({
     query: aboutPageQuery,
@@ -244,6 +253,26 @@ export async function getProjectsPage() {
   });
 }
 
+export type HomeHeroVideo = {
+  _type: "homeHeroVideo";
+  _key: string;
+  videoUrl: string;
+  alt: string;
+};
+
+export type HomeHeroImage = {
+  _type: "homeHeroImage";
+  _key: string;
+  image: SanityImage;
+  alt: string;
+};
+
+export type HomeMediaItem = HomeHeroVideo | HomeHeroImage;
+
+export type HomePageData = {
+  heroMedia: HomeMediaItem[] | null;
+};
+
 /** Minimal singleton data — just a theme reference. */
 export type PageThemeData = {
   theme: ProjectTheme | null;
@@ -258,6 +287,9 @@ export type AboutPageData = {
   heroImage: SanityImage;
   body: PortableTextBlock[];
   theme: ProjectTheme | null;
+  bottomImage: SanityImage | null;
+  bottomVideoUrl: string | null;
+  additionalSections: { body: PortableTextBlock[] }[] | null;
 };
 
 export type SiteSettingsData = {
@@ -286,6 +318,7 @@ export type TeamMemberItem = {
   role: string;
   description: PortableTextBlock[];
   email: string | null;
+  pronoun: "her" | "him" | "them" | null;
   status: "present" | "past";
   picture: SanityImage | null;
 };

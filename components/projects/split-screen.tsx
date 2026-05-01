@@ -564,9 +564,13 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
               <>
                 <p className="col-span-2 py-8 text-center text-sm text-muted">
                   No projects match the selected filters.
-                  {featuredProjects.length > 0 &&
-                    " Take a look at some of our featured projects:"}
                 </p>
+                {featuredProjects.length > 0 && (
+                  <div className="col-span-2 mt-2 mb-4">
+                    <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#7b7047" }}>Featured</p>
+                    <hr className="border-rule" />
+                  </div>
+                )}
                 {featuredProjects.length > 0 &&
                   featuredProjects.map((project) => (
                     <Link
@@ -765,12 +769,6 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                     className="py-8 text-center text-sm text-muted"
                   >
                     No projects match the selected filters.
-                    {featuredProjects.length > 0 && (
-                      <>
-                        <br />
-                        Take a look at some of our featured projects:
-                      </>
-                    )}
                   </td>
                 </tr>
               )}
@@ -779,7 +777,13 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
           {/* Featured projects fallback */}
           {filteredProjects.length === 0 && featuredProjects.length > 0 && (
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6">
+              <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#7b7047" }}>Featured</p>
+              <hr className="border-rule mb-6" />
+            </div>
+          )}
+          {filteredProjects.length === 0 && featuredProjects.length > 0 && (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featuredProjects.map((project) => (
                 <Link
                   key={project._id}

@@ -338,7 +338,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                         </div>
                         {member.email && (
                           <p className="text-sm mt-4">
-                            You can email them at{" "}
+                            You can email {member.pronoun ?? "them"} at{" "}
                             <a
                               href={`mailto:${member.email}`}
                               className="underline underline-offset-2 opacity-100 hover:opacity-70 transition-opacity"

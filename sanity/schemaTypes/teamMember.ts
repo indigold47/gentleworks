@@ -70,6 +70,21 @@ export const teamMember = defineType({
       ],
     }),
     defineField({
+      name: "pronoun",
+      title: "Pronoun",
+      type: "string",
+      description: 'Used in contact copy: "You can email her/him/them at…"',
+      options: {
+        list: [
+          { title: "her", value: "her" },
+          { title: "him", value: "him" },
+          { title: "them", value: "them" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "them",
+    }),
+    defineField({
       name: "status",
       title: "Status",
       type: "string",

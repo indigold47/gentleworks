@@ -25,7 +25,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
 import { revalidateSecret } from "@/sanity/env";
-import { FILTERS_TAG, PROJECTS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
+import { FILTERS_TAG, HOME_TAG, PROJECTS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
 
 type WebhookBody = {
   _type?: string;
@@ -67,6 +67,10 @@ export async function POST(req: NextRequest) {
   // Always refresh the collection-level tags. Cost is tiny — these drive the
   // listing page, home featured strip, sitemap, etc.
   switch (body._type) {
+    case "homePage": {
+      updateTag(HOME_TAG);
+      break;
+    }
     case "project": {
       updateTag(PROJECTS_TAG);
       if (body.slug) updateTag(projectTag(body.slug));
