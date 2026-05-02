@@ -119,7 +119,7 @@ export const homePageQuery = defineQuery(`
     "heroMedia": heroMedia[] {
       _type,
       _key,
-      videoUrl,
+      "videoUrl": video.asset->url,
       alt,
       image {
         ...,

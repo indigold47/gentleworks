@@ -24,10 +24,11 @@ export const homePage = defineType({
           title: "Video",
           fields: [
             defineField({
-              name: "videoUrl",
-              title: "Video URL",
-              type: "string",
-              description: "Externally hosted MP4/WebM URL.",
+              name: "video",
+              title: "Video file",
+              type: "file",
+              description: "Upload an MP4 or WebM. Keep under 20 MB for fast loading.",
+              options: { accept: "video/mp4,video/webm" },
               validation: (rule) => rule.required(),
             }),
             defineField({
@@ -39,7 +40,7 @@ export const homePage = defineType({
             }),
           ],
           preview: {
-            select: { title: "alt", subtitle: "videoUrl" },
+            select: { title: "alt" },
           },
         },
         {

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, type ReactNode, ViewTransition } from "react";
 import Image from "next/image";
-import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import type {
@@ -65,9 +65,21 @@ function Lightbox({
   const [index, setIndex] = useState(initialIndex);
   const [closing, setClosing] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [zoomActive, setZoomActive] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+  const [isOverImage, setIsOverImage] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const pendingIndex = useRef<number | null>(null);
+
+  const handleImageMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setZoomOrigin({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+  }, []);
 
   const handleClose = useCallback(() => {
     setClosing(true);
@@ -78,6 +90,9 @@ function Lightbox({
     if (transitioning) return;
     pendingIndex.current = nextIndex;
     setTransitioning(true);
+    setZoomActive(false);
+    setIsOverImage(false);
+    setImageLoaded(false);
     setTimeout(() => {
       setIndex(pendingIndex.current!);
       setTransitioning(false);
@@ -123,6 +138,21 @@ function Lightbox({
   useEffect(() => {
     closeRef.current?.focus();
   }, []);
+
+  // Preload adjacent images so navigation feels instant
+  useEffect(() => {
+    const toPreload = [
+      media[(index + 1) % media.length],
+      media[(index - 1 + media.length) % media.length],
+    ];
+    toPreload.forEach((item) => {
+      if (item.type === "image") {
+        const img = new window.Image();
+        img.fetchPriority = "high";
+        img.src = item.src;
+      }
+    });
+  }, [index, media]);
 
   useEffect(() => {
     const original = document.body.style.overflow;
@@ -171,13 +201,17 @@ function Lightbox({
         </button>
       )}
 
-      {/* Media */}
-      <div className={`relative h-[80vh] w-[90vw] max-w-6xl transition-opacity duration-300 ${closing ? "animate-[scaleOut_800ms_var(--ease)_both]" : "animate-[scaleIn_700ms_var(--ease)_100ms_both]"} ${transitioning ? "opacity-0" : "opacity-100"}`} style={{ transitionTimingFunction: "var(--ease)" }}>
+      {/* Media — outer div only handles animation + centering */}
+      <div
+        className={`flex items-center justify-center max-h-[80vh] max-w-[90vw] transition-opacity duration-300 ${closing ? "animate-[scaleOut_800ms_var(--ease)_both]" : "animate-[scaleIn_700ms_var(--ease)_100ms_both]"} ${transitioning ? "opacity-0" : "opacity-100"}`}
+        style={{ transitionTimingFunction: "var(--ease)" }}
+      >
         {current.type === "video" ? (
           <video
             key={current.src}
             src={current.src}
-            className="h-full w-full object-contain"
+            style={{ maxHeight: "80vh", maxWidth: "90vw" }}
+            className="object-contain"
             autoPlay
             loop
             muted
@@ -185,15 +219,48 @@ function Lightbox({
             aria-label={current.alt}
           />
         ) : (
-          <Image
-            key={current.src}
-            src={current.src}
-            alt={current.alt}
-            fill
-            sizes="90vw"
-            className="object-contain"
-            priority
-          />
+          /* Tight wrapper — shrink-wraps to the image so button corner is always on the image */
+          <div className="relative">
+            <div
+              className="overflow-hidden"
+              style={{ cursor: zoomActive ? "crosshair" : "default" }}
+              onMouseMove={zoomActive ? handleImageMouseMove : undefined}
+              onMouseEnter={() => setIsOverImage(true)}
+              onMouseLeave={() => setIsOverImage(false)}
+            >
+              <div
+                style={{
+                  transform: zoomActive && isOverImage ? "scale(2.5)" : "scale(1)",
+                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transition: zoomActive && isOverImage ? "none" : "transform 0.4s ease",
+                  willChange: zoomActive ? "transform" : "auto",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  key={current.src}
+                  src={current.src}
+                  alt={current.alt}
+                  fetchPriority="high"
+                  onLoad={() => setImageLoaded(true)}
+                  style={{ maxHeight: "80vh", maxWidth: "90vw", display: "block" }}
+                />
+              </div>
+            </div>
+            {/* Zoom button — only shown once image has loaded */}
+            {imageLoaded && <button
+              type="button"
+              onClick={() => setZoomActive((z) => !z)}
+              className="absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center text-cream/90 transition-transform duration-300 ease-out hover:scale-110"
+              aria-label={zoomActive ? "Disable zoom" : "Enable hover zoom"}
+            >
+              <span
+                className="absolute inset-0 backdrop-blur-md border border-white/20"
+                style={{ backgroundColor: "rgba(255,255,255,0.15)", opacity: zoomActive ? 1 : 0.6 }}
+              />
+              <ZoomIn size={30} strokeWidth={1.5} className={`relative transition-opacity ${zoomActive ? "opacity-90" : "opacity-60"}`} />
+            </button>}
+          </div>
         )}
       </div>
 
