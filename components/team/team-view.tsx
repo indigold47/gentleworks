@@ -41,6 +41,9 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const isAnimatingRef = useRef(false);
 
   const filtered =
     filter === "all" ? members : members.filter((m) => m.status === filter);
@@ -54,15 +57,56 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
     ? filtered.findIndex((m) => m._id === expandedId)
     : -1;
 
-  // Scroll the expanded member into view
+  // Scroll the expanded member to the top of the scroll container after accordion opens
   useEffect(() => {
     if (!expandedId) return;
     const el = memberRefs.current.get(expandedId);
-    if (el) {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      });
-    }
+    const container = scrollContainerRef.current;
+    if (!el || !container) return;
+
+    // Mark as animating — block wheel cycling during this time
+    isAnimatingRef.current = true;
+
+    // Wait for accordion animations to settle before scrolling
+    const timeout = setTimeout(() => {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const elBottom = elRect.bottom;
+      const containerBottom = containerRect.bottom;
+
+      // Check if content overflows below or above the visible area
+      const overflowsBelow = elBottom > containerBottom;
+      const overflowsAbove = elRect.top < containerRect.top;
+
+      if (overflowsBelow || overflowsAbove) {
+        const offsetTop = elRect.top - containerRect.top + container.scrollTop;
+        // Use a manual scroll for slower, smoother motion
+        const start = container.scrollTop;
+        const distance = offsetTop - start;
+        const duration = 800;
+        let startTime: number | null = null;
+
+        function step(timestamp: number) {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease-out cubic
+          const eased = 1 - Math.pow(1 - progress, 3);
+          container.scrollTop = start + distance * eased;
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            isAnimatingRef.current = false;
+          }
+        }
+
+        requestAnimationFrame(step);
+      } else {
+        isAnimatingRef.current = false;
+      }
+    }, 600);
+
+    return () => clearTimeout(timeout);
   }, [expandedId]);
 
   // Scrollbar thumb — one unit per member
@@ -71,35 +115,100 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
       ? activeIdx / (filtered.length - 1)
       : 0;
 
-  // Wheel-based member cycling — disabled when a member is expanded so the user can scroll to read
+  // Wheel handler: scroll content normally, but cycle members when content is fully visible
   useEffect(() => {
-    if (expandedId !== null) return;
+    const panel = rightPanelRef.current;
+    if (!panel) return;
 
     let accumulator = 0;
-    const THRESHOLD = 350;
+    let lastTime = 0;
+    const CYCLE_THRESHOLD = 120;
+
+    function isContentFullyVisible() {
+      const container = scrollContainerRef.current;
+      if (!container) return true;
+      if (!expandedId) return true;
+
+      const el = memberRefs.current.get(expandedId);
+      if (!el) return true;
+
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      // Content is fully visible if both top and bottom are within the container
+      return elRect.top >= containerRect.top && elRect.bottom <= containerRect.bottom;
+    }
 
     function onWheel(e: WheelEvent) {
       if (window.innerWidth < 1024) return;
+
+      // Block all wheel events while accordion is animating/scrolling
+      if (isAnimatingRef.current) {
+        e.preventDefault();
+        return;
+      }
+
+      const now = Date.now();
+
+      // Reset accumulator on gesture gap
+      if (now - lastTime > 300) {
+        accumulator = 0;
+      }
+      lastTime = now;
+
+      const container = scrollContainerRef.current;
+      const scrollingDown = e.deltaY > 0;
+      const scrollingUp = e.deltaY < 0;
+
+      // Check if there's more native scroll available in the scroll direction
+      let canNativeScroll = false;
+      if (container && expandedId) {
+        const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
+        const atTop = container.scrollTop <= 1;
+        canNativeScroll = (scrollingDown && !atBottom) || (scrollingUp && !atTop);
+      }
+
+      if (canNativeScroll && !isContentFullyVisible()) {
+        // Let native scroll handle it — content still needs to be scrolled into view
+        accumulator = 0;
+        return;
+      }
+
+      // Content is fully visible or no item open — accumulate for member cycling
       e.preventDefault();
-
       accumulator += e.deltaY;
+      // Clamp so large single events can't trigger more than one step
+      accumulator = Math.max(-CYCLE_THRESHOLD, Math.min(CYCLE_THRESHOLD, accumulator));
 
-      if (Math.abs(accumulator) >= THRESHOLD) {
-        const steps = Math.trunc(accumulator / THRESHOLD);
-        accumulator -= steps * THRESHOLD;
+      if (Math.abs(accumulator) >= CYCLE_THRESHOLD) {
+        const direction = accumulator > 0 ? 1 : -1;
+        accumulator = 0;
+
         setExpandedId((prev) => {
-          const currentIdx = prev ? filtered.findIndex((m) => m._id === prev) : -1;
-          const nextIdx = Math.max(0, Math.min(filtered.length - 1, currentIdx + steps));
-          return filtered[nextIdx]?._id ?? prev;
+          const currentIdx = prev
+            ? filtered.findIndex((m) => m._id === prev)
+            : -1;
+          const nextIdx = Math.max(
+            0,
+            Math.min(filtered.length - 1, currentIdx + direction)
+          );
+          const nextId = filtered[nextIdx]?._id ?? prev;
+
+          // Only block if we're actually changing member
+          if (nextId !== prev) {
+            isAnimatingRef.current = true;
+          }
+
+          return nextId;
         });
       }
     }
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
+    panel.addEventListener("wheel", onWheel, { passive: false });
+    return () => panel.removeEventListener("wheel", onWheel);
   }, [filtered, expandedId]);
 
-  function toggle(id: string) {
+  function openMember(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
   }
 
@@ -161,7 +270,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
               >
                 <p className="text-sm mb-2">{activeMember.fullName}</p>
                 {activeMember.picture ? (
-                  <div className="relative w-[350px] h-[420px] overflow-hidden">
+                  <div className="relative w-[350px] overflow-hidden" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }}>
                     <Image
                       src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                       alt={activeMember.picture.alt}
@@ -171,7 +280,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                     />
                   </div>
                 ) : (
-                  <div className="w-[350px] h-[420px] bg-muted/30" />
+                  <div className="w-[350px] bg-muted/30" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }} />
                 )}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -189,7 +298,9 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col items-start"
               >
-                <TeamMedia url={teamGifUrl} className="w-[350px] h-[420px] object-cover" />
+                <div className="w-[350px] overflow-hidden" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }}>
+                  <TeamMedia url={teamGifUrl} className="w-full h-full object-cover" />
+                </div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/assets/Gentle-works-green.svg"
@@ -217,7 +328,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
             aria-valuemin={0}
             aria-valuemax={count - 1}
             className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
-            style={{ height: 750 }}
+            style={{ height: "min(750px, calc(100svh - 120px))" }}
             onMouseDown={(e) => {
               e.preventDefault();
               const track = e.currentTarget;
@@ -254,7 +365,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
       })()}
 
       {/* Bottom/Right panel: team list — fixed height on desktop, inner scroll */}
-      <div className="bg-textured relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:pt-24 lg:pb-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-hidden">
+      <div ref={rightPanelRef} className="bg-textured relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:pt-24 lg:pb-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-hidden">
         {/* Header — pinned, doesn't scroll */}
         <div className="mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
@@ -281,7 +392,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
         </div>
 
         {/* Scrollable team list — contained within the panel */}
-        <div className="lg:overflow-y-auto lg:flex-1 lg:-mx-12 lg:px-12 mt-2">
+        <div ref={scrollContainerRef} className="lg:overflow-y-auto lg:flex-1 lg:-mx-12 lg:px-12 mt-2">
         {/* Accordion list */}
         <div className="flex flex-col">
           {filtered.map((member) => {
@@ -297,7 +408,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 className="border-b border-rule"
               >
                 <button
-                  onClick={() => toggle(member._id)}
+                  onClick={() => openMember(member._id)}
                   onMouseEnter={() => setHoveredId(member._id)}
                   onMouseLeave={() => setHoveredId(null)}
                   className="flex w-full items-center justify-between py-4 text-left"
