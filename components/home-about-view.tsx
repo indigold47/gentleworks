@@ -2,37 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PortableText } from "next-sanity";
 import { motion } from "motion/react";
 
-import { SiteNav } from "@/components/projects/projects-nav";
+import { AboutLayout } from "@/components/about-layout";
 import { HomeVideoCarousel } from "@/components/home-video-carousel";
 import type { AboutPageData, HomeMediaItem } from "@/sanity/lib/fetch";
-
-const FALLBACK_IMAGE_URL =
-  "https://images.squarespace-cdn.com/content/v1/64da8e1294f20c35f1d5e9ca/3165763e-5418-49cd-a0a5-c652b5f4158c/KI_optimist+hall-7-web+copy.jpg";
-
-const FALLBACK_BODY = [
-  {
-    key: "1",
-    p: (
-      <>
-        <em>Gentle Works</em> is an Atlanta, Georgia-based design practice
-        offering architecture, planning, and interior design services to clients
-        who share our commitment to the pursuit of a humane and enduring built
-        environment.
-      </>
-    ),
-  },
-  {
-    key: "2",
-    p: "We approach our work with optimism and curiosity, striving to design spaces which are not only beautiful, but sympathetic and responsive to the cultural, environmental, and economic conditions in which we find them.",
-  },
-  {
-    key: "3",
-    p: "We take small and large projects alike, but in every case we seek to craft places that serve people, to enrich the experience of everyday life, to foster social connection and commerce, and to leave a built legacy flexible enough to respond to human needs and desires not yet considered.",
-  },
-];
 
 type HomeAboutViewProps = {
   /** "home" = start at hero, "about" = start at about section */
@@ -51,8 +25,9 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
   useEffect(() => {
     if (!mainColor) return;
     document.documentElement.style.setProperty("--page-theme-main", mainColor);
-    return () => document.documentElement.style.removeProperty("--page-theme-main");
+    return () => { document.documentElement.style.removeProperty("--page-theme-main"); };
   }, [mainColor]);
+
   const scrollPanelRef = useRef<HTMLDivElement>(null);
   const [scrollFraction, setScrollFraction] = useState(0);
 
@@ -81,17 +56,23 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
     setExiting(false);
   }, [startAt]);
 
-  // Scroll down on / triggers the transition to about
+  // Scroll down on / triggers the transition to about.
+  // Delay listener activation to prevent residual scroll momentum from
+  // immediately re-triggering exit after back-navigation.
   useEffect(() => {
     if (startAt !== "home") return;
 
+    let armed = false;
+    const armTimer = setTimeout(() => { armed = true; }, 400);
+
     const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY > 0 && !exiting) {
+      if (armed && e.deltaY > 0 && !exiting) {
         setExiting(true);
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (!armed) return;
       const startY = e.touches[0].clientY;
 
       const handleTouchEnd = (e2: TouchEvent) => {
@@ -108,6 +89,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
     window.addEventListener("wheel", handleWheel, { passive: true });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     return () => {
+      clearTimeout(armTimer);
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("touchstart", handleTouchStart);
     };
@@ -125,6 +107,24 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
     return () => window.removeEventListener("wheel", onWheel);
   }, [startAt]);
 
+  const handleScrollbarMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const setFromY = (clientY: number) => {
+      const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+      const el = scrollPanelRef.current;
+      if (el) el.scrollTop = fraction * (el.scrollHeight - el.clientHeight);
+    };
+    setFromY(e.clientY);
+    const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
   // On /about: render only the about section, no hero, no scroll back
   if (startAt === "about") {
     return (
@@ -133,102 +133,14 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
         className="flex flex-col"
         style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
       >
-        <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]">
-          <div className="relative h-[50svh] sticky top-0 z-10 lg:h-svh bg-[#e8ddd4]">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-75"
-              style={{ backgroundImage: `url('${heroUrl}')` }}
-            />
-            <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
-          </div>
-
-          <div className="relative lg:sticky lg:top-0 lg:h-svh">
-            <div
-              ref={scrollPanelRef}
-              className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:h-full lg:overflow-y-auto"
-            >
-              <div className="flex gap-4 mb-8 lg:mt-[400px]">
-                <a href="https://www.instagram.com/gentleworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/instagram.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/instagram.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
-                </a>
-                <a href="https://www.linkedin.com/company/gentleworks/about/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/linkedin.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/linkedin.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
-                </a>
-              </div>
-              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
-                <h1 className="sr-only">About Gentle Works</h1>
-                {aboutBody ? (
-                  <PortableText value={aboutBody} />
-                ) : (
-                  FALLBACK_BODY.map((item, i) => (
-                    <p key={item.key} className={i > 0 ? "mt-8" : undefined}>
-                      {item.p}
-                    </p>
-                  ))
-                )}
-              </div>
-            </div>
-            {/* Top fade — appears as user scrolls away from the top */}
-            <div
-              aria-hidden="true"
-              className="hidden lg:block absolute top-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
-              style={{
-                background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)",
-                opacity: Math.min(1, scrollFraction * 8),
-              }}
-            />
-            {/* Bottom fade — hints there's more content, fades out near end */}
-            <div
-              aria-hidden="true"
-              className="hidden lg:block absolute bottom-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
-              style={{
-                background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
-                opacity: Math.max(0, 1 - scrollFraction * 6),
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Custom scrollbar — same position as project index and team page */}
-        <div
-          role="scrollbar"
-          aria-orientation="vertical"
-          aria-valuenow={Math.round(scrollFraction * 100)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cream z-10 overflow-hidden cursor-pointer"
-          style={{
-            height: 750,
-            border: `1px solid ${mainColor ? mainColor + "4D" : "rgba(122,111,71,0.3)"}`,
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const rect = e.currentTarget.getBoundingClientRect();
-            const setFromY = (clientY: number) => {
-              const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-              const el = scrollPanelRef.current;
-              if (el) el.scrollTop = fraction * (el.scrollHeight - el.clientHeight);
-            };
-            setFromY(e.clientY);
-            const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
-            const onUp = () => {
-              window.removeEventListener("mousemove", onMove);
-              window.removeEventListener("mouseup", onUp);
-            };
-            window.addEventListener("mousemove", onMove);
-            window.addEventListener("mouseup", onUp);
-          }}
-        >
-          <div
-            className="absolute left-0 w-full rounded-full pointer-events-none"
-            style={{
-              height: "25%",
-              top: `${scrollFraction * 75}%`,
-              background: mainColor ?? "#7a6f47",
-              transition: "top 80ms linear",
-            }}
-          />
-        </div>
+        <AboutLayout
+          ref={scrollPanelRef}
+          heroUrl={heroUrl}
+          mainColor={mainColor}
+          aboutBody={aboutBody}
+          scrollFraction={scrollFraction}
+          onScrollbarMouseDown={handleScrollbarMouseDown}
+        />
       </main>
     );
   }
@@ -252,7 +164,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       animate={exiting ? { y: "-50%" } : { y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       onAnimationComplete={() => {
-        if (exiting) router.replace("/about");
+        if (exiting) router.push("/about");
       }}
     >
       {/* ── First screen: hero ── */}
@@ -304,38 +216,15 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
 
       {/* ── Second screen: about (revealed during scroll animation) ── */}
       <div
-        className="h-dvh w-full grid grid-cols-1 lg:grid-cols-[2fr_1fr]"
+        className="h-dvh w-full"
         style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
       >
-        <div className="relative h-full bg-[#e8ddd4]">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-75"
-            style={{ backgroundImage: `url('${heroUrl}')` }}
-          />
-          <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
-        </div>
-
-        <div className="bg-textured relative flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 lg:py-12">
-          <div className="flex gap-4 mb-8">
-            <a href="https://www.instagram.com/gentleworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
-              <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/instagram.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/instagram.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
-            </a>
-            <a href="https://www.linkedin.com/company/gentleworks/about/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
-              <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/linkedin.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/linkedin.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
-            </a>
-          </div>
-          <div className="max-w-lg display text-[25px] text-ink/80" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
-            {aboutBody ? (
-              <PortableText value={aboutBody} />
-            ) : (
-              FALLBACK_BODY.map((item, i) => (
-                <p key={item.key} className={i > 0 ? "mt-8" : undefined}>
-                  {item.p}
-                </p>
-              ))
-            )}
-          </div>
-        </div>
+        <AboutLayout
+          heroUrl={heroUrl}
+          mainColor={mainColor}
+          aboutBody={aboutBody}
+          scrollFraction={0}
+        />
       </div>
     </motion.div>
   );

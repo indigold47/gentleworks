@@ -69,17 +69,18 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
                 isActive
                   ? `font-extrabold ${themeColor ? "" : v.active}`
                   : `font-semibold ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`
-              } ${showGlassBubble ? `inline-flex flex-col items-start backdrop-blur-md rounded-full px-2 py-1.5 border ${glassBorder}` : ""}`}
+              } ${showGlassBubble ? `relative inline-flex items-center backdrop-blur-md rounded-full px-2 py-1.5 border ${glassBorder}` : ""}`}
               style={{
                 ...(isActive ? activeStyle : idleStyle),
                 ...(showGlassBubble ? { background: glassBg } : {}),
               }}
             >
-              {/* Hidden non-italic span reserves upright width so the pill never shrinks when text goes italic */}
+              {/* Upright span always occupies space to fix pill width — hidden via opacity only */}
               {showGlassBubble && (
-                <span aria-hidden className="block h-0 overflow-hidden not-italic select-none">{item.label}</span>
+                <span aria-hidden className={`not-italic select-none transition-opacity ${isActive ? "opacity-0" : "opacity-100 group-hover:opacity-0"}`}>{item.label}</span>
               )}
-              <span className={isActive ? "italic" : "not-italic group-hover:italic"}>
+              {/* Italic span is absolute so it centers within the fixed-width pill without affecting layout */}
+              <span className={`${showGlassBubble ? "absolute inset-0 flex items-center justify-center transition-opacity" : ""} ${isActive ? "italic opacity-100" : `not-italic group-hover:italic ${showGlassBubble ? "opacity-0 group-hover:opacity-100" : ""}`}`}>
                 {item.label}
               </span>
             </Link>
