@@ -215,7 +215,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
   return (
     <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
-      <div className="bg-textured relative sticky top-0 z-10 h-[33svh] lg:h-svh lg:flex lg:flex-col lg:justify-end">
+      <div className="bg-textured relative sticky top-0 z-10 h-[33svh] md:min-h-[220px] md:h-[45svh] lg:h-svh lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
         {/* Desktop: nav is absolute overlay, photo at bottom */}
         <div className="lg:hidden">
@@ -270,7 +270,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
               >
                 <p className="text-sm mb-2">{activeMember.fullName}</p>
                 {activeMember.picture ? (
-                  <div className="relative w-[350px] overflow-hidden" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }}>
+                  <div className="relative w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
                     <Image
                       src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                       alt={activeMember.picture.alt}
@@ -280,7 +280,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                     />
                   </div>
                 ) : (
-                  <div className="w-[350px] bg-muted/30" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }} />
+                  <div className="w-[350px] bg-muted/30" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }} />
                 )}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -298,7 +298,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col items-start"
               >
-                <div className="w-[350px] overflow-hidden" style={{ height: "clamp(160px, calc(100svh - 300px), 420px)" }}>
+                <div className="w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
                   <TeamMedia url={teamGifUrl} className="w-full h-full object-cover" />
                 </div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -392,7 +392,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
         </div>
 
         {/* Scrollable team list — contained within the panel */}
-        <div ref={scrollContainerRef} className="lg:overflow-y-auto lg:flex-1 lg:-mx-12 lg:px-12 mt-2">
+        <div ref={scrollContainerRef} className="lg:overflow-y-auto lg:flex-1 lg:-mx-12 lg:px-12 mt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Accordion list */}
         <div className="flex flex-col">
           {filtered.map((member) => {
