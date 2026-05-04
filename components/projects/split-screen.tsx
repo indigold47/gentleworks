@@ -336,9 +336,35 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayId]);
 
-  // Scrollbar thumb position: driven by active project index
+  // Scrollbar thumb position: driven by active project index (desktop)
   const thumbFraction =
     filteredProjects.length > 1 ? activeIdx / (filteredProjects.length - 1) : 0;
+
+  // Mobile scroll-driven thumb position
+  const [mobileThumbFraction, setMobileThumbFraction] = useState(0);
+  const listPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const panel = listPanelRef.current;
+    if (!panel) return;
+    if (window.innerWidth >= 1024) return;
+
+    function onScroll() {
+      if (!panel) return;
+      const rect = panel.getBoundingClientRect();
+      const viewportH = window.innerHeight;
+      // How far the panel has scrolled through the viewport
+      // 0 = panel top is at viewport bottom, 1 = panel bottom is at viewport top
+      const totalTravel = rect.height + viewportH;
+      const scrolled = viewportH - rect.top;
+      const fraction = Math.max(0, Math.min(1, scrolled / totalTravel));
+      setMobileThumbFraction(fraction);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [filteredProjects.length]);
 
   /* Toggle a filter value in the URL */
   const toggleFilter = useCallback(
@@ -678,7 +704,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
         </div>
 
         {/* Right: filters + project index table */}
-        <div className="bg-textured relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
+        <div ref={listPanelRef} className="bg-textured relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
           {/* Filter section — hidden on mobile per design */}
           <div className="mb-12 hidden lg:flex gap-6 lg:pr-20">
             {/* Filters — takes remaining space */}
@@ -814,54 +840,78 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
             </div>
           )}
 
-          {/* Custom scroll indicator — centered on the split seam, desktop only */}
+          {/* Custom scroll indicator — desktop: centered on split seam; mobile: right edge of list panel */}
           {filteredProjects.length > 0 && (() => {
             const count = filteredProjects.length;
             const thumbPct = Math.max(5, 100 / count);
             const maxOffset = 100 - thumbPct;
-            const thumbTop = maxOffset > 0 ? thumbFraction * maxOffset : 0;
+            const desktopThumbTop = maxOffset > 0 ? thumbFraction * maxOffset : 0;
+            const mobileThumbTop = maxOffset > 0 ? mobileThumbFraction * maxOffset : 0;
 
             return (
-              <div
-                role="scrollbar"
-                aria-controls="project-table"
-                aria-valuenow={activeIdx}
-                aria-valuemin={0}
-                aria-valuemax={count - 1}
-                aria-orientation="vertical"
-                className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
-                style={{ height: 750 }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  const track = e.currentTarget;
-                  const rect = track.getBoundingClientRect();
-
-                  const setFromY = (clientY: number) => {
-                    const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-                    const idx = Math.round(fraction * (count - 1));
-                    setWheelIdx(idx);
-                  };
-
-                  setFromY(e.clientY);
-
-                  const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
-                  const onUp = () => {
-                    window.removeEventListener("mousemove", onMove);
-                    window.removeEventListener("mouseup", onUp);
-                  };
-                  window.addEventListener("mousemove", onMove);
-                  window.addEventListener("mouseup", onUp);
-                }}
-              >
+              <>
+                {/* Desktop scrollbar */}
                 <div
-                  className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
-                  style={{
-                    height: `${thumbPct}%`,
-                    top: `${thumbTop}%`,
-                    transition: "top 600ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+                  role="scrollbar"
+                  aria-controls="project-table"
+                  aria-valuenow={activeIdx}
+                  aria-valuemin={0}
+                  aria-valuemax={count - 1}
+                  aria-orientation="vertical"
+                  className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
+                  style={{ height: 750 }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    const track = e.currentTarget;
+                    const rect = track.getBoundingClientRect();
+
+                    const setFromY = (clientY: number) => {
+                      const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+                      const idx = Math.round(fraction * (count - 1));
+                      setWheelIdx(idx);
+                    };
+
+                    setFromY(e.clientY);
+
+                    const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+                    const onUp = () => {
+                      window.removeEventListener("mousemove", onMove);
+                      window.removeEventListener("mouseup", onUp);
+                    };
+                    window.addEventListener("mousemove", onMove);
+                    window.addEventListener("mouseup", onUp);
                   }}
-                />
-              </div>
+                >
+                  <div
+                    className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
+                    style={{
+                      height: `${thumbPct}%`,
+                      top: `${desktopThumbTop}%`,
+                      transition: "top 600ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+                    }}
+                  />
+                </div>
+
+                {/* Mobile scrollbar — right edge, same style as desktop */}
+                <div
+                  role="scrollbar"
+                  aria-orientation="vertical"
+                  aria-valuenow={Math.round(mobileThumbFraction * (count - 1))}
+                  aria-valuemin={0}
+                  aria-valuemax={count - 1}
+                  className="lg:hidden fixed right-3 top-[55svh] w-[14px] rounded-full border border-default-green/30 bg-cream z-50 overflow-hidden"
+                  style={{ height: "min(750px, calc(45svh - 40px))" }}
+                >
+                  <div
+                    className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
+                    style={{
+                      height: `${thumbPct}%`,
+                      top: `${mobileThumbTop}%`,
+                      transition: "top 200ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+                    }}
+                  />
+                </div>
+              </>
             );
           })()}
         </div>

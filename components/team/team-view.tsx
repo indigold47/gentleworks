@@ -227,24 +227,23 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
           />
 
           {/* Photo — absolute, right half of panel */}
-          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
+          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-center justify-start px-6 pt-6 pb-4 sm:px-10">
             {activeMember?.picture ? (
               <>
-                <p className="text-xs mb-1.5 text-right shrink-0">{activeMember.fullName}</p>
-                <div className="relative flex-1 min-h-0 w-full overflow-hidden">
-                  <Image
-                    src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
-                    alt={activeMember.picture.alt}
-                    fill
-                    sizes="(max-width: 1023px) 45vw, 400px"
-                    className="object-cover object-top"
-                  />
-                </div>
+                <p className="text-xs mb-1.5 shrink-0">{activeMember.fullName}</p>
+                <Image
+                  src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
+                  alt={activeMember.picture.alt}
+                  width={400}
+                  height={600}
+                  sizes="(max-width: 1023px) 45vw, 400px"
+                  className="flex-1 min-h-0 w-auto max-w-full object-contain"
+                />
               </>
             ) : activeMember && !activeMember.picture && teamGifUrl ? (
-              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-cover" />
+              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-contain" />
             ) : teamGifUrl ? (
-              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-cover" />
+              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-contain" />
             ) : null}
           </div>
         </div>
@@ -268,18 +267,18 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
               >
                 <p className="text-sm mb-2">{activeMember.fullName}</p>
                 {activeMember.picture ? (
-                  <div className="relative w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
+                  <div className="relative w-[350px]" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
                     <Image
                       src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                       alt={activeMember.picture.alt}
                       fill
                       sizes="400px"
-                      className="object-cover"
+                      className="object-contain object-left-top"
                     />
                   </div>
                 ) : teamGifUrl ? (
-                  <div className="w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
-                    <TeamMedia url={teamGifUrl} className="w-full h-full object-cover" />
+                  <div className="w-[350px]" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
+                    <TeamMedia url={teamGifUrl} className="w-full h-full object-contain" />
                   </div>
                 ) : (
                   <div className="w-[350px] bg-muted/30" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }} />
