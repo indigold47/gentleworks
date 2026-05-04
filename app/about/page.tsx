@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 
 import { HomeAboutView } from "@/components/home-about-view";
-import { getAboutPage } from "@/sanity/lib/fetch";
+import { getAboutPage, getSiteSettings } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ const FALLBACK_IMAGE_URL =
   "https://images.squarespace-cdn.com/content/v1/64da8e1294f20c35f1d5e9ca/3165763e-5418-49cd-a0a5-c652b5f4158c/KI_optimist+hall-7-web+copy.jpg";
 
 export default async function AboutPage() {
-  const data = await getAboutPage();
+  const [data, settings] = await Promise.all([getAboutPage(), getSiteSettings()]);
 
   const heroUrl = data?.heroImage
     ? urlFor(data.heroImage).width(1600).quality(80).auto("format").url()
@@ -35,6 +35,8 @@ export default async function AboutPage() {
         heroUrl={heroUrl}
         mainColor={mainColor}
         aboutBody={data?.body ?? null}
+        instagramUrl={settings?.instagramUrl}
+        linkedinUrl={settings?.linkedinUrl}
       />
     </ViewTransition>
   );

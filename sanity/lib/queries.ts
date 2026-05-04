@@ -177,7 +177,9 @@ export const siteSettingsQuery = defineQuery(`
     addressLine2,
     phone,
     email,
-    mapsUrl
+    mapsUrl,
+    instagramUrl,
+    linkedinUrl
   }
 `);
 

@@ -299,6 +299,8 @@ export type SiteSettingsData = {
   phone: string | null;
   email: string | null;
   mapsUrl: string | null;
+  instagramUrl: string | null;
+  linkedinUrl: string | null;
 };
 
 export type ContactPageData = {

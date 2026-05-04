@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="toggles_v1" data-name="toggles v1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #7c7048;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <g id="about_-_Anna" data-name="about - Anna">
+    <polyline class="cls-1" points="27.81 48.97 27.81 6.4 14.3 19.91"/>
+    <line class="cls-1" x1="41.76" y1="20.22" x2="27.95" y2="6.41"/>
+  </g>
+</svg>

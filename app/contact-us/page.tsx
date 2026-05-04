@@ -44,7 +44,7 @@ export default async function ContactUsPage() {
       <main
         id="main-content"
         className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+        style={{ "--page-theme-main": mainColor ?? "#7a7047" } as React.CSSProperties}
       >
         {/* Left: background panel with nav overlay */}
         <div className="relative h-[50svh] sticky top-0 z-10 lg:h-svh bg-[#c4b5a3]">

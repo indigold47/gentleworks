@@ -209,6 +209,11 @@ h1.display {
   }
 }
 
+@keyframes slow-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
 /* Honor reduced motion — applies globally */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -231,6 +236,12 @@ h1.display {
 [style*="--theme-secondary"] ::selection {
   background-color: var(--theme-secondary);
   color: var(--theme-main);
+}
+
+/* Page-level themed text selection (about, projects index, team, contact) */
+[style*="--page-theme-main"] ::selection {
+  background-color: var(--page-theme-main, #7a7047);
+  color: #fff;
 }
 
 /* Focus-visible is always visible for a11y */

@@ -15,18 +15,20 @@ type HomeAboutViewProps = {
   heroUrl?: string;
   mainColor?: string;
   aboutBody: AboutPageData["body"] | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
 };
 
-export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, aboutBody }: HomeAboutViewProps) {
+export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, aboutBody, instagramUrl, linkedinUrl }: HomeAboutViewProps) {
   const router = useRouter();
   const [exiting, setExiting] = useState(false);
 
   // Hoist the theme color to :root so the fixed logo (rendered outside <main>) can inherit it.
+  const resolvedColor = mainColor ?? "#7a7047";
   useEffect(() => {
-    if (!mainColor) return;
-    document.documentElement.style.setProperty("--page-theme-main", mainColor);
+    document.documentElement.style.setProperty("--page-theme-main", resolvedColor);
     return () => { document.documentElement.style.removeProperty("--page-theme-main"); };
-  }, [mainColor]);
+  }, [resolvedColor]);
 
   const scrollPanelRef = useRef<HTMLDivElement>(null);
   const [scrollFraction, setScrollFraction] = useState(0);
@@ -131,13 +133,15 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       <main
         id="main-content"
         className="flex flex-col"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+        style={{ "--page-theme-main": resolvedColor } as React.CSSProperties}
       >
         <AboutLayout
           ref={scrollPanelRef}
           heroUrl={heroUrl}
           mainColor={mainColor}
           aboutBody={aboutBody}
+          instagramUrl={instagramUrl}
+          linkedinUrl={linkedinUrl}
           scrollFraction={scrollFraction}
           onScrollbarMouseDown={handleScrollbarMouseDown}
         />
@@ -206,7 +210,8 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
         <a
           href="/about"
           onClick={handleArrowClick}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-12 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity animate-bounce cursor-pointer"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-12 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity cursor-pointer"
+          style={{ animation: "slow-bounce 3s ease-in-out infinite" }}
           aria-label="About Gentle Works"
         >
           <img src="/assets/down-arrow.svg" alt="" className="h-[82px] w-auto brightness-0 invert" />
@@ -217,12 +222,14 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       {/* ── Second screen: about (revealed during scroll animation) ── */}
       <div
         className="h-dvh w-full"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+        style={{ "--page-theme-main": resolvedColor } as React.CSSProperties}
       >
         <AboutLayout
           heroUrl={heroUrl}
           mainColor={mainColor}
           aboutBody={aboutBody}
+          instagramUrl={instagramUrl}
+          linkedinUrl={linkedinUrl}
           scrollFraction={0}
         />
       </div>

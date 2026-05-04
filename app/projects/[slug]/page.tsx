@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowDown } from "lucide-react";
 import { PortableText } from "next-sanity";
 import { Logo } from "@/components/logo";
 
@@ -14,6 +13,7 @@ import {
 import { urlFor } from "@/sanity/lib/image";
 import { ProjectGallery } from "@/components/projects/project-gallery";
 import { FadeInLeft } from "@/components/projects/fade-in-left";
+import { FooterScrollToTop } from "@/components/footer-scroll-to-top";
 
 /** Fallback when no theme is assigned in the CMS. */
 const defaultTheme = { mainColor: "#6b5c4a", secondaryColor: "#e8e0d8" };
@@ -102,8 +102,21 @@ export default async function ProjectPage({
     <main id="main-content" className="flex flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
       {/* Sticky header bar */}
       <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 sm:px-10 lg:pl-[45px] lg:pr-[25px] bg-cream/80 backdrop-blur-sm">
-        <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]}>
-          <ArrowDown size={20} strokeWidth={1.5} style={{ color: mainColor }} />
+        <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]} className="group">
+          <span
+            className="block h-[20px] w-[20px] transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
+            style={{
+              backgroundColor: mainColor,
+              maskImage: "url('/assets/left-arrow.svg')",
+              maskSize: "contain",
+              maskRepeat: "no-repeat",
+              maskPosition: "center",
+              WebkitMaskImage: "url('/assets/left-arrow.svg')",
+              WebkitMaskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+            }}
+          />
         </Link>
         <FadeInLeft onMount delay={0.1}>
           <h1 className="display text-lg sm:text-xl" style={{ color: mainColor }}>
@@ -126,7 +139,7 @@ export default async function ProjectPage({
 
           {/* Project info + Credits grid */}
           <FadeInLeft delay={0.1}>
-          <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm self-start">
+          <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm self-start" style={{ color: mainColor }}>
             {/* Project info */}
             {([
               ["Year Built", project.year?.toString()],
@@ -178,11 +191,7 @@ export default async function ProjectPage({
       <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[110px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
         <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <ArrowDown
-              size={16}
-              strokeWidth={1.5}
-              className="rotate-180"
-            />
+            <FooterScrollToTop color={mainColor} />
             <div>
               <p className="text-sm">Gentle Works</p>
               <p className="text-xs opacity-60">

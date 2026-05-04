@@ -46,7 +46,7 @@ export default async function ProjectsPage() {
       <main
         id="main-content"
         className="flex flex-col"
-        style={mainColor ? { "--page-theme-main": mainColor } as React.CSSProperties : undefined}
+        style={{ "--page-theme-main": mainColor ?? "#7a7047" } as React.CSSProperties}
       >
         <h1 className="sr-only">Projects</h1>
         <Suspense>

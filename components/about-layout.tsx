@@ -32,6 +32,8 @@ export type AboutLayoutProps = {
   heroUrl?: string;
   mainColor?: string;
   aboutBody: AboutPageData["body"] | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
   /** Show scroll-dependent fades and scrollbar (only on the standalone about page) */
   scrollFraction?: number;
   /** Handler for custom scrollbar drag */
@@ -43,7 +45,7 @@ export type AboutLayoutProps = {
  * Used both in the home page scroll animation (second screen) and on /about directly.
  */
 export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
-  function AboutLayout({ heroUrl, mainColor, aboutBody, scrollFraction, onScrollbarMouseDown }, ref) {
+  function AboutLayout({ heroUrl, mainColor, aboutBody, instagramUrl, linkedinUrl, scrollFraction, onScrollbarMouseDown }, ref) {
     const showScrollUI = scrollFraction !== undefined;
 
     return (
@@ -63,20 +65,20 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
               className="bg-textured relative flex flex-col justify-center lg:justify-start px-8 py-12 sm:px-12 lg:px-16 lg:py-12 lg:h-full lg:overflow-y-auto"
             >
               <div className="flex gap-4 mb-8 lg:mt-[400px]">
-                <a href="https://www.instagram.com/gentleworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
+                <a href={instagramUrl ?? "https://www.instagram.com/gentleworks/"} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="opacity-60 hover:opacity-100 transition-opacity">
                   <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/instagram.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/instagram.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
                 </a>
-                <a href="https://www.linkedin.com/company/gentleworks/about/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
+                <a href={linkedinUrl ?? "https://www.linkedin.com/company/gentleworks/about/"} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="opacity-60 hover:opacity-100 transition-opacity">
                   <span className="block h-[36px] w-[36px]" style={{ backgroundColor: mainColor ?? "#7a6f47", maskImage: "url('/assets/linkedin.svg')", maskSize: "contain", maskRepeat: "no-repeat", WebkitMaskImage: "url('/assets/linkedin.svg')", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat" }} />
                 </a>
               </div>
-              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
+              <div className="max-w-lg display text-[25px] lg:text-[30px] text-ink/80 space-y-8" style={{ lineHeight: "1.18", ...(mainColor ? { color: mainColor } : {}) }}>
                 <h1 className="sr-only">About Gentle Works</h1>
                 {aboutBody ? (
                   <PortableText value={aboutBody} />
                 ) : (
-                  FALLBACK_BODY.map((item, i) => (
-                    <p key={item.key} className={i > 0 ? "mt-8" : undefined}>
+                  FALLBACK_BODY.map((item) => (
+                    <p key={item.key}>
                       {item.p}
                     </p>
                   ))

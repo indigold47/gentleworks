@@ -46,6 +46,20 @@ export const siteSettings = defineType({
       description:
         "Link opened when the address is clicked. Leave empty to disable.",
     }),
+    defineField({
+      name: "instagramUrl",
+      title: "Instagram URL",
+      type: "url",
+      description:
+        'Full URL to the Instagram profile, e.g. "https://www.instagram.com/gentleworks/".',
+    }),
+    defineField({
+      name: "linkedinUrl",
+      title: "LinkedIn URL",
+      type: "url",
+      description:
+        'Full URL to the LinkedIn page, e.g. "https://www.linkedin.com/company/gentleworks/".',
+    }),
   ],
   preview: {
     prepare: () => ({

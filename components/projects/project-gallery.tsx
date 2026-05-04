@@ -255,8 +255,8 @@ function Lightbox({
               aria-label={zoomActive ? "Disable zoom" : "Enable hover zoom"}
             >
               <span
-                className="absolute inset-0 backdrop-blur-md border border-white/20"
-                style={{ backgroundColor: "rgba(255,255,255,0.15)", opacity: zoomActive ? 1 : 0.6 }}
+                className="absolute inset-0 rounded-sm backdrop-blur-xl backdrop-saturate-150"
+                style={{ backgroundColor: "rgba(255,255,255,0.2)", opacity: zoomActive ? 1 : 0.6 }}
               />
               <ZoomIn size={30} strokeWidth={1.5} className={`relative transition-opacity ${zoomActive ? "opacity-90" : "opacity-60"}`} />
             </button>}
@@ -331,8 +331,8 @@ function GalleryCard({
       >
         {/* glass background layer */}
         <span
-          className="absolute inset-0 backdrop-blur-md border border-white/20"
-          style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)", opacity: 0.45 }}
+          className="absolute inset-0 rounded-sm backdrop-blur-xl backdrop-saturate-150"
+          style={{ backgroundColor: `color-mix(in srgb, ${themeColor ?? "rgba(0,0,0,0.3)"} 50%, transparent)` }}
         />
         <Plus size={30} strokeWidth={1.5} className="relative transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
@@ -381,8 +381,8 @@ function VideoCard({
       >
         {/* glass background layer */}
         <span
-          className="absolute inset-0 backdrop-blur-md border border-white/20"
-          style={{ backgroundColor: themeColor ?? "rgba(0,0,0,0.3)", opacity: 0.45 }}
+          className="absolute inset-0 rounded-sm backdrop-blur-xl backdrop-saturate-150"
+          style={{ backgroundColor: `color-mix(in srgb, ${themeColor ?? "rgba(0,0,0,0.3)"} 50%, transparent)` }}
         />
         <Plus size={30} strokeWidth={1.5} className="relative transition-transform duration-300 ease-out group-hover:rotate-90" />
       </span>
