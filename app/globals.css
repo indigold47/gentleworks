@@ -76,6 +76,27 @@ summary,
   cursor: url("/assets/cursor.svg") 24 8, auto !important;
 }
 
+/* Homepage hero: hide system cursor so the carousel arrows act as cursor */
+.home-hero-cursor-none,
+.home-hero-cursor-none *,
+.home-hero-cursor-none *:hover,
+.home-hero-cursor-none *:active,
+.home-hero-cursor-none *:focus {
+  cursor: none !important;
+}
+
+/* Restore custom cursor on the down-arrow CTA and its children within the hero */
+.home-hero-cta,
+.home-hero-cta:hover,
+.home-hero-cta:active,
+.home-hero-cta:focus,
+.home-hero-cta *,
+.home-hero-cta *:hover,
+.home-hero-cta *:active,
+.home-hero-cta *:focus {
+  cursor: url("/assets/cursor.svg") 24 8, pointer !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

@@ -284,12 +284,6 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 ) : (
                   <div className="w-[350px] bg-muted/30" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }} />
                 )}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/assets/Gentle-works-green.svg"
-                  alt="Gentle Works"
-                  className="mt-4 w-[350px]"
-                />
               </motion.div>
             ) : teamGifUrl ? (
               <motion.div
@@ -303,15 +297,15 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                 <div className="w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
                   <TeamMedia url={teamGifUrl} className="w-full h-full object-cover" />
                 </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/assets/Gentle-works-green.svg"
-                  alt="Gentle Works"
-                  className="mt-4 w-[350px]"
-                />
               </motion.div>
             ) : null}
           </AnimatePresence>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/Gentle-works-green.svg"
+            alt="Gentle Works"
+            className="mt-4 w-[350px]"
+          />
         </div>
       </div>
 

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { urlFor } from "@/sanity/lib/image";
 import type { HomeMediaItem } from "@/sanity/lib/fetch";
@@ -112,15 +111,16 @@ export function HomeVideoCarousel({ items }: Props) {
           className="hidden md:flex pointer-events-none fixed top-0 left-0 z-50 items-center justify-center text-white"
           style={{
             transform: `translate(calc(${cursorPos.x}px - 50%), calc(${cursorPos.y}px - 50%))`,
-            width: 40,
-            height: 40,
+            width: 60,
+            height: 60,
           }}
         >
-          {cursorSide === "left" ? (
-            <ArrowLeft size={24} strokeWidth={1.5} />
-          ) : (
-            <ArrowRight size={24} strokeWidth={1.5} />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cursorSide === "left" ? "/assets/left-arrow.svg" : "/assets/right-arrow.svg"}
+            alt=""
+            className="w-[60px] h-auto brightness-0 invert"
+          />
         </div>
       )}
     </div>

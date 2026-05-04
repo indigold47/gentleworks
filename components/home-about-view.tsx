@@ -172,7 +172,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       }}
     >
       {/* ── First screen: hero ── */}
-      <main id="main-content" className="relative h-dvh w-full overflow-hidden select-none">
+      <main id="main-content" className="home-hero-cursor-none relative h-dvh w-full overflow-hidden select-none">
         <HomeVideoCarousel items={heroMedia} />
 
         {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}
@@ -210,7 +210,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
         <a
           href="/about"
           onClick={handleArrowClick}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-12 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity cursor-pointer"
+          className="home-hero-cta absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-0 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity p-12 lg:pb-12"
           style={{ animation: "slow-bounce 3s ease-in-out infinite" }}
           aria-label="About Gentle Works"
         >
