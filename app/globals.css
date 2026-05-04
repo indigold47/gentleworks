@@ -69,11 +69,30 @@ summary,
 }
 
 /* Lock the custom cursor universally — prevents any browser-native cursor swap */
-*,
-*:hover,
-*:active,
-*:focus {
-  cursor: url("/assets/cursor.svg") 24 8, auto !important;
+:where(*),
+:where(*):hover,
+:where(*):active,
+:where(*):focus {
+  cursor: url("/assets/cursor.svg") 24 8, auto;
+}
+
+/* Hover cursor for interactive elements and their children */
+a:hover,
+a:hover *,
+button:hover,
+button:hover *,
+[role="button"]:hover,
+[role="button"]:hover *,
+label[for]:hover,
+label[for]:hover *,
+select:hover,
+summary:hover,
+summary:hover *,
+[type="checkbox"]:hover,
+[type="radio"]:hover,
+[class*="cursor-pointer"]:hover,
+[class*="cursor-pointer"]:hover * {
+  cursor: url("/assets/cursor-hover.svg") 24 8, pointer !important;
 }
 
 /* Homepage hero: hide system cursor so the carousel arrows act as cursor */
@@ -87,14 +106,17 @@ summary,
 
 /* Restore custom cursor on the down-arrow CTA and its children within the hero */
 .home-hero-cta,
-.home-hero-cta:hover,
 .home-hero-cta:active,
 .home-hero-cta:focus,
 .home-hero-cta *,
-.home-hero-cta *:hover,
 .home-hero-cta *:active,
 .home-hero-cta *:focus {
   cursor: url("/assets/cursor.svg") 24 8, pointer !important;
+}
+
+.home-hero-cta:hover,
+.home-hero-cta *:hover {
+  cursor: url("/assets/cursor-hover.svg") 24 8, pointer !important;
 }
 
 body {

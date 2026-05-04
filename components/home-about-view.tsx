@@ -176,7 +176,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
         <HomeVideoCarousel items={heroMedia} />
 
         {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}
-        <div className="absolute inset-x-0 top-0 z-10 hidden lg:flex items-center justify-between px-[25px] pt-5">
+        <div className="absolute inset-x-0 top-0 z-10 hidden lg:flex items-start justify-between px-[25px] pt-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/GentleWorks-Logo-InLine.svg"
