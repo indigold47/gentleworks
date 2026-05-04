@@ -241,11 +241,8 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                   />
                 </div>
               </>
-            ) : activeMember ? (
-              <>
-                <p className="text-xs mb-1.5 text-right shrink-0">{activeMember.fullName}</p>
-                <div className="flex-1 min-h-0 w-full bg-muted/30" />
-              </>
+            ) : activeMember && !activeMember.picture && teamGifUrl ? (
+              <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-cover" />
             ) : teamGifUrl ? (
               <TeamMedia url={teamGifUrl} className="flex-1 min-h-0 w-full object-cover" />
             ) : null}
@@ -279,6 +276,10 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                       sizes="400px"
                       className="object-cover"
                     />
+                  </div>
+                ) : teamGifUrl ? (
+                  <div className="w-[350px] overflow-hidden" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }}>
+                    <TeamMedia url={teamGifUrl} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-[350px] bg-muted/30" style={{ height: "clamp(80px, calc(100svh - 420px), 420px)" }} />
@@ -367,12 +368,12 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
 
       {/* Bottom/Right panel: team list — fixed height on desktop, inner scroll */}
       <div ref={rightPanelRef} className="bg-textured relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:pt-24 lg:pb-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-hidden">
-        {/* Header — pinned, doesn't scroll */}
+        {/* Header + filter tabs — sticky on mobile so they stay visible while scrolling */}
+        <div className="sticky top-[33svh] md:top-[45svh] lg:static z-10 bg-textured pb-0">
         <div className="mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
         </div>
 
-        {/* Filter tabs — pinned, doesn't scroll */}
         <div className="flex items-center gap-0 border-b border-rule pb-1 mb-0">
           <span className="text-sm text-muted mr-auto">People</span>
           {(["all", "present", "past"] as const).map((f, i) => (
@@ -390,6 +391,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
               {f === "all" ? "All" : f === "present" ? "Present" : "Past"}
             </button>
           ))}
+        </div>
         </div>
 
         {/* Scrollable team list — contained within the panel */}
@@ -442,12 +444,16 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
                       style={{ overflow: "hidden" }}
                     >
                       <div className="pb-6">
-                        <p className="display italic text-base mb-4">
-                          {member.role}
-                        </p>
-                        <div className="text-sm leading-relaxed space-y-4">
-                          <PortableText value={member.description} />
-                        </div>
+                        {member.role && (
+                          <p className="display italic text-base mb-4">
+                            {member.role}
+                          </p>
+                        )}
+                        {member.description && member.description.length > 0 && (
+                          <div className="text-sm leading-relaxed space-y-4">
+                            <PortableText value={member.description} />
+                          </div>
+                        )}
                         {member.email && (
                           <p className="text-sm mt-4">
                             You can email {member.pronoun ?? "them"} at{" "}

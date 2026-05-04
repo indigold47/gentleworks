@@ -172,7 +172,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       }}
     >
       {/* ── First screen: hero ── */}
-      <main id="main-content" className="relative h-dvh w-full overflow-hidden">
+      <main id="main-content" className="relative h-dvh w-full overflow-hidden select-none">
         <HomeVideoCarousel items={heroMedia} />
 
         {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}

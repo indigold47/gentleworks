@@ -37,16 +37,14 @@ export const teamMember = defineType({
       name: "role",
       title: "Role",
       type: "string",
-      description: 'e.g. "Principal", "Project Designer".',
-      validation: (rule) => rule.required(),
+      description: 'e.g. "Principal", "Project Designer". Optional for past employees.',
     }),
     defineField({
       name: "description",
       title: "Description",
       type: "array",
       of: [{ type: "block" }],
-      description: "Bio text shown when the accordion is expanded.",
-      validation: (rule) => rule.required(),
+      description: "Bio text shown when the accordion is expanded. Optional for past employees.",
     }),
     defineField({
       name: "email",

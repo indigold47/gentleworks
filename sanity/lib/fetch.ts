@@ -317,8 +317,8 @@ export type TeamMemberItem = {
   displayName: string;
   fullName: string;
   slug: string;
-  role: string;
-  description: PortableTextBlock[];
+  role: string | null;
+  description: PortableTextBlock[] | null;
   email: string | null;
   pronoun: "her" | "him" | "them" | null;
   status: "present" | "past";
