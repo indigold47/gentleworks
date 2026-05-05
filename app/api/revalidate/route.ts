@@ -12,7 +12,7 @@
  *   URL:     https://<prod-domain>/api/revalidate
  *   Dataset: production
  *   Trigger: Create / Update / Delete
- *   Filter:  _type in ["project", "filterCategory", "teamMember", "theme"]
+ *   Filter:  _type in ["project", "filterCategory", "teamMember", "theme", "homePage", "aboutPage", "contactPage", "teamPage", "projectsPage", "siteSettings"]
  *   Projection: {
  *     "_type": _type,
  *     "slug":  slug.current
@@ -25,7 +25,19 @@ import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
 import { revalidateSecret } from "@/sanity/env";
-import { FILTERS_TAG, HOME_TAG, PROJECTS_TAG, TEAM_TAG, THEMES_TAG, projectTag } from "@/sanity/lib/fetch";
+import {
+  ABOUT_TAG,
+  CONTACT_TAG,
+  FILTERS_TAG,
+  HOME_TAG,
+  PROJECTS_PAGE_TAG,
+  PROJECTS_TAG,
+  SETTINGS_TAG,
+  TEAM_PAGE_TAG,
+  TEAM_TAG,
+  THEMES_TAG,
+  projectTag,
+} from "@/sanity/lib/fetch";
 
 type WebhookBody = {
   _type?: string;
@@ -89,6 +101,26 @@ export async function POST(req: NextRequest) {
       // Theme edits affect project pages that reference them → invalidate both.
       updateTag(THEMES_TAG);
       updateTag(PROJECTS_TAG);
+      break;
+    }
+    case "aboutPage": {
+      updateTag(ABOUT_TAG);
+      break;
+    }
+    case "contactPage": {
+      updateTag(CONTACT_TAG);
+      break;
+    }
+    case "teamPage": {
+      updateTag(TEAM_PAGE_TAG);
+      break;
+    }
+    case "projectsPage": {
+      updateTag(PROJECTS_PAGE_TAG);
+      break;
+    }
+    case "siteSettings": {
+      updateTag(SETTINGS_TAG);
       break;
     }
     default: {
