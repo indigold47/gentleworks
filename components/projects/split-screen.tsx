@@ -648,13 +648,13 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
               <ViewTransition name={activeLayer === "a" ? `project-hero-${layerA.slug}` : undefined} share={activeLayer === "a" ? "hero-morph" : undefined}>
                 <Image
                   src={urlFor(layerA.heroImage)
-                    .width(1600)
+                    .width(3200)
                     .quality(85)
                     .auto("format")
                     .url()}
                   alt={layerA.heroImage.alt}
                   fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 67vw, 100vw"
                   className="object-cover"
                   priority
                 />
@@ -674,13 +674,13 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
               <ViewTransition name={activeLayer === "b" ? `project-hero-${layerB.slug}` : undefined} share={activeLayer === "b" ? "hero-morph" : undefined}>
                 <Image
                   src={urlFor(layerB.heroImage)
-                    .width(1600)
+                    .width(3200)
                     .quality(85)
                     .auto("format")
                     .url()}
                   alt={layerB.heroImage.alt}
                   fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 67vw, 100vw"
                   className="object-cover"
                 />
               </ViewTransition>
