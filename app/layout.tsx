@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { FixedLogo } from "@/components/fixed-logo";
 import { Analytics } from "@/components/analytics";
@@ -9,6 +9,10 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gentle.works"),

@@ -426,7 +426,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
   /* Shared mobile toolbar */
   const mobileToolbar = (
-    <div className="absolute top-6 right-6 flex items-center gap-4 z-10 lg:hidden">
+    <div className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-4 z-10 lg:hidden">
       <button
         type="button"
         aria-label="List view"
@@ -460,7 +460,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {searchOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-ink/95 backdrop-blur-sm lg:hidden">
           {/* Search header */}
-          <div className="flex items-center gap-4 px-6 pt-6 pb-4 border-b border-cream/10">
+          <div className="flex items-center gap-4 px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-4 border-b border-cream/10">
             <Search size={20} strokeWidth={1.5} className="text-cream/40 shrink-0" />
             <input
               ref={searchInputRef}
