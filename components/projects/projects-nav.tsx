@@ -65,7 +65,7 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor }
             <Link
               href={item.href}
               transitionTypes={isActive ? undefined : ["page-nav"]}
-              className={`group display text-[22px] leading-snug tracking-wide shrink-0 ${
+              className={`group display text-[16px] lg:text-[22px] leading-snug tracking-wide shrink-0 ${
                 isActive
                   ? `font-extrabold ${themeColor ? "" : v.active}`
                   : `font-semibold ${themeColor ? "transition-opacity hover:opacity-100" : v.idle} transition-colors`

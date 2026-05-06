@@ -237,8 +237,34 @@ export const project = defineType({
       name: "description",
       title: "Description",
       type: "array",
-      of: [{ type: "block" }],
-      description: "Rich text shown on the individual project page.",
+      of: [
+        {
+          type: "block",
+          styles: [
+            { title: "Normal", value: "normal" },
+            { title: "Indent", value: "indent" },
+          ],
+        },
+        {
+          type: "object",
+          name: "divider",
+          title: "Dividing Line",
+          fields: [
+            defineField({
+              name: "style",
+              title: "Style",
+              type: "string",
+              initialValue: "line",
+              options: { list: [{ title: "Line", value: "line" }] },
+              readOnly: true,
+            }),
+          ],
+          preview: {
+            prepare: () => ({ title: "── Dividing Line ──" }),
+          },
+        },
+      ],
+      description: "Rich text shown on the individual project page. Use 'Indent' style for indented paragraphs, and insert a 'Dividing Line' block between sections.",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -255,7 +281,19 @@ export const project = defineType({
       title: "Credits",
       type: "object",
       fields: [
-        defineField({ name: "architectDesigner", title: "Architect/Designer", type: "string" }),
+        defineField({
+          name: "architectDesignerRole",
+          title: "Architect/Designer Role",
+          type: "string",
+          options: {
+            list: [
+              { title: "Architect", value: "Architect" },
+              { title: "Interior Designer", value: "Interior Designer" },
+              { title: "Architect and Interior Designer", value: "Architect and Interior Designer" },
+            ],
+          },
+        }),
+        defineField({ name: "architectDesigner", title: "Architect/Designer Name", type: "string" }),
         defineField({ name: "client", title: "Client", type: "string" }),
         defineField({ name: "photographer", title: "Photographer", type: "string" }),
         defineField({ name: "contractor", title: "Contractor", type: "string" }),
@@ -268,6 +306,24 @@ export const project = defineType({
         defineField({ name: "branding", title: "Branding", type: "string" }),
         defineField({ name: "otherSpecialists", title: "Other Specialists", type: "string" }),
         defineField({ name: "cinematographer", title: "Cinematographer", type: "string" }),
+        defineField({
+          name: "custom",
+          title: "Custom Credits",
+          type: "array",
+          description: "Add any additional credits not covered above.",
+          of: [
+            {
+              type: "object",
+              fields: [
+                defineField({ name: "label", title: "Role / Label", type: "string", validation: (rule) => rule.required() }),
+                defineField({ name: "value", title: "Name / Value", type: "string", validation: (rule) => rule.required() }),
+              ],
+              preview: {
+                select: { title: "label", subtitle: "value" },
+              },
+            },
+          ],
+        }),
       ],
     }),
     defineField({

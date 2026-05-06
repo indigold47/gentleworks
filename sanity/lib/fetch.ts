@@ -201,6 +201,7 @@ export type ProjectDetail = ProjectListItem & {
   heroVideo: SanityVideo | null;
   galleryRows: GalleryRow[] | null;
   credits: {
+    architectDesignerRole?: string;
     architectDesigner?: string;
     client?: string;
     photographer?: string;
@@ -214,6 +215,7 @@ export type ProjectDetail = ProjectListItem & {
     branding?: string;
     otherSpecialists?: string;
     cinematographer?: string;
+    custom?: Array<{ _key: string; label: string; value: string }>;
   } | null;
   theme: ProjectTheme | null;
 };

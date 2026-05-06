@@ -133,7 +133,21 @@ export default async function ProjectPage({
           {/* Description */}
           <FadeInLeft>
             <div className="text-base leading-relaxed" style={{ color: mainColor }}>
-              <PortableText value={project.description} />
+              <PortableText
+                value={project.description}
+                components={{
+                  block: {
+                    indent: ({ children }) => (
+                      <p className="pl-8">{children}</p>
+                    ),
+                  },
+                  types: {
+                    divider: () => (
+                      <hr className="my-6 border-t border-current opacity-20" />
+                    ),
+                  },
+                }}
+              />
             </div>
           </FadeInLeft>
 
@@ -142,9 +156,14 @@ export default async function ProjectPage({
           <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm self-start" style={{ color: mainColor }}>
             {/* Project info */}
             {([
-              ["Year Built", project.year?.toString()],
+              ["Status", project.status
+                ? project.status === "built" && project.year
+                  ? `Built, ${project.year}`
+                  : project.status.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+                : undefined],
               ["Type", [...(Array.isArray(project.projectType) ? project.projectType : project.projectType ? [project.projectType] : []), ...(Array.isArray(project.projectTag) ? project.projectTag : project.projectTag ? [project.projectTag] : [])].map((v) => v.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ") || undefined],
               ["Location", project.location],
+              ["Client", project.client ?? undefined],
             ] as [string, string | undefined][])
               .filter(([, value]) => value)
               .map(([label, value]) => (
@@ -159,7 +178,7 @@ export default async function ProjectPage({
             {/* Credits */}
             {project.credits &&
               ([
-                ["Architect/Designer", project.credits.architectDesigner],
+                [project.credits.architectDesignerRole ?? "Architect/Designer", project.credits.architectDesigner],
                 ["Client", project.credits.client],
                 ["Photographer", project.credits.photographer],
                 ["Contractor", project.credits.contractor],
@@ -180,6 +199,14 @@ export default async function ProjectPage({
                       {label}:
                     </dt>
                     <dd className="mt-0.5">{value}</dd>
+                  </div>
+                ))}
+            {project.credits?.custom?.map((c) => (
+                  <div key={c._key}>
+                    <dt className="display italic" style={{ color: mainColor }}>
+                      {c.label}:
+                    </dt>
+                    <dd className="mt-0.5">{c.value}</dd>
                   </div>
                 ))}
           </dl>

@@ -141,10 +141,14 @@ function searchProjects(projects: ProjectDetail[], query: string): ProjectDetail
     // Credits fields
     if (p.credits) {
       fields.push(
-        ...Object.values(p.credits).filter(
-          (v): v is string => typeof v === "string",
-        ),
+        ...Object.entries(p.credits)
+          .filter(([k]) => k !== "custom")
+          .map(([, v]) => v)
+          .filter((v): v is string => typeof v === "string"),
       );
+      if (p.credits.custom) {
+        fields.push(...p.credits.custom.map((c) => c.value));
+      }
     }
 
     return fields.some((f) => f && f.toLowerCase().includes(q));
@@ -649,7 +653,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                 <Image
                   src={urlFor(layerA.heroImage)
                     .width(3200)
-                    .quality(85)
+                    .quality(90)
                     .auto("format")
                     .url()}
                   alt={layerA.heroImage.alt}
@@ -675,7 +679,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                 <Image
                   src={urlFor(layerB.heroImage)
                     .width(3200)
-                    .quality(85)
+                    .quality(90)
                     .auto("format")
                     .url()}
                   alt={layerB.heroImage.alt}

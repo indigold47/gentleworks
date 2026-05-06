@@ -488,7 +488,7 @@ export function ProjectGallery({
             />
           ) : (
             <GalleryCard
-              src={urlFor(heroImage).width(2400).quality(85).auto("format").url()}
+              src={urlFor(heroImage).width(3200).quality(90).auto("format").url()}
               alt={heroImage.alt}
               sizes="100vw"
               priority
@@ -541,8 +541,8 @@ export function ProjectGallery({
                       <AnimatedGalleryItem key={item.asset?._ref ?? slotIdx} delay={slotIdx * 0.1}>
                         <GalleryCard
                           src={urlFor(item)
-                            .width(1200)
-                            .quality(85)
+                            .width(2400)
+                            .quality(90)
                             .auto("format")
                             .url()}
                           alt={item.alt}

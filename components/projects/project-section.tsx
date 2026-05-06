@@ -20,7 +20,7 @@ export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectio
       {/* Left: sticky hero image */}
       <div className="relative h-[50svh] lg:sticky lg:top-0 lg:h-svh">
         <Image
-          src={urlFor(project.heroImage).width(1600).quality(85).auto("format").url()}
+          src={urlFor(project.heroImage).width(3200).quality(90).auto("format").url()}
           alt={project.heroImage.alt}
           fill
           sizes="(min-width: 1024px) 50vw, 100vw"
@@ -49,21 +49,45 @@ export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectio
         {/* Description (portable text) */}
         {project.description && (
           <div className="mt-8 max-w-lg space-y-4 text-base leading-relaxed">
-            <PortableText value={project.description} />
+            <PortableText
+              value={project.description}
+              components={{
+                block: {
+                  indent: ({ children }) => (
+                    <p className="pl-8">{children}</p>
+                  ),
+                },
+                types: {
+                  divider: () => (
+                    <hr className="my-6 border-t border-current opacity-20" />
+                  ),
+                },
+              }}
+            />
           </div>
         )}
 
         {/* Credits */}
-        {project.credits && Object.values(project.credits).some(Boolean) && (
+        {project.credits && (Object.entries(project.credits).some(([k, v]) => k !== "custom" && v) || project.credits.custom?.length) && (
           <dl className="mt-10 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
             {Object.entries(project.credits)
-              .filter(([, value]) => value)
+              .filter(([key, value]) => key !== "custom" && key !== "architectDesignerRole" && value)
               .map(([key, value]) => (
                 <div key={key} className="contents">
-                  <dt className="text-muted capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</dt>
-                  <dd>{value}</dd>
+                  <dt className="text-muted capitalize">
+                    {key === "architectDesigner"
+                      ? (project.credits!.architectDesignerRole ?? "Architect/Designer")
+                      : key.replace(/([A-Z])/g, " $1").trim()}
+                  </dt>
+                  <dd>{value as string}</dd>
                 </div>
               ))}
+            {project.credits.custom?.map((c) => (
+              <div key={c._key} className="contents">
+                <dt className="text-muted">{c.label}</dt>
+                <dd>{c.value}</dd>
+              </div>
+            ))}
           </dl>
         )}
 
