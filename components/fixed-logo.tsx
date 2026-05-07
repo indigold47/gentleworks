@@ -19,7 +19,7 @@ function FixedLogoInner() {
       href="/"
       aria-label="Gentle Works home"
       transitionTypes={["page-nav"]}
-      className={`fixed z-50 top-5 right-6 sm:right-10 lg:right-[25px] h-[60px] w-[60px] max-lg:top-auto max-lg:right-auto max-lg:bottom-6 max-lg:left-6 transition-transform duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg] ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      className={`fixed z-50 top-[calc(1.25rem+env(safe-area-inset-top))] right-[calc(1.5rem+env(safe-area-inset-right))] sm:right-[calc(2.5rem+env(safe-area-inset-right))] lg:right-[25px] h-[60px] w-[60px] max-lg:top-auto max-lg:right-auto max-lg:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] max-lg:left-[calc(1.5rem+env(safe-area-inset-left))] transition-transform duration-700 ease-[var(--ease)] hover:scale-110 hover:rotate-[15deg] ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

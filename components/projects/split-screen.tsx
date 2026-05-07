@@ -873,7 +873,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   aria-valuemax={count - 1}
                   aria-orientation="vertical"
                   className="hidden lg:block fixed left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-30 overflow-hidden cursor-pointer"
-                  style={{ height: 750 }}
+                  style={{ height: "min(750px, calc(100svh - 120px))" }}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     const track = e.currentTarget;

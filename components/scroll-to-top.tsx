@@ -24,7 +24,7 @@ export function ScrollToTop() {
       type="button"
       aria-label="Scroll to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={`fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-rule bg-cream/90 backdrop-blur-sm text-ink transition-all hover:bg-sage hover:text-cream hover:border-sage ${
+      className={`fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-[calc(1.5rem+env(safe-area-inset-right))] z-30 flex h-11 w-11 items-center justify-center rounded-full border border-rule bg-cream/90 backdrop-blur-sm text-ink transition-all hover:bg-sage hover:text-cream hover:border-sage ${
         visible
           ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-4 pointer-events-none"
