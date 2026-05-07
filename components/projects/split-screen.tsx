@@ -260,12 +260,29 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   }, [filteredProjects.length]);
 
   // Wheel-based project cycling — accumulates scroll delta for smooth, slow scrolling
+  // Allows native scroll through when at boundaries (first/last project) so filters stay accessible.
+  const wheelIdxRef = useRef(0);
+  useEffect(() => { wheelIdxRef.current = wheelIdx; }, [wheelIdx]);
+
   useEffect(() => {
     let accumulator = 0;
     const THRESHOLD = 350; // pixels of scroll needed to advance one project
 
     function onWheel(e: WheelEvent) {
       if (window.innerWidth < 1024) return;
+
+      const idx = wheelIdxRef.current;
+      const atFirst = idx === 0;
+      const atLast = idx >= filteredProjects.length - 1;
+      const scrollingUp = e.deltaY < 0;
+      const scrollingDown = e.deltaY > 0;
+
+      // At boundaries, let native scroll handle it (e.g. to reach filters above or content below)
+      if ((atFirst && scrollingUp) || (atLast && scrollingDown)) {
+        accumulator = 0;
+        return;
+      }
+
       e.preventDefault();
 
       accumulator += e.deltaY;
