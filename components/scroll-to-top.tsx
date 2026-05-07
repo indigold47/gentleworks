@@ -30,7 +30,7 @@ export function ScrollToTop() {
           : "opacity-0 translate-y-4 pointer-events-none"
       }`}
     >
-      <ArrowUp size={18} strokeWidth={1.5} />
+      <ArrowUp size={24} strokeWidth={1.5} />
     </button>
   );
 }

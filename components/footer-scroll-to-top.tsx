@@ -9,7 +9,7 @@ export function FooterScrollToTop({ color }: { color: string }) {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
       <span
-        className="block h-[16px] w-[16px] transition-transform duration-300 ease-out group-hover:-translate-y-1"
+        className="block h-[40px] w-[40px] transition-transform duration-300 ease-out group-hover:-translate-y-1"
         style={{
           backgroundColor: color,
           maskImage: "url('/assets/up-arrow.svg')",

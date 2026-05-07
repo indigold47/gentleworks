@@ -742,7 +742,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                       <FilterChip
                         key={opt.value}
                         label={opt.label}
-                        active={activeFilters[cat.key].has(opt.value)}
+                        active={activeFilters[cat.key].has(opt.value) || (opt.value === "all" && cat.singleSelect && activeFilters[cat.key].size === 0)}
                         highlighted={highlightedValues.has(`${cat.key}:${opt.value}`)}
                         onClick={() => toggleFilter(cat.key, opt.value)}
                       />
@@ -788,7 +788,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                     <Link
                       href={`/projects/${project.slug}`}
                       transitionTypes={["nav-forward"]}
-                      className="display text-[20px] leading-[1.15]"
+                      className="display text-[22px] leading-[1.15]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {project.title}
