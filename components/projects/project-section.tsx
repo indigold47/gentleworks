@@ -15,15 +15,15 @@ type ProjectSectionProps = {
 export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectionProps) {
   return (
     <section
-      className="grid min-h-svh grid-cols-1 lg:grid-cols-2 border-b border-rule last:border-b-0"
+      className="grid min-h-svh grid-cols-1 md:grid-cols-2 border-b border-rule last:border-b-0"
     >
       {/* Left: sticky hero image */}
-      <div className="relative h-[50svh] lg:sticky lg:top-0 lg:h-svh">
+      <div className="relative h-[50svh] md:sticky md:top-0 md:h-svh">
         <Image
           src={urlFor(project.heroImage).width(3200).quality(90).auto("format").url()}
           alt={project.heroImage.alt}
           fill
-          sizes="(min-width: 1024px) 50vw, 100vw"
+          sizes="(min-width: 768px) 50vw, 100vw"
           className="object-cover"
           priority={isFirst}
         />
@@ -31,7 +31,7 @@ export function ProjectSection({ project, isFirst, imageOverlay }: ProjectSectio
       </div>
 
       {/* Right: scrollable project info */}
-      <div className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-16 lg:py-24">
+      <div className="flex flex-col justify-center px-6 py-12 sm:px-10 md:px-16 md:py-24">
         {/* Title + year */}
         <p className="text-sm uppercase tracking-[0.14em] text-muted">
           {project.year}

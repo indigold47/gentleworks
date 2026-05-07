@@ -224,8 +224,8 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   const [wheelIdx, setWheelIdx] = useState(0);
   const tableBodyRef = useRef<HTMLTableSectionElement>(null);
 
-  // Mobile view mode — list (default) or grid
-  const [mobileView, setMobileView] = useState<MobileView>("list");
+  // Mobile view mode — grid (default) or list
+  const [mobileView, setMobileView] = useState<MobileView>("grid");
 
   // Search
   const [searchOpen, setSearchOpen] = useState(false);
@@ -429,31 +429,40 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   const isGrid = mobileView === "grid";
 
   /* Shared mobile toolbar */
+  // Toolbar colors: cream over dark image (list view) vs dark over textured bg (grid view)
+  const tbActive = isGrid ? "text-default-green" : "text-cream";
+  const tbIdle = isGrid ? "text-default-green/50 hover:text-default-green" : "text-cream/60 hover:text-cream";
+  const tbGlassBg = isGrid ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.15)";
+  const tbGlassBorder = isGrid ? "border-black/10" : "border-white/10";
+
   const mobileToolbar = (
-    <div className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-4 z-10 lg:hidden">
+    <div className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-2 z-10 lg:hidden">
       <button
         type="button"
         aria-label="List view"
         onClick={() => setMobileView("list")}
-        className={`transition-colors ${!isGrid ? "text-cream" : "text-cream/60 hover:text-cream"}`}
+        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${!isGrid ? tbActive : tbIdle}`}
+        style={{ background: tbGlassBg }}
       >
-        <AlignJustify size={26} strokeWidth={1.5} />
+        <AlignJustify size={20} strokeWidth={1.8} />
       </button>
       <button
         type="button"
         aria-label="Grid view"
         onClick={() => setMobileView("grid")}
-        className={`transition-colors ${isGrid ? "text-cream" : "text-cream/60 hover:text-cream"}`}
+        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${isGrid ? tbActive : tbIdle}`}
+        style={{ background: tbGlassBg }}
       >
-        <LayoutGrid size={26} strokeWidth={1.5} />
+        <LayoutGrid size={20} strokeWidth={1.8} />
       </button>
       <button
         type="button"
         aria-label="Search projects"
         onClick={() => setSearchOpen(true)}
-        className="text-cream/60 hover:text-cream transition-colors"
+        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${tbIdle}`}
+        style={{ background: tbGlassBg }}
       >
-        <Search size={26} strokeWidth={1.5} />
+        <Search size={20} strokeWidth={1.8} />
       </button>
     </div>
   );
@@ -462,7 +471,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     <>
       {/* ---- Search overlay ---- */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-ink/95 backdrop-blur-sm lg:hidden">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#7a7047]/85 backdrop-blur-sm lg:hidden">
           {/* Search header */}
           <div className="flex items-center gap-4 px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-4 border-b border-cream/10">
             <Search size={20} strokeWidth={1.5} className="text-cream/40 shrink-0" />
@@ -473,7 +482,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search projects..."
               aria-label="Search projects"
-              className="flex-1 bg-transparent text-cream text-lg placeholder:text-cream/30 outline-none display"
+              className="flex-1 bg-transparent text-cream text-lg placeholder:text-cream/70 outline-none display"
             />
             <button
               type="button"
@@ -550,10 +559,11 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
       {/* ---- Mobile grid view ---- */}
       {isGrid && (
-        <div className="lg:hidden min-h-svh">
-          {/* Nav header with dark background */}
-          <div className="relative bg-ink px-6 pt-6 pb-8 sm:px-10">
-            <SiteNav activeHref="/projects" className="relative z-10 flex flex-col gap-1" themeColor={themeColor} />
+        <div className="bg-textured lg:hidden min-h-svh">
+          {/* Nav header — sticky so it stays visible while scrolling the grid */}
+          <div className="bg-textured sticky top-0 z-20 relative pb-4">
+            <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} />
+            <div className="pt-[calc(15rem+env(safe-area-inset-top))]" />
             {mobileToolbar}
           </div>
 
@@ -636,7 +646,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       )}
 
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
-      <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr] ${isGrid ? "hidden lg:grid" : ""}`}>
+      <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr] ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
         <div className="relative h-[50svh] sticky top-0 z-10 overflow-hidden lg:h-svh">
           {/* Layer A */}
@@ -698,7 +708,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           <SiteNav activeHref="/projects" themeColor={themeColor} />
           {mobileToolbar}
           {/* Inline wordmark logo — bottom-left, matching team page positioning */}
-          <Link href="/" className="absolute bottom-12 left-12 z-10">
+          <Link href="/" className="hidden lg:block absolute bottom-12 left-12 z-10">
             <img
               src="/assets/GentleWorks-Logo-InLine.svg"
               alt="Gentle Works"
@@ -862,7 +872,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   aria-valuemin={0}
                   aria-valuemax={count - 1}
                   aria-orientation="vertical"
-                  className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
+                  className="hidden lg:block fixed left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-30 overflow-hidden cursor-pointer"
                   style={{ height: 750 }}
                   onMouseDown={(e) => {
                     e.preventDefault();
@@ -896,25 +906,6 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   />
                 </div>
 
-                {/* Mobile scrollbar — right edge, same style as desktop */}
-                <div
-                  role="scrollbar"
-                  aria-orientation="vertical"
-                  aria-valuenow={Math.round(mobileThumbFraction * (count - 1))}
-                  aria-valuemin={0}
-                  aria-valuemax={count - 1}
-                  className="lg:hidden fixed right-3 top-[55svh] w-[14px] rounded-full border border-default-green/30 bg-cream z-50 overflow-hidden"
-                  style={{ height: "min(750px, calc(45svh - 40px))" }}
-                >
-                  <div
-                    className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
-                    style={{
-                      height: `${thumbPct}%`,
-                      top: `${mobileThumbTop}%`,
-                      transition: "top 200ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
-                  />
-                </div>
               </>
             );
           })()}

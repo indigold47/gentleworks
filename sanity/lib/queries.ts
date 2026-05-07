@@ -236,3 +236,28 @@ export const allTeamMembersQuery = defineQuery(`
     }
   }
 `);
+
+export const pressPageQuery = defineQuery(`
+  *[_type == "pressPage"][0] {
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    }
+  }
+`);
+
+export const allPressItemsQuery = defineQuery(`
+  *[_type == "pressItem"] | order(coalesce(order, 9999) asc, year desc) {
+    _id,
+    name,
+    description,
+    year,
+    pressType,
+    link,
+    image {
+      ...,
+      "alt": coalesce(alt, "")
+    }
+  }
+`);

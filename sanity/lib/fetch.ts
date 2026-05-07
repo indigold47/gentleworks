@@ -8,9 +8,11 @@ import {
   allProjectsQuery,
   allProjectsDetailQuery,
   allProjectSlugsQuery,
+  allPressItemsQuery,
   allTeamMembersQuery,
   contactPageQuery,
   homePageQuery,
+  pressPageQuery,
   projectBySlugQuery,
   projectsPageQuery,
   siteSettingsQuery,
@@ -58,6 +60,8 @@ export const ABOUT_TAG = "about";
 export const CONTACT_TAG = "contact";
 export const TEAM_PAGE_TAG = "teamPage";
 export const PROJECTS_PAGE_TAG = "projectsPage";
+export const PRESS_TAG = "press";
+export const PRESS_PAGE_TAG = "pressPage";
 export const SETTINGS_TAG = "settings";
 
 export function projectTag(slug: string) {
@@ -105,6 +109,20 @@ export async function getAllTeamMembers() {
   return sanityFetch<TeamMemberItem[], typeof allTeamMembersQuery>({
     query: allTeamMembersQuery,
     tags: [TEAM_TAG],
+  });
+}
+
+export async function getAllPressItems() {
+  return sanityFetch<PressItem[], typeof allPressItemsQuery>({
+    query: allPressItemsQuery,
+    tags: [PRESS_TAG],
+  });
+}
+
+export async function getPressPage() {
+  return sanityFetch<PressPageData | null, typeof pressPageQuery>({
+    query: pressPageQuery,
+    tags: [PRESS_PAGE_TAG],
   });
 }
 
@@ -325,4 +343,18 @@ export type TeamMemberItem = {
   pronoun: "her" | "him" | "them" | null;
   status: "present" | "past";
   picture: SanityImage | null;
+};
+
+export type PressItem = {
+  _id: string;
+  name: string;
+  description: string;
+  year: number;
+  pressType: "award" | "article";
+  link: string;
+  image: SanityImage | null;
+};
+
+export type PressPageData = {
+  theme: ProjectTheme | null;
 };

@@ -251,7 +251,7 @@ function Lightbox({
             {imageLoaded && <button
               type="button"
               onClick={() => setZoomActive((z) => !z)}
-              className="absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center text-cream/90 transition-transform duration-300 ease-out hover:scale-110"
+              className="hidden md:flex absolute top-3 right-3 z-10 h-11 w-11 items-center justify-center text-cream/90 transition-transform duration-300 ease-out hover:scale-110"
               aria-label={zoomActive ? "Disable zoom" : "Enable hover zoom"}
             >
               <span
@@ -307,20 +307,24 @@ function GalleryCard({
   themeColor?: string;
   onClick: () => void;
 }) {
+  const isAuto = aspect === "auto";
+
   return (
     <button
       type="button"
       onClick={onClick}
       className={`group relative overflow-hidden cursor-pointer w-full ${objectFit === "contain" ? "bg-white/60" : ""}`}
-      style={{ aspectRatio: aspect }}
+      style={isAuto ? undefined : { aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <Image
         src={src}
         alt={alt}
-        fill
+        {...(isAuto
+          ? { width: 2400, height: 1600, className: `w-full h-auto ${objectFit === "contain" ? "object-contain p-2" : "object-cover"}` }
+          : { fill: true, className: objectFit === "contain" ? "object-contain p-2" : "object-cover" }
+        )}
         sizes={sizes}
-        className={objectFit === "contain" ? "object-contain p-2" : "object-cover"}
         style={objectPosition ? { objectPosition } : undefined}
         priority={priority}
       />
@@ -357,17 +361,19 @@ function VideoCard({
   themeColor?: string;
   onClick: () => void;
 }) {
+  const isAuto = aspect === "auto";
+
   return (
     <button
       type="button"
       onClick={onClick}
       className="group relative overflow-hidden cursor-pointer w-full"
-      style={{ aspectRatio: aspect }}
+      style={isAuto ? undefined : { aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <video
         src={src}
-        className="absolute inset-0 h-full w-full object-cover"
+        className={isAuto ? "w-full h-auto object-cover" : "absolute inset-0 h-full w-full object-cover"}
         autoPlay
         loop
         muted
@@ -476,7 +482,7 @@ export function ProjectGallery({
   return (
     <>
       {/* Hero — video takes priority when present */}
-      <section className="px-6 sm:px-10 lg:px-[110px]">
+      <section className="px-6 sm:px-10 md:px-[110px]">
         <ViewTransition name={`project-hero-${slug}`} share="hero-morph">
           {heroVideo?.url ? (
             <VideoCard
@@ -506,7 +512,7 @@ export function ProjectGallery({
 
       {/* Gallery rows — preset-driven layout */}
       {galleryRows && galleryRows.length > 0 && (
-        <section className="flex flex-col gap-6 lg:gap-[45px] px-6 pt-6 pb-12 sm:px-10 lg:px-[110px] lg:pt-[40px] lg:pb-16">
+        <section className="flex flex-col gap-6 md:gap-[45px] px-6 pt-6 pb-12 sm:px-10 md:px-[110px] md:pt-[40px] md:pb-16">
           {galleryRows.map((row, rowIdx) => {
             const preset = GALLERY_PRESETS[row.preset as GalleryPresetId];
             if (!preset || !row.media?.length) return null;
@@ -514,7 +520,7 @@ export function ProjectGallery({
             return (
               <div
                 key={row._key ?? rowIdx}
-                className="grid grid-cols-1 gap-6 lg:gap-[45px] lg:[grid-template-columns:var(--preset-cols)]"
+                className={`grid grid-cols-1 gap-6 md:gap-[45px] md:[grid-template-columns:var(--preset-cols)] ${preset.aspects[0] === "auto" ? "items-start" : ""}`}
                 style={
                   { "--preset-cols": preset.cols } as React.CSSProperties
                 }

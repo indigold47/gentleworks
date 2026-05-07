@@ -12,7 +12,7 @@
  *   URL:     https://<prod-domain>/api/revalidate
  *   Dataset: production
  *   Trigger: Create / Update / Delete
- *   Filter:  _type in ["project", "filterCategory", "teamMember", "theme", "homePage", "aboutPage", "contactPage", "teamPage", "projectsPage", "siteSettings"]
+ *   Filter:  _type in ["project", "filterCategory", "teamMember", "theme", "homePage", "aboutPage", "contactPage", "teamPage", "projectsPage", "pressItem", "pressPage", "siteSettings"]
  *   Projection: {
  *     "_type": _type,
  *     "slug":  slug.current
@@ -30,6 +30,8 @@ import {
   CONTACT_TAG,
   FILTERS_TAG,
   HOME_TAG,
+  PRESS_PAGE_TAG,
+  PRESS_TAG,
   PROJECTS_PAGE_TAG,
   PROJECTS_TAG,
   SETTINGS_TAG,
@@ -117,6 +119,14 @@ export async function POST(req: NextRequest) {
     }
     case "projectsPage": {
       updateTag(PROJECTS_PAGE_TAG);
+      break;
+    }
+    case "pressItem": {
+      updateTag(PRESS_TAG);
+      break;
+    }
+    case "pressPage": {
+      updateTag(PRESS_PAGE_TAG);
       break;
     }
     case "siteSettings": {

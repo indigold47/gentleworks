@@ -23,7 +23,9 @@ export type GalleryPresetId =
   | "landscape-portrait"
   | "portrait-landscape"
   | "three-portrait"
-  | "two-square";
+  | "two-square"
+  | "custom-1"
+  | "custom-2";
 
 export type GalleryPreset = {
   slots: number;
@@ -53,7 +55,7 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
   },
   "landscape-two-wide": {
     slots: 3,
-    label: "Landscape + Two Wide (4:3 + 3:8 + 3:8)",
+    label: "Landscape + Two Vertical (4:3 + 3:8 + 3:8)",
     aspects: ["4/3", "3/8", "3/8"],
     cols: "1fr 2fr 2fr",
     sizes: [
@@ -64,7 +66,7 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
   },
   "two-wide-landscape": {
     slots: 3,
-    label: "Two Wide + Landscape (3:8 + 3:8 + 4:3)",
+    label: "Two Vertical + Landscape (3:8 + 3:8 + 4:3)",
     aspects: ["3/8", "3/8", "4/3"],
     cols: "2fr 2fr 1fr",
     sizes: [
@@ -148,6 +150,23 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
     slots: 2,
     label: "Two Square (1:1 + 1:1)",
     aspects: ["1/1", "1/1"],
+    cols: "1fr 1fr",
+    sizes: [
+      "(min-width: 640px) 50vw, 100vw",
+      "(min-width: 640px) 50vw, 100vw",
+    ],
+  },
+  "custom-1": {
+    slots: 1,
+    label: "Custom — 1 Image (native proportions)",
+    aspects: ["auto"],
+    cols: "1fr",
+    sizes: ["100vw"],
+  },
+  "custom-2": {
+    slots: 2,
+    label: "Custom — 2 Images (native proportions)",
+    aspects: ["auto", "auto"],
     cols: "1fr 1fr",
     sizes: [
       "(min-width: 640px) 50vw, 100vw",

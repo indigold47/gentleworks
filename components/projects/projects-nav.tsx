@@ -10,6 +10,7 @@ const navItems: NavItem[] = [
   { label: "Project Index", href: "/projects" },
   { label: "Our Team", href: "/team" },
   { label: "Contact Us", href: "/contact-us" },
+  { label: "Press", href: "/press" },
 ];
 
 type SiteNavProps = {

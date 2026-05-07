@@ -175,42 +175,42 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       <main id="main-content" className="home-hero-cursor-none relative h-dvh w-full overflow-hidden select-none">
         <HomeVideoCarousel items={heroMedia} />
 
-        {/* ── Desktop: top bar — wordmark left, circular logo right, same padding edge-to-edge ── */}
-        <div className="absolute inset-x-0 top-0 z-10 hidden lg:flex items-start justify-between px-[25px] pt-5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/GentleWorks-Logo-InLine.svg"
-            alt="Gentle Works"
-            className="w-[450px] max-w-[55vw] h-auto brightness-0 invert"
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/Gentle-Works-Logo.svg"
-            alt=""
-            aria-hidden="true"
-            className="h-[60px] w-[60px] brightness-0 invert"
-          />
-        </div>
+        {/* ── Desktop: centered wordmark + circular logo top-right ── */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/GentleWorks-Logo-InLine.svg"
+          alt="Gentle Works"
+          className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[765px] max-w-[85vw] h-auto brightness-0 invert"
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 360 360"
+          aria-hidden="true"
+          className="hidden md:block absolute top-5 right-[25px] z-10 h-[60px] w-[60px]"
+        >
+          <path fill="#fff" d="M308.19,168.04v7.56c-1.1,9.77-2,19.45-4.76,29.35-3.39,12.15-7.24,24.05-14.67,34.3l-14.75,20.35c-14.96,20.65-32.45,29.72-55.7,39.45-11.34,4.74-22.91,8.01-35.25,8.79-23.3,1.48-52.7-3.71-71.18-17.58l-15.37-11.53c-18.09-13.58-30.63-26.34-37.52-48.73-5.96-19.36-8.14-38.87-7.14-59.2.64-13.2,3.09-25.78,6.64-38.4,7.51-26.66,26.77-47.78,50.17-61.56,5.86-3.45,11.86-5.54,18.47-7.14,12.43-3.01,24.53-5.96,37.33-7.14,7.97-.73,24.7-.91,32.35.03,10.9,1.34,21.11,3.63,31.57,6.83,18.18,5.55,33.98,15.04,47.76,28.07,19.63,18.58,28.62,51.17,32.05,76.56Z" />
+        </svg>
         {/* ── Mobile: centered wordmark at top ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/GentleWorks-Logo-InLine.svg"
           alt="Gentle Works"
-          className="lg:hidden absolute top-[60px] left-1/2 -translate-x-1/2 z-10 w-[75vw] h-auto brightness-0 invert"
+          className="md:hidden absolute top-[60px] left-1/2 -translate-x-1/2 z-10 w-[75vw] h-auto brightness-0 invert"
         />
         {/* ── Mobile: circular logo at bottom-left (mirrors FixedLogo on other pages) ── */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/Gentle-Works-Logo.svg"
-          alt=""
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 360 360"
           aria-hidden="true"
-          className="lg:hidden absolute bottom-6 left-6 z-10 h-[60px] w-[60px] brightness-0 invert"
-        />
+          className="md:hidden absolute bottom-6 left-6 z-10 h-[60px] w-[60px]"
+        >
+          <path fill="#fff" d="M308.19,168.04v7.56c-1.1,9.77-2,19.45-4.76,29.35-3.39,12.15-7.24,24.05-14.67,34.3l-14.75,20.35c-14.96,20.65-32.45,29.72-55.7,39.45-11.34,4.74-22.91,8.01-35.25,8.79-23.3,1.48-52.7-3.71-71.18-17.58l-15.37-11.53c-18.09-13.58-30.63-26.34-37.52-48.73-5.96-19.36-8.14-38.87-7.14-59.2.64-13.2,3.09-25.78,6.64-38.4,7.51-26.66,26.77-47.78,50.17-61.56,5.86-3.45,11.86-5.54,18.47-7.14,12.43-3.01,24.53-5.96,37.33-7.14,7.97-.73,24.7-.91,32.35.03,10.9,1.34,21.11,3.63,31.57,6.83,18.18,5.55,33.98,15.04,47.76,28.07,19.63,18.58,28.62,51.17,32.05,76.56Z" />
+        </svg>
 
         <a
           href="/about"
           onClick={handleArrowClick}
-          className="home-hero-cta absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-auto lg:bottom-0 lg:translate-y-0 z-10 hover:opacity-80 transition-opacity p-12 lg:pb-12"
+          className="home-hero-cta absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:top-auto md:bottom-0 md:translate-y-0 z-10 hover:opacity-80 transition-opacity p-12 md:pb-12"
           style={{ animation: "slow-bounce 3s ease-in-out infinite" }}
           aria-label="About Gentle Works"
         >

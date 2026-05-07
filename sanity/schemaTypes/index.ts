@@ -7,6 +7,8 @@ import { homePage } from "./homePage";
 import { project } from "./project";
 import { projectsPage } from "./projectsPage";
 import { siteSettings } from "./siteSettings";
+import { pressItem } from "./pressItem";
+import { pressPage } from "./pressPage";
 import { teamMember } from "./teamMember";
 import { teamPage } from "./teamPage";
 import { theme } from "./theme";
@@ -16,6 +18,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   contactPage,
   filterCategory,
   homePage,
+  pressItem,
+  pressPage,
   project,
   projectsPage,
   siteSettings,

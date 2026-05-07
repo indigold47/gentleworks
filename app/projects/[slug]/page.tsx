@@ -99,9 +99,9 @@ export default async function ProjectPage({
       }}
       default="none"
     >
-    <main id="main-content" className="mx-auto flex w-full max-w-[1750px] flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
-      {/* Sticky header bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-10 lg:pl-[45px] lg:pr-[25px] bg-cream/80 backdrop-blur-sm">
+    <main id="main-content" className="flex w-full flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
+      {/* Sticky header bar — full width */}
+      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-10 md:pl-[45px] md:pr-[25px] bg-cream/80 backdrop-blur-sm">
         <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]} className="group">
           <span
             className="block h-[20px] w-[20px] transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
@@ -127,9 +127,10 @@ export default async function ProjectPage({
       </header>
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
+      <div className="mx-auto w-full max-w-[1750px]">
       <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug} themeColor={mainColor}>
         {/* Description + Credits */}
-        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-2 lg:gap-[45px] lg:px-[110px] lg:pt-16 lg:pb-0">
+        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 md:grid-cols-[3fr_2fr] md:gap-[45px] md:px-[110px] md:pt-16 md:pb-0">
           {/* Description */}
           <FadeInLeft>
             <div className="text-base leading-relaxed" style={{ color: mainColor }}>
@@ -179,7 +180,6 @@ export default async function ProjectPage({
             {project.credits &&
               ([
                 [project.credits.architectDesignerRole ?? "Architect/Designer", project.credits.architectDesigner],
-                ["Client", project.credits.client],
                 ["Photographer", project.credits.photographer],
                 ["Contractor", project.credits.contractor],
                 ["MEP Engineer", project.credits.mepEngineer],
@@ -213,9 +213,10 @@ export default async function ProjectPage({
           </FadeInLeft>
         </section>
       </ProjectGallery>
+      </div>
 
-      {/* Footer */}
-      <footer className="border-t border-rule px-6 py-8 sm:px-10 lg:px-[110px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
+      {/* Footer — full width */}
+      <footer className="border-t border-rule px-6 py-8 sm:px-10 md:pl-[45px] md:pr-[25px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
         <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <FooterScrollToTop color={mainColor} />
