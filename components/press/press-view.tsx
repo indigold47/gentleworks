@@ -162,7 +162,7 @@ export function PressView({ items, themeColor }: PressViewProps) {
       style={{ color: themeColor ?? "#7b6f47" }}
     >
       {/* Left panel: nav + press list */}
-      <div ref={listPanelRef} className="bg-textured relative flex flex-col">
+      <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
         {/* Nav */}
         <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} />
 

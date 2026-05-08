@@ -578,7 +578,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {isGrid && (
         <div className="bg-textured lg:hidden min-h-svh">
           {/* Nav header — sticky so it stays visible while scrolling the grid */}
-          <div className="bg-textured sticky top-0 z-20 relative pb-4">
+          <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative pb-4">
             <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} />
             <div className="pt-[calc(15rem+env(safe-area-inset-top))]" />
             {mobileToolbar}
@@ -665,7 +665,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
       <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr] ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
-        <div className="relative h-[50svh] sticky top-0 z-10 overflow-hidden lg:h-svh">
+        <div className="bleed-safe-top relative h-[calc(50svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))]">
           {/* Layer A */}
           {layerA && (
             <div

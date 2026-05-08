@@ -101,7 +101,7 @@ export default async function ProjectPage({
     >
     <main id="main-content" className="flex w-full flex-col" style={{ "--theme-main": mainColor, "--theme-secondary": secondaryColor } as React.CSSProperties}>
       {/* Sticky header bar — full width */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-5 pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-10 md:pl-[45px] md:pr-[25px] bg-cream/80 backdrop-blur-sm">
+      <header className="bleed-safe-top sticky top-0 z-20 flex items-center justify-between px-6 py-5 pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-10 md:pl-[45px] md:pr-[25px] bg-cream/80 backdrop-blur-sm">
         <Link href="/projects" aria-label="Back to projects" transitionTypes={["nav-back"]} className="group">
           <span
             className="block h-[40px] w-[40px] transition-transform duration-300 ease-out group-hover:-translate-x-1.5"

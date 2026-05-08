@@ -216,7 +216,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
   return (
     <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
-      <div className="bg-textured relative sticky top-0 z-10 h-[33svh] md:min-h-[220px] md:h-[45svh] lg:h-svh lg:flex lg:flex-col lg:justify-end">
+      <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] md:min-h-[220px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
         {/* Desktop: nav is absolute overlay, photo at bottom */}
         <div className="lg:hidden">

@@ -8,6 +8,9 @@
  */
 
 :root {
+  /* iOS safe-area shorthand — used to bleed backgrounds behind the status bar */
+  --sat: env(safe-area-inset-top, 0px);
+
   /* Brand colors */
   --color-ink: #141414;
   --color-cream: #f5f1ea;
@@ -289,6 +292,16 @@ h1.display {
 [style*="--page-theme-main"] ::selection {
   background-color: var(--page-theme-main, #7a7047);
   color: #fff;
+}
+
+/* ------------------------------------------------------------------ */
+/*  iOS safe-area bleed                                                */
+/* ------------------------------------------------------------------ */
+/* Pull a section upward so its background extends behind the status
+   bar / notch.  Apply to the first visual container on each page
+   (hero panel, sticky header, etc.).                                  */
+.bleed-safe-top {
+  margin-top: calc(-1 * var(--sat));
 }
 
 /* Focus-visible is always visible for a11y */
