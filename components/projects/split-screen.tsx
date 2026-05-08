@@ -314,8 +314,8 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   const activeIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
   const displayProject = filteredProjects[activeIdx] ?? filteredProjects[0];
 
-  // Effective highlight index: live hover > sticky (last hovered) > nothing
-  const effectiveHighlightIdx = hoveredIdx ?? stickyIdx;
+  // Effective highlight index: live hover > sticky (last hovered) > wheel-active
+  const effectiveHighlightIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
 
   // Compute which filter values the hovered project matches — used to highlight chips.
   const hoveredProject = effectiveHighlightIdx !== null ? filteredProjects[effectiveHighlightIdx] : null;
