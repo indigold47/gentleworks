@@ -159,7 +159,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
   return (
     <div
-      className="grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]"
+      className="grid grid-cols-1 lg:min-h-svh lg:grid-cols-[3fr_2fr]"
       style={{ color: themeColor ?? "#7b6f47" }}
     >
       {/* Mobile: sticky nav panel (matches about/contact/team pattern) */}
@@ -176,8 +176,8 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
         {/* Press list */}
         <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-64 lg:pb-12">
-          {/* Filter tabs */}
-          <div className="flex items-center justify-end gap-0 mb-4">
+          {/* Filter tabs — sticky on mobile below the nav panel */}
+          <div className="flex items-center justify-end gap-0 mb-4 sticky top-[calc(33svh_+_var(--sat))] lg:static z-10 bg-textured py-2 -mt-2">
             {(["all", "award", "article"] as const).map((f, i) => (
               <button
                 key={f}

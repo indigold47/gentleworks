@@ -29,6 +29,7 @@ export default async function TeamPage() {
     >
       <main
         id="main-content"
+        className="bg-textured min-h-svh"
         style={{ "--page-theme-main": mainColor ?? "#7b6f47", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7b6f47" } as React.CSSProperties}
       >
         <TeamView members={members} themeColor={mainColor} secondaryColor={secondaryColor} teamGifUrl={teamGifUrl} />
