@@ -229,10 +229,10 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
           />
 
           {/* Photo — absolute, right half of panel */}
-          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-center justify-start px-6 pt-6 pb-4 sm:px-10">
+          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
             {activeMember?.picture ? (
               <>
-                <p className="text-xs mb-1.5 shrink-0">{activeMember.fullName}</p>
+                <p className="text-xs mb-1.5 shrink-0 text-right">{activeMember.fullName}</p>
                 <Image
                   src={urlFor(activeMember.picture).width(800).quality(85).auto("format").url()}
                   alt={activeMember.picture.alt}
