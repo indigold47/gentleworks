@@ -10,35 +10,63 @@ import type { StructureResolver } from "sanity/structure";
  * All other document types keep the default list behavior.
  */
 
-const SINGLETONS = [
+/** Singleton pages — shown as direct document editors (no "create new" button). */
+const PAGE_SINGLETONS = [
   { type: "homePage", title: "Home Page" },
   { type: "aboutPage", title: "About Page" },
   { type: "contactPage", title: "Contact Page" },
+  { type: "pressPage", title: "Press Page" },
+  { type: "projectsPage", title: "Projects Page" },
+  { type: "teamPage", title: "Team Page" },
+] as const;
+
+/** Ordered list types shown after the divider. */
+const LIST_TYPES = ["project", "teamMember", "pressItem", "filterCategory"] as const;
+
+/** Singleton settings shown at the bottom. */
+const SETTINGS_SINGLETONS = [
+  { type: "theme", title: "Theme" },
   { type: "siteSettings", title: "Site Settings" },
 ] as const;
 
-const SINGLETON_TYPES: Set<string> = new Set(SINGLETONS.map((s) => s.type));
+/** All types we manage explicitly — excludes them from the auto-generated list. */
+const MANAGED_TYPES: Set<string> = new Set([
+  ...PAGE_SINGLETONS.map((s) => s.type),
+  ...LIST_TYPES,
+  ...SETTINGS_SINGLETONS.map((s) => s.type),
+]);
 
-export const structure: StructureResolver = (S) =>
-  S.list()
+function singletonItem(S: Parameters<StructureResolver>[0], type: string, title: string) {
+  return S.listItem()
+    .title(title)
+    .id(type)
+    .child(S.document().schemaType(type).documentId(type));
+}
+
+export const structure: StructureResolver = (S) => {
+  const allListItems = S.documentTypeListItems();
+  const listItemsByType = new Map(allListItems.map((item) => [item.getId(), item]));
+
+  return S.list()
     .title("Content")
     .items([
-      // Singleton items — each opens a single document editor
-      ...SINGLETONS.map((singleton) =>
-        S.listItem()
-          .title(singleton.title)
-          .id(singleton.type)
-          .child(
-            S.document()
-              .schemaType(singleton.type)
-              .documentId(singleton.type)
-          )
-      ),
+      // Page singletons
+      ...PAGE_SINGLETONS.map((s) => singletonItem(S, s.type, s.title)),
 
       S.divider(),
 
-      // Everything else — default list behavior
-      ...S.documentTypeListItems().filter(
-        (item) => !SINGLETON_TYPES.has(item.getId() as string)
-      ),
+      // Ordered list types
+      ...LIST_TYPES.flatMap((type) => {
+        const item = listItemsByType.get(type);
+        return item ? [item] : [];
+      }),
+
+      S.divider(),
+
+      // Settings singletons
+      ...SETTINGS_SINGLETONS.map((s) => singletonItem(S, s.type, s.title)),
+
+      // Any remaining types not explicitly managed
+      ...allListItems.filter((item) => !MANAGED_TYPES.has(item.getId() as string)),
     ]);
+};

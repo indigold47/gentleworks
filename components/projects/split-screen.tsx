@@ -291,6 +291,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       if (Math.abs(accumulator) >= THRESHOLD) {
         const steps = Math.trunc(accumulator / THRESHOLD);
         accumulator -= steps * THRESHOLD;
+        setStickyIdx(null);
         setWheelIdx((prev) => {
           const next = prev + steps;
           return Math.max(0, Math.min(filteredProjects.length - 1, next));
@@ -900,6 +901,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                     const setFromY = (clientY: number) => {
                       const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
                       const idx = Math.round(fraction * (count - 1));
+                      setStickyIdx(null);
                       setWheelIdx(idx);
                     };
 
