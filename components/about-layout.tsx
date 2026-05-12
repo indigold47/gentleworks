@@ -51,7 +51,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
 
     return (
       <div className="relative h-full">
-        <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]">
+        <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]">
           <div className="bleed-safe-top relative h-[calc(50svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#e8ddd4]">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-75"
@@ -119,7 +119,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
             aria-valuenow={Math.round(scrollFraction * 100)}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="hidden lg:block absolute left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cream z-10 overflow-hidden cursor-pointer"
+            className="hidden lg:block absolute left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cream z-10 overflow-hidden cursor-pointer"
             style={{
               height: "min(750px, calc(100svh - 120px))",
               border: `1px solid ${mainColor ? mainColor + "4D" : "rgba(122,111,71,0.3)"}`,

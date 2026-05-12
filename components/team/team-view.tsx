@@ -215,7 +215,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
   }
 
   return (
-    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[2fr_1fr]" style={{ color: themeColor ?? "#7b6f47" }}>
+    <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[3fr_2fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
       <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] md:min-h-[220px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
@@ -324,7 +324,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
             aria-valuenow={activeIdx}
             aria-valuemin={0}
             aria-valuemax={count - 1}
-            className="hidden lg:block fixed left-[66.666%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
+            className="hidden lg:block fixed left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-10 overflow-hidden cursor-pointer"
             style={{ height: "min(750px, calc(100svh - 120px))" }}
             onMouseDown={(e) => {
               e.preventDefault();
