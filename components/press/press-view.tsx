@@ -302,7 +302,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
       {/* Right panel: textured background + item image on hover */}
       <div className="hidden lg:block bg-textured sticky top-0 h-svh">
-        <div className="flex flex-col items-end justify-start h-full px-12 pt-24">
+        <div className="flex justify-end px-12 pt-24">
           <AnimatePresence mode="wait">
             {displayItem?.image && (
               <motion.div
@@ -311,19 +311,16 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="relative max-h-[clamp(200px,calc(100svh-200px),600px)]"
               >
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={urlFor(displayItem.image)
                     .height(1200)
                     .quality(85)
                     .auto("format")
                     .url()}
                   alt={displayItem.image.alt || displayItem.name}
-                  width={800}
-                  height={1200}
-                  sizes="(min-width: 1024px) 35vw, 100vw"
-                  className="max-h-[clamp(200px,calc(100svh-200px),600px)] w-auto object-contain"
+                  className="h-[min(350px,calc(100svh-380px))] w-auto object-cover"
                 />
               </motion.div>
             )}
