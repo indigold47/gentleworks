@@ -12,9 +12,14 @@ const inter = Inter({
 
 export const viewport: Viewport = {
   viewportFit: "cover",
+  themeColor: "#f5f1ea",
 };
 
 export const metadata: Metadata = {
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
   metadataBase: new URL("https://gentle.works"),
   title: {
     default: "Gentle Works — Architecture & Design Studio in Atlanta, GA",
