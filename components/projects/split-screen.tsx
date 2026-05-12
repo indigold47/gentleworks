@@ -556,9 +556,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="display text-cream text-base leading-tight group-hover:text-cream/70 transition-colors truncate">
+                      <h2 className="display text-cream text-base leading-tight group-hover:text-cream/70 transition-colors truncate">
                         {project.title}
-                      </h3>
+                      </h2>
                       <p className="text-cream/40 text-sm leading-snug truncate">
                         {[project.location, project.year].filter(Boolean).join(" · ")}
                       </p>
@@ -615,12 +615,12 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                       className="object-cover"
                     />
                   </div>
-                  <h3
+                  <h2
                     className="display mt-2 text-base leading-tight"
                     style={{ color: themeColor ?? "#7B6F47" }}
                   >
                     {project.title}
-                  </h3>
+                  </h2>
                   <p className="text-xs text-ink/50 leading-snug">
                     {project.location ?? "--"}
                   </p>
@@ -667,12 +667,12 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                           className="object-cover transition-opacity duration-200 group-hover:opacity-80"
                         />
                       </div>
-                      <h3
+                      <h2
                         className="display mt-2 text-base leading-tight"
                         style={{ color: themeColor ?? "#7B6F47" }}
                       >
                         {project.title}
-                      </h3>
+                      </h2>
                       <p className="text-xs text-ink/50">
                         {[project.location, project.year].filter(Boolean).join(" · ")}
                       </p>
@@ -889,12 +889,12 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                         className="object-cover transition-opacity duration-200 group-hover:opacity-80"
                       />
                     </div>
-                    <h3
+                    <h2
                       className="display mt-2 text-base leading-tight"
                       style={{ color: themeColor ?? "#7B6F47" }}
                     >
                       {project.title}
-                    </h3>
+                    </h2>
                     <p className="text-xs text-ink/50">
                       {[project.location, project.year].filter(Boolean).join(" · ")}
                     </p>

@@ -220,7 +220,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
           style={{ animation: "slow-bounce 3s ease-in-out infinite" }}
           aria-label="About Gentle Works"
         >
-          <img src="/assets/down-arrow.svg" alt="" className="h-[82px] w-auto brightness-0 invert" />
+          <img src="/assets/down-arrow.svg" alt="" width={29} height={82} className="h-[82px] w-auto brightness-0 invert" />
         </a>
 
       </main>

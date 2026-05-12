@@ -147,7 +147,7 @@ h1.display {
 /* Textured background for right-side split panels */
 .bg-textured {
   background-color: var(--color-cream);
-  background-image: url("/assets/textured-background.png");
+  background-image: url("/assets/textured-background.webp");
   background-repeat: repeat;
 }
 
