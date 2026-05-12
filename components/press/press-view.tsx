@@ -18,7 +18,7 @@ type PressViewProps = {
 };
 
 export function PressView({ items, themeColor, secondaryColor }: PressViewProps) {
-  const [activeIdx, setActiveIdx] = useState(-1);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState(-1);
   const [filter, setFilter] = useState<Filter>("all");
   const listPanelRef = useRef<HTMLDivElement>(null);
