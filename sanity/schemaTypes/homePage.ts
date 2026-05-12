@@ -32,6 +32,14 @@ export const homePage = defineType({
               validation: (rule) => rule.required(),
             }),
             defineField({
+              name: "poster",
+              title: "Poster image",
+              type: "image",
+              description:
+                "A still frame shown while the video loads. Use the first frame of the video for a seamless transition.",
+              options: { hotspot: true },
+            }),
+            defineField({
               name: "alt",
               title: "Alt text",
               type: "string",

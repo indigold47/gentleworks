@@ -120,6 +120,7 @@ export const homePageQuery = defineQuery(`
       _type,
       _key,
       "videoUrl": video.asset->url,
+      "posterUrl": poster.asset->url,
       alt,
       image {
         ...,

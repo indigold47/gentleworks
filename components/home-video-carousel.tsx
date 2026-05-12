@@ -83,6 +83,7 @@ export function HomeVideoCarousel({ items }: Props) {
             <video
               key={current._key}
               src={current.videoUrl}
+              poster={current.posterUrl ?? undefined}
               aria-label={current.alt}
               autoPlay
               muted

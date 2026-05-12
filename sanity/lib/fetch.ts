@@ -277,6 +277,7 @@ export type HomeHeroVideo = {
   _type: "homeHeroVideo";
   _key: string;
   videoUrl: string;
+  posterUrl?: string | null;
   alt: string;
 };
 
