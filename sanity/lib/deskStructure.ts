@@ -21,11 +21,10 @@ const PAGE_SINGLETONS = [
 ] as const;
 
 /** Ordered list types shown after the divider. */
-const LIST_TYPES = ["project", "teamMember", "pressItem", "filterCategory"] as const;
+const LIST_TYPES = ["project", "teamMember", "pressItem", "filterCategory", "theme"] as const;
 
 /** Singleton settings shown at the bottom. */
 const SETTINGS_SINGLETONS = [
-  { type: "theme", title: "Theme" },
   { type: "siteSettings", title: "Site Settings" },
 ] as const;
 

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
 import * as amplitude from "@amplitude/analytics-browser";
@@ -588,36 +589,46 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
           {/* Project grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 px-6 py-8 sm:px-10">
-            {filteredProjects.map((project) => (
-              <Link
+            {filteredProjects.map((project, idx) => (
+              <motion.div
                 key={project._id}
-                href={`/projects/${project.slug}`}
-                transitionTypes={["nav-forward"]}
-                className="group"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 1.25, ease: "easeOut", delay: idx < 4 ? idx * 0.25 : 0 }}
               >
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <Image
-                    src={urlFor(project.heroImage)
-                      .width(600)
-                      .quality(80)
-                      .auto("format")
-                      .url()}
-                    alt={project.heroImage.alt}
-                    fill
-                    sizes="(min-width: 640px) 45vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-                <h3 className="display mt-2 text-base leading-tight">
-                  {project.title}
-                </h3>
-                <p className="text-xs text-ink/50 leading-snug">
-                  {project.location ?? "--"}
-                </p>
-                <p className="text-xs text-ink/50">
-                  {project.year ?? "--"}
-                </p>
-              </Link>
+                <Link
+                  href={`/projects/${project.slug}`}
+                  transitionTypes={["nav-forward"]}
+                  className="group"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <Image
+                      src={urlFor(project.heroImage)
+                        .width(600)
+                        .quality(80)
+                        .auto("format")
+                        .url()}
+                      alt={project.heroImage.alt}
+                      fill
+                      sizes="(min-width: 640px) 45vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <h3
+                    className="display mt-2 text-base leading-tight"
+                    style={{ color: themeColor ?? "#7B6F47" }}
+                  >
+                    {project.title}
+                  </h3>
+                  <p className="text-xs text-ink/50 leading-snug">
+                    {project.location ?? "--"}
+                  </p>
+                  <p className="text-xs text-ink/50">
+                    {project.year ?? "--"}
+                  </p>
+                </Link>
+              </motion.div>
             ))}
             {filteredProjects.length === 0 && (
               <>
@@ -631,9 +642,15 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   </div>
                 )}
                 {featuredProjects.length > 0 &&
-                  featuredProjects.map((project) => (
-                    <Link
+                  featuredProjects.map((project, idx) => (
+                    <motion.div
                       key={project._id}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 1.25, ease: "easeOut", delay: idx * 0.25 }}
+                    >
+                    <Link
                       href={`/projects/${project.slug}`}
                       className="group"
                     >
@@ -650,13 +667,17 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                           className="object-cover transition-opacity duration-200 group-hover:opacity-80"
                         />
                       </div>
-                      <h3 className="display mt-2 text-base leading-tight">
+                      <h3
+                        className="display mt-2 text-base leading-tight"
+                        style={{ color: themeColor ?? "#7B6F47" }}
+                      >
                         {project.title}
                       </h3>
                       <p className="text-xs text-ink/50">
                         {[project.location, project.year].filter(Boolean).join(" · ")}
                       </p>
                     </Link>
+                    </motion.div>
                   ))}
               </>
             )}
@@ -843,32 +864,42 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           )}
           {filteredProjects.length === 0 && featuredProjects.length > 0 && (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredProjects.map((project) => (
-                <Link
+              {featuredProjects.map((project, idx) => (
+                <motion.div
                   key={project._id}
-                  href={`/projects/${project.slug}`}
-                  className="group"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 1.25, ease: "easeOut", delay: idx * 0.25 }}
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={urlFor(project.heroImage)
-                        .width(600)
-                        .quality(80)
-                        .auto("format")
-                        .url()}
-                      alt={project.heroImage.alt}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      className="object-cover transition-opacity duration-200 group-hover:opacity-80"
-                    />
-                  </div>
-                  <h3 className="display mt-2 text-base leading-tight">
-                    {project.title}
-                  </h3>
-                  <p className="text-xs text-ink/50">
-                    {[project.location, project.year].filter(Boolean).join(" · ")}
-                  </p>
-                </Link>
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="group"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <Image
+                        src={urlFor(project.heroImage)
+                          .width(600)
+                          .quality(80)
+                          .auto("format")
+                          .url()}
+                        alt={project.heroImage.alt}
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover transition-opacity duration-200 group-hover:opacity-80"
+                      />
+                    </div>
+                    <h3
+                      className="display mt-2 text-base leading-tight"
+                      style={{ color: themeColor ?? "#7B6F47" }}
+                    >
+                      {project.title}
+                    </h3>
+                    <p className="text-xs text-ink/50">
+                      {[project.location, project.year].filter(Boolean).join(" · ")}
+                    </p>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           )}

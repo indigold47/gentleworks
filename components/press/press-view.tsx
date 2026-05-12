@@ -159,16 +159,23 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
   return (
     <div
-      className="flex flex-col min-h-svh lg:grid lg:grid-cols-[3fr_2fr]"
+      className="grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]"
       style={{ color: themeColor ?? "#7b6f47" }}
     >
-      {/* Left panel: nav + press list */}
-      <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
-        {/* Nav */}
+      {/* Mobile: sticky nav panel (matches about/contact/team pattern) */}
+      <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] lg:hidden">
         <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
+      </div>
+
+      {/* Left panel: nav (desktop) + press list */}
+      <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
+        {/* Desktop nav */}
+        <div className="hidden lg:block">
+          <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
+        </div>
 
         {/* Press list */}
-        <div className="flex flex-col px-6 pt-60 pb-10 sm:px-10 lg:px-12 lg:pt-64 lg:pb-12">
+        <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-64 lg:pb-12">
           {/* Filter tabs */}
           <div className="flex items-center justify-end gap-0 mb-4">
             {(["all", "award", "article"] as const).map((f, i) => (

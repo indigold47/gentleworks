@@ -107,6 +107,11 @@ export const allProjectsDetailQuery = defineQuery(`
       }
     },
     credits,
+    "theme": theme->{
+      name,
+      "mainColor": mainColor.hex,
+      "secondaryColor": secondaryColor.hex
+    },
   }
 `);
 
