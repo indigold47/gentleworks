@@ -44,6 +44,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
   const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
   const isAnimatingRef = useRef(false);
 
   const filtered =
@@ -119,8 +120,8 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
 
   // Wheel handler: scroll content normally, but cycle members when content is fully visible
   useEffect(() => {
-    const panel = rightPanelRef.current;
-    if (!panel) return;
+    const panels = [rightPanelRef.current, leftPanelRef.current].filter(Boolean) as HTMLElement[];
+    if (panels.length === 0) return;
 
     let accumulator = 0;
     let lastTime = 0;
@@ -206,8 +207,8 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
       }
     }
 
-    panel.addEventListener("wheel", onWheel, { passive: false });
-    return () => panel.removeEventListener("wheel", onWheel);
+    panels.forEach((panel) => panel.addEventListener("wheel", onWheel, { passive: false }));
+    return () => panels.forEach((panel) => panel.removeEventListener("wheel", onWheel));
   }, [filtered, expandedId]);
 
   function openMember(id: string) {
@@ -217,7 +218,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
   return (
     <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[3fr_2fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
-      <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] md:min-h-[220px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:flex lg:flex-col lg:justify-end">
+      <div ref={leftPanelRef} className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] md:min-h-[220px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
         {/* Desktop: nav is absolute overlay, photo at bottom */}
         <div className="lg:hidden">

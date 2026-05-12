@@ -22,6 +22,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
   const [hoveredIdx, setHoveredIdx] = useState(-1);
   const [filter, setFilter] = useState<Filter>("all");
   const listPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isAnimatingRef = useRef(false);
 
@@ -43,8 +44,8 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
   // Wheel handler for cycling items on desktop
   useEffect(() => {
-    const panel = listPanelRef.current;
-    if (!panel) return;
+    const panels = [listPanelRef.current, rightPanelRef.current].filter(Boolean) as HTMLElement[];
+    if (panels.length === 0) return;
 
     let accumulator = 0;
     let lastTime = 0;
@@ -102,8 +103,8 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
       }
     }
 
-    panel.addEventListener("wheel", onWheel, { passive: false });
-    return () => panel.removeEventListener("wheel", onWheel);
+    panels.forEach((p) => p.addEventListener("wheel", onWheel, { passive: false }));
+    return () => panels.forEach((p) => p.removeEventListener("wheel", onWheel));
   }, [filtered]);
 
   // Scroll active item into view
@@ -175,7 +176,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         </div>
 
         {/* Press list */}
-        <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-64 lg:pb-12">
+        <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-72 lg:pb-12">
           {/* Filter tabs — sticky on mobile below the nav panel */}
           <div className="flex items-center justify-end gap-0 mb-4 sticky top-[calc(33svh_+_var(--sat))] lg:static z-10 bg-textured py-2 -mt-2">
             {(["all", "award", "article"] as const).map((f, i) => (
@@ -301,7 +302,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         ))()}
 
       {/* Right panel: textured background + item image on hover */}
-      <div className="hidden lg:block bg-textured sticky top-0 h-svh">
+      <div ref={rightPanelRef} className="hidden lg:block bg-textured sticky top-0 h-svh">
         <div className="flex justify-end px-12 pt-24">
           <AnimatePresence mode="wait">
             {displayItem?.image && (
