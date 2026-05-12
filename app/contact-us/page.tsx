@@ -34,6 +34,7 @@ export default async function ContactUsPage() {
   const email = data?.email ?? FALLBACK.email;
   const introText = data?.introText ?? FALLBACK.introText;
   const mainColor = data?.theme?.mainColor;
+  const secondaryColor = data?.theme?.secondaryColor;
 
   return (
     <ViewTransition
@@ -44,7 +45,7 @@ export default async function ContactUsPage() {
       <main
         id="main-content"
         className="grid min-h-svh grid-cols-1 lg:grid-cols-[2fr_1fr]"
-        style={{ "--page-theme-main": mainColor ?? "#7a7047" } as React.CSSProperties}
+        style={{ "--page-theme-main": mainColor ?? "#7a7047", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7a7047" } as React.CSSProperties}
       >
         {/* Left: background panel with nav overlay */}
         <div className="bleed-safe-top relative h-[calc(50svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#c4b5a3]">
@@ -54,7 +55,7 @@ export default async function ContactUsPage() {
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
           )}
-          <SiteNav activeHref="/contact-us" themeColor={mainColor} />
+          <SiteNav activeHref="/contact-us" themeColor={mainColor} secondaryColor={secondaryColor} />
         </div>
 
         {/* Right: contact info + form */}

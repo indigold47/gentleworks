@@ -200,11 +200,12 @@ type SplitScreenProps = {
   projects: ProjectDetail[];
   filterCategories: FilterCategoryItem[];
   themeColor?: string;
+  secondaryColor?: string;
 };
 
 type MobileView = "list" | "grid";
 
-export function SplitScreen({ projects, filterCategories: cmsCategories, themeColor }: SplitScreenProps) {
+export function SplitScreen({ projects, filterCategories: cmsCategories, themeColor, secondaryColor }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   // Build filter categories from CMS data
@@ -579,7 +580,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
         <div className="bg-textured lg:hidden min-h-svh">
           {/* Nav header — sticky so it stays visible while scrolling the grid */}
           <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative pb-4">
-            <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} />
+            <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
             <div className="pt-[calc(15rem+env(safe-area-inset-top))]" />
             {mobileToolbar}
           </div>
@@ -722,7 +723,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
             aria-hidden
             className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
           />
-          <SiteNav activeHref="/projects" themeColor={themeColor} />
+          <SiteNav activeHref="/projects" themeColor={themeColor} secondaryColor={secondaryColor} />
           {mobileToolbar}
           {/* Inline wordmark logo — bottom-left, matching team page positioning */}
           <Link href="/" className="hidden lg:block absolute bottom-12 left-12 z-10">

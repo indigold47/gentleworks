@@ -33,10 +33,11 @@ function TeamMedia({ url, className }: { url: string; className: string }) {
 type TeamViewProps = {
   members: TeamMemberItem[];
   themeColor?: string;
+  secondaryColor?: string;
   teamGifUrl?: string | null;
 };
 
-export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
+export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: TeamViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
@@ -224,6 +225,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
             activeHref="/team"
             variant="dark"
             themeColor={themeColor}
+            secondaryColor={secondaryColor}
           />
 
           {/* Photo — absolute, right half of panel */}
@@ -250,7 +252,7 @@ export function TeamView({ members, themeColor, teamGifUrl }: TeamViewProps) {
 
         {/* Desktop: absolute nav overlay */}
         <div className="hidden lg:block">
-          <SiteNav activeHref="/team" variant="dark" themeColor={themeColor} />
+          <SiteNav activeHref="/team" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
         </div>
 
         {/* Desktop: photo at bottom of panel */}

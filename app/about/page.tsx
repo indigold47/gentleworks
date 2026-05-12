@@ -23,6 +23,7 @@ export default async function AboutPage() {
     : FALLBACK_IMAGE_URL;
 
   const mainColor = data?.theme?.mainColor;
+  const secondaryColor = data?.theme?.secondaryColor;
 
   return (
     <ViewTransition
@@ -34,6 +35,7 @@ export default async function AboutPage() {
         startAt="about"
         heroUrl={heroUrl}
         mainColor={mainColor}
+        secondaryColor={secondaryColor}
         aboutBody={data?.body ?? null}
         instagramUrl={settings?.instagramUrl}
         linkedinUrl={settings?.linkedinUrl}

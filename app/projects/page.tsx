@@ -28,6 +28,7 @@ export default async function ProjectsPage() {
   ]);
 
   const mainColor = pageData?.theme?.mainColor;
+  const secondaryColor = pageData?.theme?.secondaryColor;
 
   return (
     <ViewTransition
@@ -46,11 +47,11 @@ export default async function ProjectsPage() {
       <main
         id="main-content"
         className="flex flex-col select-none"
-        style={{ "--page-theme-main": mainColor ?? "#7a7047" } as React.CSSProperties}
+        style={{ "--page-theme-main": mainColor ?? "#7a7047", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7a7047" } as React.CSSProperties}
       >
         <h1 className="sr-only">Projects</h1>
         <Suspense>
-          <SplitScreen projects={projects} filterCategories={filterCategories} themeColor={mainColor} />
+          <SplitScreen projects={projects} filterCategories={filterCategories} themeColor={mainColor} secondaryColor={secondaryColor} />
         </Suspense>
         <ScrollToTop />
       </main>

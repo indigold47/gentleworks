@@ -14,9 +14,10 @@ type Filter = "all" | "award" | "article";
 type PressViewProps = {
   items: PressItem[];
   themeColor?: string;
+  secondaryColor?: string;
 };
 
-export function PressView({ items, themeColor }: PressViewProps) {
+export function PressView({ items, themeColor, secondaryColor }: PressViewProps) {
   const [activeIdx, setActiveIdx] = useState(-1);
   const [hoveredIdx, setHoveredIdx] = useState(-1);
   const [filter, setFilter] = useState<Filter>("all");
@@ -164,7 +165,7 @@ export function PressView({ items, themeColor }: PressViewProps) {
       {/* Left panel: nav + press list */}
       <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
         {/* Nav */}
-        <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} />
+        <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
 
         {/* Press list */}
         <div className="flex flex-col px-6 pt-60 pb-10 sm:px-10 lg:px-12 lg:pt-64 lg:pb-12">
@@ -207,7 +208,12 @@ export function PressView({ items, themeColor }: PressViewProps) {
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(-1)}
                 onClick={() => setActiveIdx(idx)}
-                className="group grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_2fr_auto] gap-x-6 border-t border-rule py-6 transition-opacity hover:opacity-80 items-start"
+                className="group grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_2fr_auto] gap-x-6 border-t border-rule py-6 transition-colors items-start"
+                style={
+                  hoveredIdx === idx || activeIdx === idx
+                    ? { backgroundColor: `color-mix(in srgb, ${secondaryColor ?? "#b5ad8e"} 30%, transparent)` }
+                    : undefined
+                }
               >
                 {/* Arrow + name */}
                 <div className="flex items-start gap-3">

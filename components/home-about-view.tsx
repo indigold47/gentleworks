@@ -14,12 +14,13 @@ type HomeAboutViewProps = {
   heroMedia?: HomeMediaItem[];
   heroUrl?: string;
   mainColor?: string;
+  secondaryColor?: string;
   aboutBody: AboutPageData["body"] | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
 };
 
-export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, aboutBody, instagramUrl, linkedinUrl }: HomeAboutViewProps) {
+export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, secondaryColor, aboutBody, instagramUrl, linkedinUrl }: HomeAboutViewProps) {
   const router = useRouter();
   const [exiting, setExiting] = useState(false);
 
@@ -27,8 +28,12 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
   const resolvedColor = mainColor ?? "#7a7047";
   useEffect(() => {
     document.documentElement.style.setProperty("--page-theme-main", resolvedColor);
-    return () => { document.documentElement.style.removeProperty("--page-theme-main"); };
-  }, [resolvedColor]);
+    document.documentElement.style.setProperty("--page-theme-secondary", secondaryColor ?? resolvedColor);
+    return () => {
+      document.documentElement.style.removeProperty("--page-theme-main");
+      document.documentElement.style.removeProperty("--page-theme-secondary");
+    };
+  }, [resolvedColor, secondaryColor]);
 
   const scrollPanelRef = useRef<HTMLDivElement>(null);
   const [scrollFraction, setScrollFraction] = useState(0);
@@ -133,12 +138,13 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       <main
         id="main-content"
         className="flex flex-col"
-        style={{ "--page-theme-main": resolvedColor } as React.CSSProperties}
+        style={{ "--page-theme-main": resolvedColor, "--page-theme-secondary": secondaryColor ?? resolvedColor } as React.CSSProperties}
       >
         <AboutLayout
           ref={scrollPanelRef}
           heroUrl={heroUrl}
           mainColor={mainColor}
+          secondaryColor={secondaryColor}
           aboutBody={aboutBody}
           instagramUrl={instagramUrl}
           linkedinUrl={linkedinUrl}
@@ -222,11 +228,12 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, abo
       {/* ── Second screen: about (revealed during scroll animation) ── */}
       <div
         className="h-dvh w-full"
-        style={{ "--page-theme-main": resolvedColor } as React.CSSProperties}
+        style={{ "--page-theme-main": resolvedColor, "--page-theme-secondary": secondaryColor ?? resolvedColor } as React.CSSProperties}
       >
         <AboutLayout
           heroUrl={heroUrl}
           mainColor={mainColor}
+          secondaryColor={secondaryColor}
           aboutBody={aboutBody}
           instagramUrl={instagramUrl}
           linkedinUrl={linkedinUrl}

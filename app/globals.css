@@ -298,8 +298,8 @@ h1.display {
 }
 
 /* Page-level themed text selection (about, projects index, team, contact) */
-[style*="--page-theme-main"] ::selection {
-  background-color: var(--page-theme-main, #7a7047);
+[style*="--page-theme-secondary"] ::selection {
+  background-color: var(--page-theme-secondary);
   color: #fff;
 }
 

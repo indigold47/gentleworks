@@ -18,6 +18,7 @@ export default async function TeamPage() {
   ]);
 
   const mainColor = pageData?.theme?.mainColor;
+  const secondaryColor = pageData?.theme?.secondaryColor;
   const teamGifUrl = pageData?.teamGifUrl ?? "/assets/our-team.gif";
 
   return (
@@ -28,9 +29,9 @@ export default async function TeamPage() {
     >
       <main
         id="main-content"
-        style={{ "--page-theme-main": mainColor ?? "#7b6f47" } as React.CSSProperties}
+        style={{ "--page-theme-main": mainColor ?? "#7b6f47", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7b6f47" } as React.CSSProperties}
       >
-        <TeamView members={members} themeColor={mainColor} teamGifUrl={teamGifUrl} />
+        <TeamView members={members} themeColor={mainColor} secondaryColor={secondaryColor} teamGifUrl={teamGifUrl} />
       </main>
     </ViewTransition>
   );

@@ -31,6 +31,7 @@ const FALLBACK_BODY = [
 export type AboutLayoutProps = {
   heroUrl?: string;
   mainColor?: string;
+  secondaryColor?: string;
   aboutBody: AboutPageData["body"] | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
@@ -45,7 +46,7 @@ export type AboutLayoutProps = {
  * Used both in the home page scroll animation (second screen) and on /about directly.
  */
 export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
-  function AboutLayout({ heroUrl, mainColor, aboutBody, instagramUrl, linkedinUrl, scrollFraction, onScrollbarMouseDown }, ref) {
+  function AboutLayout({ heroUrl, mainColor, secondaryColor, aboutBody, instagramUrl, linkedinUrl, scrollFraction, onScrollbarMouseDown }, ref) {
     const showScrollUI = scrollFraction !== undefined;
 
     return (
@@ -56,7 +57,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
               className="absolute inset-0 bg-cover bg-center opacity-75"
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
-            <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} />
+            <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} secondaryColor={secondaryColor} />
           </div>
 
           <div className="relative lg:sticky lg:top-0 lg:h-svh">

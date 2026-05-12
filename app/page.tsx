@@ -18,6 +18,7 @@ export default async function Home() {
       heroMedia={homeData?.heroMedia ?? []}
       heroUrl={heroUrl}
       mainColor={aboutData?.theme?.mainColor}
+      secondaryColor={aboutData?.theme?.secondaryColor}
       aboutBody={aboutData?.body ?? null}
       instagramUrl={settings?.instagramUrl}
       linkedinUrl={settings?.linkedinUrl}

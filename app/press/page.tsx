@@ -18,6 +18,7 @@ export default async function PressPage() {
   ]);
 
   const mainColor = pageData?.theme?.mainColor;
+  const secondaryColor = pageData?.theme?.secondaryColor;
 
   return (
     <ViewTransition
@@ -28,12 +29,13 @@ export default async function PressPage() {
       <main
         id="main-content"
         style={
-          { "--page-theme-main": mainColor ?? "#7b6f47" } as React.CSSProperties
+          { "--page-theme-main": mainColor ?? "#7b6f47", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7b6f47" } as React.CSSProperties
         }
       >
         <PressView
           items={items}
           themeColor={mainColor}
+          secondaryColor={secondaryColor}
         />
       </main>
     </ViewTransition>
