@@ -78,6 +78,18 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
+        {/* Orientation lock overlay — visible only on mobile landscape */}
+        <div
+          className="orientation-lock hidden fixed inset-0 z-[9999] items-center justify-center bg-cream text-ink text-center px-8"
+          aria-hidden="true"
+        >
+          <div>
+            <p className="font-display text-2xl mb-2">Please rotate your device</p>
+            <p className="text-sm text-muted">
+              This site is best viewed in portrait mode.
+            </p>
+          </div>
+        </div>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-ink focus:text-cream focus:text-sm"

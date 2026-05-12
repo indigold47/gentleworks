@@ -264,6 +264,15 @@ h1.display {
   50% { transform: translateY(-12px); }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Orientation lock — show overlay on mobile landscape                 */
+/* ------------------------------------------------------------------ */
+@media (orientation: landscape) and (max-height: 500px) {
+  .orientation-lock {
+    display: flex;
+  }
+}
+
 /* Honor reduced motion — applies globally */
 @media (prefers-reduced-motion: reduce) {
   *,
