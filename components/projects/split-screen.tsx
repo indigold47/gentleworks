@@ -688,7 +688,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                 zIndex: activeLayer === "a" ? 2 : 1,
               }}
             >
-              <ViewTransition name={activeLayer === "a" ? `project-hero-${layerA.slug}` : undefined} share={activeLayer === "a" ? "hero-morph" : undefined}>
+              <ViewTransition name={activeLayer === "a" && layerA.slug !== layerB?.slug ? `project-hero-${layerA.slug}` : undefined} share={activeLayer === "a" && layerA.slug !== layerB?.slug ? "hero-morph" : undefined}>
                 <Image
                   src={urlFor(layerA.heroImage)
                     .width(3200)
@@ -714,7 +714,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                 zIndex: activeLayer === "b" ? 2 : 1,
               }}
             >
-              <ViewTransition name={activeLayer === "b" ? `project-hero-${layerB.slug}` : undefined} share={activeLayer === "b" ? "hero-morph" : undefined}>
+              <ViewTransition name={activeLayer === "b" && layerB.slug !== layerA?.slug ? `project-hero-${layerB.slug}` : undefined} share={activeLayer === "b" && layerB.slug !== layerA?.slug ? "hero-morph" : undefined}>
                 <Image
                   src={urlFor(layerB.heroImage)
                     .width(3200)
