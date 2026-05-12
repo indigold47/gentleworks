@@ -58,7 +58,7 @@ export function SiteNav({ activeHref, variant = "light", className, themeColor, 
   const glassBorder = variant === "light" ? "border-white/10" : "border-black/10";
 
   return (
-    <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-2 px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] sm:px-10 sm:pt-[calc(2.5rem+env(safe-area-inset-top))] lg:px-12 lg:pt-[calc(3rem+env(safe-area-inset-top))]"}>
+    <nav className={className ?? "absolute top-0 left-0 right-0 z-10 flex flex-col gap-2 lg:gap-4 px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] sm:px-10 sm:pt-[calc(2.5rem+env(safe-area-inset-top))] lg:px-12 lg:pt-[calc(3rem+env(safe-area-inset-top))]"}>
       {navItems.map((item) => {
         const isActive = item.href === activeHref;
         return (
