@@ -413,7 +413,7 @@ function AnimatedGalleryItem({
     <motion.div
       initial={prefersReduced ? false : { opacity: 0, y: 20 }}
       whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-25%" }}
+      viewport={{ once: true, margin: "-10%" }}
       transition={{
         duration: 0.7,
         ease: [0.22, 1, 0.36, 1] as [number, number, number, number],

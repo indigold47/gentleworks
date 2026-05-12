@@ -311,11 +311,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="relative"
-                style={{
-                  height: "clamp(200px, calc(100svh - 200px), 600px)",
-                  width: "auto",
-                }}
+                className="relative max-h-[clamp(200px,calc(100svh-200px),600px)]"
               >
                 <Image
                   src={urlFor(displayItem.image)
@@ -324,10 +320,10 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                     .auto("format")
                     .url()}
                   alt={displayItem.image.alt || displayItem.name}
-                  width={500}
-                  height={700}
-                  sizes="400px"
-                  className="h-full w-auto object-contain object-right-top"
+                  width={800}
+                  height={1200}
+                  sizes="(min-width: 1024px) 35vw, 100vw"
+                  className="max-h-[clamp(200px,calc(100svh-200px),600px)] w-auto object-contain"
                 />
               </motion.div>
             )}

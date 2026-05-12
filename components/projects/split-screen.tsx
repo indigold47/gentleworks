@@ -273,18 +273,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     function onWheel(e: WheelEvent) {
       if (window.innerWidth < 1024) return;
 
-      const idx = wheelIdxRef.current;
-      const atFirst = idx === 0;
-      const atLast = idx >= filteredProjects.length - 1;
-      const scrollingUp = e.deltaY < 0;
-      const scrollingDown = e.deltaY > 0;
-
-      // At boundaries, let native scroll handle it (e.g. to reach filters above or content below)
-      if ((atFirst && scrollingUp) || (atLast && scrollingDown)) {
-        accumulator = 0;
-        return;
-      }
-
+      // Always prevent native page scroll on desktop — filters are sticky so no need to scroll the page
       e.preventDefault();
 
       accumulator += e.deltaY;
@@ -758,9 +747,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
         </div>
 
         {/* Right: filters + project index table */}
-        <div ref={listPanelRef} className="bg-textured relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
-          {/* Filter section — hidden on mobile per design */}
-          <div className="mb-12 hidden lg:flex gap-6 lg:pr-20">
+        <div ref={listPanelRef} className="bg-textured relative flex flex-col px-6 py-8 sm:px-10 lg:px-12 lg:py-12 lg:h-svh lg:sticky lg:top-0">
+          {/* Filter section — hidden on mobile, fixed on desktop */}
+          <div className="mb-12 hidden lg:flex gap-6 lg:pr-20 lg:shrink-0">
             {/* Filters — takes remaining space */}
             <div className="min-w-0 flex-1">
               {/* "Filter" label with full-width rule */}
@@ -794,6 +783,8 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
 
           </div>
 
+          {/* Scrollable project list area — only this scrolls on desktop */}
+          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
             <thead>
@@ -904,64 +895,61 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
             </div>
           )}
 
-          {/* Custom scroll indicator — desktop: centered on split seam; mobile: right edge of list panel */}
-          {filteredProjects.length > 0 && (() => {
-            const count = filteredProjects.length;
-            const thumbPct = Math.max(5, 100 / count);
-            const maxOffset = 100 - thumbPct;
-            const desktopThumbTop = maxOffset > 0 ? thumbFraction * maxOffset : 0;
-            const mobileThumbTop = maxOffset > 0 ? mobileThumbFraction * maxOffset : 0;
-
-            return (
-              <>
-                {/* Desktop scrollbar */}
-                <div
-                  role="scrollbar"
-                  aria-controls="project-table"
-                  aria-valuenow={activeIdx}
-                  aria-valuemin={0}
-                  aria-valuemax={count - 1}
-                  aria-orientation="vertical"
-                  className="hidden lg:block fixed left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-30 overflow-hidden cursor-pointer"
-                  style={{ height: "min(750px, calc(100svh - 120px))" }}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    const track = e.currentTarget;
-                    const rect = track.getBoundingClientRect();
-
-                    const setFromY = (clientY: number) => {
-                      const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-                      const idx = Math.round(fraction * (count - 1));
-                      setStickyIdx(null);
-                      setWheelIdx(idx);
-                    };
-
-                    setFromY(e.clientY);
-
-                    const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
-                    const onUp = () => {
-                      window.removeEventListener("mousemove", onMove);
-                      window.removeEventListener("mouseup", onUp);
-                    };
-                    window.addEventListener("mousemove", onMove);
-                    window.addEventListener("mouseup", onUp);
-                  }}
-                >
-                  <div
-                    className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
-                    style={{
-                      height: `${thumbPct}%`,
-                      top: `${desktopThumbTop}%`,
-                      transition: "top 600ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
-                  />
-                </div>
-
-              </>
-            );
-          })()}
+          </div>{/* end scrollable project list area */}
         </div>
       </div>
+
+      {/* Custom scroll indicator — rendered outside the grid so sticky panel doesn't clip it */}
+      {filteredProjects.length > 0 && (() => {
+        const count = filteredProjects.length;
+        const thumbPct = Math.max(5, 100 / count);
+        const maxOffset = 100 - thumbPct;
+        const desktopThumbTop = maxOffset > 0 ? thumbFraction * maxOffset : 0;
+
+        return (
+          <div
+            role="scrollbar"
+            aria-controls="project-table"
+            aria-valuenow={activeIdx}
+            aria-valuemin={0}
+            aria-valuemax={count - 1}
+            aria-orientation="vertical"
+            className="hidden lg:block fixed left-[60%] top-1/2 w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-default-green/30 bg-cream z-30 overflow-hidden cursor-pointer"
+            style={{ height: "min(750px, calc(100svh - 120px))" }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              const track = e.currentTarget;
+              const rect = track.getBoundingClientRect();
+
+              const setFromY = (clientY: number) => {
+                const fraction = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+                const idx = Math.round(fraction * (count - 1));
+                setStickyIdx(null);
+                setWheelIdx(idx);
+              };
+
+              setFromY(e.clientY);
+
+              const onMove = (ev: MouseEvent) => setFromY(ev.clientY);
+              const onUp = () => {
+                window.removeEventListener("mousemove", onMove);
+                window.removeEventListener("mouseup", onUp);
+              };
+              window.addEventListener("mousemove", onMove);
+              window.addEventListener("mouseup", onUp);
+            }}
+          >
+            <div
+              className="absolute left-0 w-full rounded-full bg-default-green pointer-events-none"
+              style={{
+                height: `${thumbPct}%`,
+                top: `${desktopThumbTop}%`,
+                transition: "top 600ms cubic-bezier(0.16, 1, 0.3, 1), height 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+            />
+          </div>
+        );
+      })()}
     </>
   );
 }

@@ -60,8 +60,8 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
     cols: "32fr 9fr 9fr",
     sizes: [
       "(min-width: 640px) 64vw, 100vw",
-      "(min-width: 640px) 18vw, 100vw",
-      "(min-width: 640px) 18vw, 100vw",
+      "(min-width: 640px) 50vw, 100vw",
+      "(min-width: 640px) 50vw, 100vw",
     ],
   },
   "two-wide-landscape": {
@@ -70,8 +70,8 @@ export const GALLERY_PRESETS: Record<GalleryPresetId, GalleryPreset> = {
     aspects: ["3/8", "3/8", "4/3"],
     cols: "9fr 9fr 32fr",
     sizes: [
-      "(min-width: 640px) 18vw, 100vw",
-      "(min-width: 640px) 18vw, 100vw",
+      "(min-width: 640px) 50vw, 100vw",
+      "(min-width: 640px) 50vw, 100vw",
       "(min-width: 640px) 64vw, 100vw",
     ],
   },
