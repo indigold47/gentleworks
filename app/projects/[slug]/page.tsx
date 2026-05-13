@@ -119,7 +119,7 @@ export default async function ProjectPage({
           />
         </Link>
         <FadeInLeft onMount delay={0.1}>
-          <h1 className="display text-[22px]" style={{ color: mainColor }}>
+          <h1 className="display text-[min(22px,4.5vw)] sm:text-[22px] text-center leading-tight" style={{ color: mainColor }}>
             {project.title}
           </h1>
         </FadeInLeft>

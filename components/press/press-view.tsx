@@ -217,12 +217,6 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
       {/* Left panel: nav (desktop) + press list */}
       <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
-        {/* Mobile top content fade */}
-        <div
-          aria-hidden="true"
-          className="lg:hidden sticky top-[calc(33svh_+_var(--sat))] inset-x-0 h-16 pointer-events-none z-[5]"
-          style={{ background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)", marginBottom: "-4rem" }}
-        />
         {/* Desktop nav */}
         <div className="hidden lg:block">
           <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />

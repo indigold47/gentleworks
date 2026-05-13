@@ -473,6 +473,12 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
         </div>
 
       </div>
+      {/* Mobile bottom content fade */}
+      <div
+        aria-hidden="true"
+        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 pointer-events-none z-[5]"
+        style={{ background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)" }}
+      />
     </div>
   );
 }

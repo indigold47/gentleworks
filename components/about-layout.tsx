@@ -52,7 +52,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
     return (
       <div className="relative h-full">
         <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]">
-          <div className="bleed-safe-top relative h-[calc(50svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#e8ddd4]">
+          <div className="bleed-safe-top relative h-[calc(40svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#e8ddd4]">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-75"
               style={{ backgroundImage: `url('${heroUrl}')` }}
