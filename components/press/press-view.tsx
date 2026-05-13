@@ -211,7 +211,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
       style={{ color: themeColor ?? "#7b6f47" }}
     >
       {/* Mobile: sticky nav panel (matches about/contact/team pattern) */}
-      <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] lg:hidden">
+      <div className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] min-h-[280px] lg:hidden">
         <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
       </div>
 
@@ -222,10 +222,26 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
           <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
         </div>
 
+        {/* Desktop inline logo — fixed bottom-left, does not affect list flow */}
+        <div
+          role="img"
+          aria-label="Gentle Works"
+          className="hidden lg:block fixed bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
+          style={{
+            backgroundColor: themeColor ?? "#7b6f47",
+            maskImage: "url('/assets/GentleWorks-Logo-InLine.svg')",
+            maskSize: "100% 100%",
+            maskRepeat: "no-repeat",
+            WebkitMaskImage: "url('/assets/GentleWorks-Logo-InLine.svg')",
+            WebkitMaskSize: "100% 100%",
+            WebkitMaskRepeat: "no-repeat",
+          }}
+        />
+
         {/* Press list */}
         <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-72 lg:pb-12">
           {/* Filter tabs — sticky on mobile below the nav panel */}
-          <div className="flex items-center justify-end gap-0 mb-4 sticky top-[calc(33svh_+_var(--sat))] lg:static z-10 bg-textured py-2 -mt-2">
+          <div className="flex items-center justify-end gap-0 mb-4 sticky top-[max(280px,calc(33svh_+_var(--sat)))] lg:static z-10 bg-textured py-2 -mt-2">
             {(["all", "award", "article"] as const).map((f, i) => (
               <button
                 key={f}
@@ -349,7 +365,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         ))()}
 
       {/* Right panel: textured background + item image on hover */}
-      <div ref={rightPanelRef} className="hidden lg:block bg-textured sticky top-0 h-svh">
+      <div ref={rightPanelRef} className="hidden lg:block bg-textured sticky top-0 h-svh relative">
         <div className="flex justify-end items-end h-full px-12 pb-12">
           <AnimatePresence mode="wait">
             {displayItem?.image && (

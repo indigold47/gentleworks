@@ -218,7 +218,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
   return (
     <div className="flex flex-col min-h-svh lg:grid lg:grid-cols-[3fr_2fr]" style={{ color: themeColor ?? "#7b6f47" }}>
       {/* Top/Left panel: nav + selected member photo */}
-      <div ref={leftPanelRef} className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] md:min-h-[220px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:flex lg:flex-col lg:justify-end">
+      <div ref={leftPanelRef} className="bleed-safe-top bg-textured relative sticky top-0 z-10 h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0 lg:flex lg:flex-col lg:justify-end">
         {/* Mobile: absolute nav (top-left, matches all other pages) + photo pinned top-right */}
         {/* Desktop: nav is absolute overlay, photo at bottom */}
         <div className="lg:hidden">
@@ -230,7 +230,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
           />
 
           {/* Photo — absolute, right half of panel */}
-          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-end justify-start px-6 pt-6 pb-4 sm:px-10">
+          <div className="absolute top-0 right-0 h-full w-1/2 overflow-hidden flex flex-col items-end justify-start px-6 pt-[calc(5.5rem+env(safe-area-inset-top))] pb-4 sm:px-10">
             {activeMember?.picture ? (
               <>
                 <p className="text-xs mb-1.5 shrink-0 text-right">{activeMember.fullName}</p>
@@ -365,7 +365,7 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
       {/* Bottom/Right panel: team list — fixed height on desktop, inner scroll */}
       <div ref={rightPanelRef} className="bg-textured relative flex flex-col px-6 py-10 sm:px-10 lg:px-12 lg:pt-24 lg:pb-12 lg:sticky lg:top-0 lg:h-svh lg:overflow-hidden">
         {/* Header + filter tabs — sticky on mobile so they stay visible while scrolling */}
-        <div className="sticky top-[33svh] md:top-[45svh] lg:static z-10 bg-textured pb-0">
+        <div className="sticky top-[max(280px,calc(33svh_+_var(--sat)))] md:top-[45svh] lg:static z-10 bg-textured pb-0">
         <div className="mb-1">
           <h1 className="text-base">Meet the Gentle Workers.</h1>
         </div>

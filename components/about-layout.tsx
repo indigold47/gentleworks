@@ -54,12 +54,26 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
     return (
       <div className="relative h-full">
         <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]">
-          <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#e8ddd4]">
+          <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0 bg-[#e8ddd4]">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-75"
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
             <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} secondaryColor={secondaryColor} />
+            <div
+              role="img"
+              aria-label="Gentle Works"
+              className="hidden lg:block absolute bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
+              style={{
+                backgroundColor: mainColor ?? "#7a6f47",
+                maskImage: "url('/assets/GentleWorks-Logo-InLine.svg')",
+                maskSize: "100% 100%",
+                maskRepeat: "no-repeat",
+                WebkitMaskImage: "url('/assets/GentleWorks-Logo-InLine.svg')",
+                WebkitMaskSize: "100% 100%",
+                WebkitMaskRepeat: "no-repeat",
+              }}
+            />
           </div>
 
           <div className="relative lg:sticky lg:top-0 lg:h-svh">

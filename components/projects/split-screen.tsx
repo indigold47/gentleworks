@@ -481,7 +481,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   const tbGlassBorder = isGrid ? "border-black/10" : "border-white/10";
 
   const mobileToolbar = (
-    <div className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-2 z-10 lg:hidden">
+    <div className="absolute top-[calc(5.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-2 z-10 lg:hidden">
       <button
         type="button"
         aria-label="List view"
@@ -606,7 +606,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {isGrid && (
         <div className="bg-textured lg:hidden min-h-svh">
           {/* Nav header — sticky so it stays visible while scrolling the grid */}
-          <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] flex flex-col justify-end pb-4">
+          <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] flex flex-col justify-end pb-4">
             <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
             <div className="flex-1" />
             {mobileToolbar}
@@ -713,7 +713,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
       <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr] ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
-        <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))]">
+        <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0">
           {/* Layer A */}
           {layerA && (
             <div
