@@ -301,6 +301,41 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     row?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [wheelIdx]);
 
+  // Mobile: highlight whichever row is nearest the top of the viewport
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(min-width: 1024px)");
+    if (mq.matches) return;
+
+    const tbody = tableBodyRef.current;
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll<HTMLElement>("tr");
+    if (rows.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let best: { idx: number; top: number } | null = null;
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const idx = Array.from(rows).indexOf(entry.target as HTMLElement);
+          const top = entry.boundingClientRect.top;
+          if (best === null || top < best.top) {
+            best = { idx, top };
+          }
+        });
+        if (best) {
+          setStickyIdx(null);
+          setWheelIdx((best as { idx: number; top: number }).idx);
+        }
+      },
+      { rootMargin: "-35% 0px -55% 0px", threshold: 0 }
+    );
+
+    rows.forEach((row) => observer.observe(row));
+    return () => observer.disconnect();
+  }, [filteredProjects]);
+
   // The image to display: hovered wins, then sticky (last hovered), then wheel, then first
   const safeWheelIdx = Math.min(wheelIdx, filteredProjects.length - 1);
   const activeIdx = hoveredIdx ?? stickyIdx ?? safeWheelIdx;
@@ -570,9 +605,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {isGrid && (
         <div className="bg-textured lg:hidden min-h-svh">
           {/* Nav header — sticky so it stays visible while scrolling the grid */}
-          <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative pb-4">
+          <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] flex flex-col justify-end pb-4">
             <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
-            <div className="pt-[calc(15rem+env(safe-area-inset-top))]" />
+            <div className="flex-1" />
             {mobileToolbar}
           </div>
 
@@ -677,7 +712,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
       <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr] ${isGrid ? "hidden lg:grid" : ""}`}>
         {/* Left: hero image — changes on table row hover */}
-        <div className="bleed-safe-top relative h-[calc(50svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))]">
+        <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))]">
           {/* Layer A */}
           {layerA && (
             <div
@@ -787,7 +822,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
-            <thead>
+            <thead className="sticky top-[calc(33svh_+_var(--sat))] md:top-[calc(45svh_+_var(--sat))] lg:top-0 z-[5] bg-cream">
               <tr className="border-b border-default-green/30">
                 <th className="pb-2 text-left text-[13px] font-normal opacity-60 w-[55%]">
                   Project
