@@ -786,7 +786,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           </div>
 
           {/* Scrollable project list area — only this scrolls on desktop */}
-          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0 lg:scroll-pt-10">
+          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0 lg:scroll-pt-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
             <thead className="lg:sticky lg:top-0 z-[5] bg-[#f5f1ea]">
