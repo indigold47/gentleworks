@@ -86,7 +86,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
                 )}
               </div>
             </div>
-            {/* Top fade — appears as user scrolls away from the top */}
+            {/* Top fade — appears as user scrolls away from the top (desktop only, mobile uses fixed) */}
             {showScrollUI && (
               <div
                 aria-hidden="true"
@@ -97,7 +97,7 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
                 }}
               />
             )}
-            {/* Bottom fade — hints there's more content, fades out near end */}
+            {/* Bottom fade — hints there's more content, fades out near end (desktop only, mobile uses fixed) */}
             {showScrollUI && (
               <div
                 aria-hidden="true"
@@ -105,6 +105,17 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
                 style={{
                   background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
                   opacity: Math.max(0, 1 - scrollFraction * 6),
+                }}
+              />
+            )}
+            {/* Mobile bottom fade — fixed to viewport */}
+            {showScrollUI && (
+              <div
+                aria-hidden="true"
+                className="lg:hidden fixed bottom-0 left-0 right-0 h-20 pointer-events-none z-10 transition-opacity duration-500"
+                style={{
+                  background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
+                  opacity: 1 - scrollFraction,
                 }}
               />
             )}

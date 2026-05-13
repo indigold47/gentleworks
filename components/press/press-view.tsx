@@ -205,6 +205,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
   }, [filtered]);
 
   return (
+    <>
     <div
       className="grid grid-cols-1 lg:min-h-svh lg:grid-cols-[3fr_2fr]"
       style={{ color: themeColor ?? "#7b6f47" }}
@@ -216,6 +217,12 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
       {/* Left panel: nav (desktop) + press list */}
       <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
+        {/* Mobile top content fade */}
+        <div
+          aria-hidden="true"
+          className="lg:hidden sticky top-[calc(33svh_+_var(--sat))] inset-x-0 h-16 pointer-events-none z-[5]"
+          style={{ background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)", marginBottom: "-4rem" }}
+        />
         {/* Desktop nav */}
         <div className="hidden lg:block">
           <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
@@ -375,5 +382,12 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         </div>
       </div>
     </div>
+    {/* Mobile bottom content fade */}
+    <div
+      aria-hidden="true"
+      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 pointer-events-none z-[5]"
+      style={{ background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)" }}
+    />
+    </>
   );
 }

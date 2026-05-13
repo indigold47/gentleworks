@@ -41,12 +41,31 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
   useEffect(() => {
     const el = scrollPanelRef.current;
     if (!el) return;
-    const onScroll = () => {
+
+    // Desktop: track the scroll panel's own scroll
+    const onPanelScroll = () => {
       const max = el.scrollHeight - el.clientHeight;
       setScrollFraction(max > 0 ? el.scrollTop / max : 0);
     };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+    el.addEventListener("scroll", onPanelScroll, { passive: true });
+
+    // Mobile: track how close the bottom of the text panel is to the viewport bottom
+    const onWindowScroll = () => {
+      if (window.innerWidth >= 1024) return; // lg breakpoint — desktop uses panel scroll
+      const rect = el.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      // 0 = panel bottom is far below viewport, 1 = panel bottom is at/above viewport bottom
+      const distFromBottom = rect.bottom - viewH;
+      const fadeZone = 150; // pixels before bottom edge where fade starts to disappear
+      const fraction = distFromBottom <= 0 ? 1 : distFromBottom < fadeZone ? 1 - distFromBottom / fadeZone : 0;
+      setScrollFraction(fraction);
+    };
+    window.addEventListener("scroll", onWindowScroll, { passive: true });
+
+    return () => {
+      el.removeEventListener("scroll", onPanelScroll);
+      window.removeEventListener("scroll", onWindowScroll);
+    };
   }, [startAt]);
 
   const handleArrowClick = useCallback(
