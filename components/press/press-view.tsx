@@ -18,6 +18,16 @@ type PressViewProps = {
 };
 
 export function PressView({ items, themeColor, secondaryColor }: PressViewProps) {
+  // Hoist theme color to :root so the fixed logo (outside <main>) picks it up
+  useEffect(() => {
+    if (themeColor) {
+      document.documentElement.style.setProperty("--page-theme-main", themeColor);
+    }
+    return () => {
+      document.documentElement.style.removeProperty("--page-theme-main");
+    };
+  }, [themeColor]);
+
   const [activeIdx, setActiveIdx] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState(-1);
   const [filter, setFilter] = useState<Filter>("all");
