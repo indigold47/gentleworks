@@ -308,13 +308,14 @@ function GalleryCard({
   onClick: () => void;
 }) {
   const isAuto = aspect === "auto";
+  const isFill = aspect === "fill";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden cursor-pointer w-full ${objectFit === "contain" ? "bg-white/60" : ""}`}
-      style={isAuto ? undefined : { aspectRatio: aspect }}
+      className={`group relative overflow-hidden cursor-pointer w-full ${isFill ? "h-full" : ""} ${objectFit === "contain" ? "bg-white/60" : ""}`}
+      style={isAuto || isFill ? undefined : { aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <Image
@@ -362,13 +363,14 @@ function VideoCard({
   onClick: () => void;
 }) {
   const isAuto = aspect === "auto";
+  const isFill = aspect === "fill";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative overflow-hidden cursor-pointer w-full"
-      style={isAuto ? undefined : { aspectRatio: aspect }}
+      className={`group relative overflow-hidden cursor-pointer w-full ${isFill ? "h-full" : ""}`}
+      style={isAuto || isFill ? undefined : { aspectRatio: aspect }}
       aria-label={`View ${alt} fullscreen`}
     >
       <video
@@ -482,13 +484,14 @@ export function ProjectGallery({
   return (
     <>
       {/* Hero — video takes priority when present */}
-      <section className="px-6 sm:px-10 md:px-[110px]">
+      <section className="px-6 sm:px-10 md:px-10 lg:px-[110px]">
         <ViewTransition name={`project-hero-${slug}`} share="hero-morph">
+          <div className="aspect-[3/2] md:aspect-[5/2] overflow-hidden">
           {heroVideo?.url ? (
             <VideoCard
               src={heroVideo.url}
               alt={heroVideo.alt}
-              aspect="5/2"
+              aspect="fill"
               themeColor={themeColor}
               onClick={() => openLightbox(0)}
             />
@@ -498,12 +501,13 @@ export function ProjectGallery({
               alt={heroImage.alt}
               sizes="100vw"
               priority
-              aspect="5/2"
+              aspect="fill"
               themeColor={themeColor}
               objectPosition={hotspotToPosition(heroImage.hotspot)}
               onClick={() => openLightbox(0)}
             />
           )}
+          </div>
         </ViewTransition>
       </section>
 
@@ -512,7 +516,7 @@ export function ProjectGallery({
 
       {/* Gallery rows — preset-driven layout */}
       {galleryRows && galleryRows.length > 0 && (
-        <section className="flex flex-col gap-6 md:gap-[45px] px-6 pt-6 pb-12 sm:px-10 md:px-[110px] md:pt-[40px] md:pb-16">
+        <section className="flex flex-col gap-6 md:gap-[45px] px-6 pt-6 pb-12 sm:px-10 md:px-10 lg:px-[110px] md:pt-[40px] md:pb-16">
           {galleryRows.map((row, rowIdx) => {
             const preset = GALLERY_PRESETS[row.preset as GalleryPresetId];
             if (!preset || !row.media?.length) return null;

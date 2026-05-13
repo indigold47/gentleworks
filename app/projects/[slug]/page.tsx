@@ -130,7 +130,7 @@ export default async function ProjectPage({
       <div className="mx-auto w-full max-w-[1750px]">
       <ProjectGallery heroImage={project.heroImage} heroVideo={project.heroVideo} galleryRows={project.galleryRows} slug={project.slug} themeColor={mainColor}>
         {/* Description + Credits */}
-        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 md:grid-cols-[3fr_2fr] md:gap-[45px] md:px-[110px] md:pt-16 md:pb-0">
+        <section className="grid grid-cols-1 gap-10 px-6 py-12 sm:px-10 md:grid-cols-[3fr_2fr] md:gap-[45px] md:px-10 lg:px-[110px] md:pt-16 md:pb-0">
           {/* Description */}
           <FadeInLeft>
             <div className="text-base leading-relaxed" style={{ color: mainColor }}>
