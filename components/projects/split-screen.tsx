@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search, LayoutGrid, AlignJustify, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import * as amplitude from "@amplitude/analytics-browser";
 
 import type {
@@ -204,8 +204,6 @@ type SplitScreenProps = {
   secondaryColor?: string;
 };
 
-type MobileView = "list" | "grid";
-
 export function SplitScreen({ projects, filterCategories: cmsCategories, themeColor, secondaryColor }: SplitScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -225,9 +223,6 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   // Wheel-activated project index
   const [wheelIdx, setWheelIdx] = useState(0);
   const tableBodyRef = useRef<HTMLTableSectionElement>(null);
-
-  // Mobile view mode — grid (default) or list
-  const [mobileView, setMobileView] = useState<MobileView>("grid");
 
   // Search
   const [searchOpen, setSearchOpen] = useState(false);
@@ -471,41 +466,14 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     );
   }
 
-  const isGrid = mobileView === "grid";
-
-  /* Shared mobile toolbar */
-  // Toolbar colors: cream over dark image (list view) vs dark over textured bg (grid view)
-  const tbActive = isGrid ? "text-default-green" : "text-cream";
-  const tbIdle = isGrid ? "text-default-green/50 hover:text-default-green" : "text-cream/60 hover:text-cream";
-  const tbGlassBg = isGrid ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.15)";
-  const tbGlassBorder = isGrid ? "border-black/10" : "border-white/10";
-
   const mobileToolbar = (
-    <div className="absolute top-[calc(5.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-2 z-10 lg:hidden">
-      <button
-        type="button"
-        aria-label="List view"
-        onClick={() => setMobileView("list")}
-        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${!isGrid ? tbActive : tbIdle}`}
-        style={{ background: tbGlassBg }}
-      >
-        <AlignJustify size={20} strokeWidth={1.8} />
-      </button>
-      <button
-        type="button"
-        aria-label="Grid view"
-        onClick={() => setMobileView("grid")}
-        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${isGrid ? tbActive : tbIdle}`}
-        style={{ background: tbGlassBg }}
-      >
-        <LayoutGrid size={20} strokeWidth={1.8} />
-      </button>
+    <div className="absolute top-[calc(5.5rem+env(safe-area-inset-top))] right-[calc(34px+env(safe-area-inset-right))] sm:right-[calc(50px+env(safe-area-inset-right))] flex items-center gap-2 z-10 lg:hidden">
       <button
         type="button"
         aria-label="Search projects"
         onClick={() => setSearchOpen(true)}
-        className={`flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border ${tbGlassBorder} transition-colors ${tbIdle}`}
-        style={{ background: tbGlassBg }}
+        className="flex items-center justify-center w-10 h-10 rounded-full backdrop-blur-md border border-black/10 transition-colors text-default-green/50 hover:text-default-green"
+        style={{ background: "rgba(255,255,255,0.35)" }}
       >
         <Search size={20} strokeWidth={1.8} />
       </button>
@@ -603,8 +571,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       )}
 
       {/* ---- Mobile grid view ---- */}
-      {isGrid && (
-        <div className="bg-textured lg:hidden min-h-svh">
+      <div className="bg-textured lg:hidden min-h-svh">
           {/* Nav header — sticky so it stays visible while scrolling the grid */}
           <div className="bleed-safe-top bg-textured sticky top-0 z-20 relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] flex flex-col justify-end pb-4">
             <SiteNav activeHref="/projects" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
@@ -708,10 +675,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
             )}
           </div>
         </div>
-      )}
 
-      {/* ---- Split-screen view (list on mobile, always on desktop) ---- */}
-      <div className={`grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr] ${isGrid ? "hidden lg:grid" : ""}`}>
+      {/* ---- Split-screen view (desktop only) ---- */}
+      <div className="hidden lg:grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]">
         {/* Left: hero image — changes on table row hover */}
         <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0">
           {/* Layer A */}
