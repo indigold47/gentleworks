@@ -786,10 +786,10 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           </div>
 
           {/* Scrollable project list area — only this scrolls on desktop */}
-          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0">
+          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0 lg:scroll-pt-10">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
-            <thead className="lg:sticky lg:top-0 z-[5]">
+            <thead className="lg:sticky lg:top-0 z-[5] bg-[#f5f1ea]">
               <tr className="border-b border-default-green/30">
                 <th className="pb-2 text-left text-[13px] font-normal opacity-60 w-[55%]">
                   Project
@@ -806,7 +806,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
               {filteredProjects.map((project, i) => (
                 <tr
                   key={project._id}
-                  className={`border-b border-[#d4cdb8] cursor-pointer transition-colors ${
+                  className={`border-b border-[#d4cdb8] cursor-pointer transition-colors scroll-mt-10 ${
                     effectiveHighlightIdx === i || (effectiveHighlightIdx === null && safeWheelIdx === i)
                       ? "bg-[#b5ad8e]/30"
                       : ""
