@@ -168,6 +168,42 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
     return () => clearTimeout(timeout);
   }, [activeIdx]);
 
+  // Mobile: highlight whichever row is nearest the top of the viewport
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Only on mobile/tablet (below lg breakpoint)
+    const mq = window.matchMedia("(min-width: 1024px)");
+    if (mq.matches) return;
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const rows = container.querySelectorAll<HTMLElement>("[data-press-row]");
+    if (rows.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the entry closest to the top that is intersecting
+        let best: { idx: number; top: number } | null = null;
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const idx = Array.from(rows).indexOf(entry.target as HTMLElement);
+          const top = entry.boundingClientRect.top;
+          if (best === null || top < best.top) {
+            best = { idx, top };
+          }
+        });
+        if (best) {
+          setActiveIdx((best as { idx: number; top: number }).idx);
+        }
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+
+    rows.forEach((row) => observer.observe(row));
+    return () => observer.disconnect();
+  }, [filtered]);
+
   return (
     <div
       className="grid grid-cols-1 lg:min-h-svh lg:grid-cols-[3fr_2fr]"
@@ -228,7 +264,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                 onClick={() => setActiveIdx(idx)}
                 className="group grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_2fr_auto] gap-x-6 border-t border-rule py-6 transition-colors items-start"
                 style={
-                  hoveredIdx === idx || activeIdx === idx
+                  hoveredIdx === idx || (activeIdx === idx && hoveredIdx === -1)
                     ? { backgroundColor: `color-mix(in srgb, ${secondaryColor ?? "#b5ad8e"} 30%, transparent)` }
                     : undefined
                 }
@@ -313,7 +349,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
       {/* Right panel: textured background + item image on hover */}
       <div ref={rightPanelRef} className="hidden lg:block bg-textured sticky top-0 h-svh">
-        <div className="flex justify-end px-12 pt-24">
+        <div className="flex justify-end items-end h-full px-12 pb-12">
           <AnimatePresence mode="wait">
             {displayItem?.image && (
               <motion.div
