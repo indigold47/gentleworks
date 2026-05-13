@@ -293,8 +293,9 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     return () => window.removeEventListener("wheel", onWheel);
   }, [filteredProjects.length]);
 
-  // Scroll the active row into view when wheel index changes
+  // Scroll the active row into view when wheel index changes (desktop only)
   useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) return;
     const tbody = tableBodyRef.current;
     if (!tbody) return;
     const row = tbody.children[wheelIdx] as HTMLElement | undefined;
@@ -822,7 +823,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
-            <thead className="sticky top-[calc(33svh_+_var(--sat))] md:top-[calc(45svh_+_var(--sat))] lg:top-0 z-[5] bg-cream">
+            <thead className="lg:sticky lg:top-0 z-[5]">
               <tr className="border-b border-default-green/30">
                 <th className="pb-2 text-left text-[13px] font-normal opacity-60 w-[55%]">
                   Project
