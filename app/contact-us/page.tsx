@@ -48,7 +48,7 @@ export default async function ContactUsPage() {
         style={{ "--page-theme-main": mainColor ?? "#7a7047", "--page-theme-secondary": secondaryColor ?? mainColor ?? "#7a7047" } as React.CSSProperties}
       >
         {/* Left: background panel with nav overlay */}
-        <div className="bleed-safe-top relative h-[calc(40svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#c4b5a3]">
+        <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 lg:h-[calc(100svh_+_var(--sat))] bg-[#c4b5a3]">
           {heroUrl && (
             <div
               className="absolute inset-0 bg-cover bg-center"
