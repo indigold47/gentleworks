@@ -5,7 +5,7 @@
  *   1. Editor hits Publish in /studio
  *   2. Sanity POSTs the changed document to this route with a signed body
  *   3. We verify the signature against SANITY_REVALIDATE_SECRET
- *   4. We call updateTag() for every tag touched by the change
+ *   4. We call revalidateTag() for every tag touched by the change
  *   5. Next regenerates the affected cached fetches on the next request
  *
  * Configure the webhook in sanity.io/manage → API → Webhooks:
@@ -20,7 +20,7 @@
  *   Secret:  same value as SANITY_REVALIDATE_SECRET
  *   HTTP:    POST, application/json
  */
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
@@ -45,6 +45,10 @@ type WebhookBody = {
   _type?: string;
   slug?: string;
 };
+
+/** Expire the cached entry immediately — "max" means use the maximum
+ *  expiration profile so the tag is treated as fully stale right away. */
+const expire = (tag: string) => revalidateTag(tag, "max");
 
 export async function POST(req: NextRequest) {
   if (!revalidateSecret) {
@@ -82,55 +86,55 @@ export async function POST(req: NextRequest) {
   // listing page, home featured strip, sitemap, etc.
   switch (body._type) {
     case "homePage": {
-      updateTag(HOME_TAG);
+      expire(HOME_TAG);
       break;
     }
     case "project": {
-      updateTag(PROJECTS_TAG);
-      if (body.slug) updateTag(projectTag(body.slug));
+      expire(PROJECTS_TAG);
+      if (body.slug) expire(projectTag(body.slug));
       break;
     }
     case "teamMember": {
-      updateTag(TEAM_TAG);
+      expire(TEAM_TAG);
       break;
     }
     case "filterCategory": {
       // Filter category changes affect the project index filter chips.
-      updateTag(FILTERS_TAG);
+      expire(FILTERS_TAG);
       break;
     }
     case "theme": {
       // Theme edits affect project pages that reference them → invalidate both.
-      updateTag(THEMES_TAG);
-      updateTag(PROJECTS_TAG);
+      expire(THEMES_TAG);
+      expire(PROJECTS_TAG);
       break;
     }
     case "aboutPage": {
-      updateTag(ABOUT_TAG);
+      expire(ABOUT_TAG);
       break;
     }
     case "contactPage": {
-      updateTag(CONTACT_TAG);
+      expire(CONTACT_TAG);
       break;
     }
     case "teamPage": {
-      updateTag(TEAM_PAGE_TAG);
+      expire(TEAM_PAGE_TAG);
       break;
     }
     case "projectsPage": {
-      updateTag(PROJECTS_PAGE_TAG);
+      expire(PROJECTS_PAGE_TAG);
       break;
     }
     case "pressItem": {
-      updateTag(PRESS_TAG);
+      expire(PRESS_TAG);
       break;
     }
     case "pressPage": {
-      updateTag(PRESS_PAGE_TAG);
+      expire(PRESS_PAGE_TAG);
       break;
     }
     case "siteSettings": {
-      updateTag(SETTINGS_TAG);
+      expire(SETTINGS_TAG);
       break;
     }
     default: {
