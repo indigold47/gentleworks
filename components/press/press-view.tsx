@@ -52,7 +52,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
   const thumbTop =
     activeIdx >= 0 && maxOffset > 0 ? thumbFraction * maxOffset : 0;
 
-  // Wheel handler for cycling items on desktop
+  // Wheel handler for desktop — cycle through items one by one (matches team page pattern)
   useEffect(() => {
     const panels = [listPanelRef.current, rightPanelRef.current].filter(Boolean) as HTMLElement[];
     if (panels.length === 0) return;
@@ -63,50 +63,27 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
 
     function onWheel(e: WheelEvent) {
       if (window.innerWidth < 1024) return;
+
       if (isAnimatingRef.current) {
         e.preventDefault();
         return;
       }
 
+      e.preventDefault();
+
       const now = Date.now();
       if (now - lastTime > 300) accumulator = 0;
       lastTime = now;
 
-      const container = scrollContainerRef.current;
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
-
-      let canNativeScroll = false;
-      if (container) {
-        const atBottom =
-          container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 1;
-        const atTop = container.scrollTop <= 1;
-        canNativeScroll =
-          (scrollingDown && !atBottom) || (scrollingUp && !atTop);
-      }
-
-      if (canNativeScroll) {
-        accumulator = 0;
-        return;
-      }
-
-      e.preventDefault();
       accumulator += e.deltaY;
-      accumulator = Math.max(
-        -CYCLE_THRESHOLD,
-        Math.min(CYCLE_THRESHOLD, accumulator)
-      );
+      accumulator = Math.max(-CYCLE_THRESHOLD, Math.min(CYCLE_THRESHOLD, accumulator));
 
       if (Math.abs(accumulator) >= CYCLE_THRESHOLD) {
         const direction = accumulator > 0 ? 1 : -1;
         accumulator = 0;
 
         setActiveIdx((prev) => {
-          const next = Math.max(
-            0,
-            Math.min(filtered.length - 1, prev + direction)
-          );
+          const next = Math.max(0, Math.min(filtered.length - 1, prev + direction));
           if (next !== prev) isAnimatingRef.current = true;
           return next;
         });
@@ -216,17 +193,17 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
       </div>
 
       {/* Left panel: nav (desktop) + press list */}
-      <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col">
+      <div ref={listPanelRef} className="bleed-safe-top bg-textured relative flex flex-col lg:sticky lg:top-0 lg:h-svh">
         {/* Desktop nav */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block lg:shrink-0">
           <SiteNav activeHref="/press" variant="dark" themeColor={themeColor} secondaryColor={secondaryColor} />
         </div>
 
-        {/* Desktop inline logo — fixed bottom-left, does not affect list flow */}
+        {/* Desktop inline logo — absolute bottom-left within the sticky panel */}
         <div
           role="img"
           aria-label="Gentle Works"
-          className="hidden lg:block fixed bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
+          className="hidden lg:block absolute bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
           style={{
             backgroundColor: themeColor ?? "#7b6f47",
             maskImage: "url('/assets/GentleWorks-Logo-InLine.svg')",
@@ -239,9 +216,9 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         />
 
         {/* Press list */}
-        <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-72 lg:pb-12">
+        <div className="flex flex-col px-6 pb-10 pt-4 sm:px-10 lg:px-12 lg:pt-72 lg:pb-24 lg:flex-1 lg:min-h-0">
           {/* Filter tabs — sticky on mobile below the nav panel */}
-          <div className="flex items-center justify-end gap-0 mb-4 sticky top-[max(280px,calc(33svh_+_var(--sat)))] lg:static z-10 bg-textured py-2 -mt-2">
+          <div className="flex items-center justify-end gap-0 mb-4 sticky top-[max(280px,calc(33svh_+_var(--sat)))] lg:static z-10 py-2 -mt-2 bg-textured lg:!bg-none lg:!bg-transparent">
             {(["all", "award", "article"] as const).map((f, i) => (
               <button
                 key={f}
