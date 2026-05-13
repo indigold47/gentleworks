@@ -37,6 +37,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
 
   const scrollPanelRef = useRef<HTMLDivElement>(null);
   const [scrollFraction, setScrollFraction] = useState(0);
+  const [mobileTopFade, setMobileTopFade] = useState(0);
 
   useEffect(() => {
     const el = scrollPanelRef.current;
@@ -49,16 +50,24 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
     };
     el.addEventListener("scroll", onPanelScroll, { passive: true });
 
-    // Mobile: track how close the bottom of the text panel is to the viewport bottom
+    // Mobile: track scroll position for top and bottom fades independently
     const onWindowScroll = () => {
       if (window.innerWidth >= 1024) return; // lg breakpoint — desktop uses panel scroll
       const rect = el.getBoundingClientRect();
       const viewH = window.innerHeight;
-      // 0 = panel bottom is far below viewport, 1 = panel bottom is at/above viewport bottom
+
+      // Bottom fade: 0 = panel bottom far below, 1 = at/above viewport bottom
       const distFromBottom = rect.bottom - viewH;
-      const fadeZone = 150; // pixels before bottom edge where fade starts to disappear
+      const fadeZone = 150;
       const fraction = distFromBottom <= 0 ? 1 : distFromBottom < fadeZone ? 1 - distFromBottom / fadeZone : 0;
       setScrollFraction(fraction);
+
+      // Top fade: how far the text content has scrolled behind the sticky hero
+      // The hero height matches the CSS: 33svh on mobile, 45svh on md
+      const heroH = window.innerWidth >= 768 ? viewH * 0.45 : viewH * 0.33;
+      const scrolledBehindHero = heroH - rect.top;
+      const topFadeZone = 80;
+      setMobileTopFade(scrolledBehindHero <= 0 ? 0 : Math.min(1, scrolledBehindHero / topFadeZone));
     };
     window.addEventListener("scroll", onWindowScroll, { passive: true });
 
@@ -168,6 +177,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
           instagramUrl={instagramUrl}
           linkedinUrl={linkedinUrl}
           scrollFraction={scrollFraction}
+          mobileTopFade={mobileTopFade}
           onScrollbarMouseDown={handleScrollbarMouseDown}
         />
       </main>

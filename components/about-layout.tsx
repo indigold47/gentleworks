@@ -37,6 +37,8 @@ export type AboutLayoutProps = {
   linkedinUrl?: string | null;
   /** Show scroll-dependent fades and scrollbar (only on the standalone about page) */
   scrollFraction?: number;
+  /** Mobile top fade opacity (0–1), tracked independently from scrollFraction */
+  mobileTopFade?: number;
   /** Handler for custom scrollbar drag */
   onScrollbarMouseDown?: React.MouseEventHandler<HTMLDivElement>;
 };
@@ -46,7 +48,7 @@ export type AboutLayoutProps = {
  * Used both in the home page scroll animation (second screen) and on /about directly.
  */
 export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
-  function AboutLayout({ heroUrl, mainColor, secondaryColor, aboutBody, instagramUrl, linkedinUrl, scrollFraction, onScrollbarMouseDown }, ref) {
+  function AboutLayout({ heroUrl, mainColor, secondaryColor, aboutBody, instagramUrl, linkedinUrl, scrollFraction, mobileTopFade, onScrollbarMouseDown }, ref) {
     const showScrollUI = scrollFraction !== undefined;
 
     return (
@@ -105,6 +107,17 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
                 style={{
                   background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
                   opacity: Math.max(0, 1 - scrollFraction * 6),
+                }}
+              />
+            )}
+            {/* Mobile top fade — fixed just below the sticky hero image */}
+            {showScrollUI && (
+              <div
+                aria-hidden="true"
+                className="lg:hidden fixed left-0 right-0 h-20 pointer-events-none z-20 transition-opacity duration-500 top-[calc(33svh_+_var(--sat))] md:top-[calc(45svh_+_var(--sat))]"
+                style={{
+                  background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)",
+                  opacity: mobileTopFade ?? 0,
                 }}
               />
             )}
