@@ -266,7 +266,7 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
           aboutBody={aboutBody}
           instagramUrl={instagramUrl}
           linkedinUrl={linkedinUrl}
-          scrollFraction={0}
+          scrollFraction={undefined}
         />
       </div>
     </motion.div>
