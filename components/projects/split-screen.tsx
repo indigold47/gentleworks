@@ -354,6 +354,21 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     return values;
   }, [hoveredProject, filterCategories]);
 
+  // Desktop scroll fraction for the project list panel (drives top/bottom fades)
+  const [listScrollFraction, setListScrollFraction] = useState(0);
+  const listScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = listScrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      setListScrollFraction(max > 0 ? el.scrollTop / max : 0);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Crossfade: two always-mounted layers that alternate opacity
   const [layerA, setLayerA] = useState(displayProject);
   const [layerB, setLayerB] = useState<ProjectDetail | null>(null);
@@ -786,7 +801,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           </div>
 
           {/* Scrollable project list area — only this scrolls on desktop */}
-          <div className="lg:flex-1 lg:overflow-y-auto lg:min-h-0 lg:scroll-pt-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div ref={listScrollRef} className="lg:flex-1 lg:overflow-y-auto lg:min-h-0 lg:scroll-pt-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {/* Project index table */}
           <table className="w-full border-collapse text-default-green">
             <thead className="lg:sticky lg:top-0 z-[5] bg-[#f5f1ea]">
@@ -898,6 +913,25 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
           )}
 
           </div>{/* end scrollable project list area */}
+
+          {/* Top fade — appears as user scrolls down */}
+          <div
+            aria-hidden="true"
+            className="hidden lg:block absolute top-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
+            style={{
+              background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)",
+              opacity: Math.min(1, listScrollFraction * 8),
+            }}
+          />
+          {/* Bottom fade — hints there's more content, fades out near end */}
+          <div
+            aria-hidden="true"
+            className="hidden lg:block absolute bottom-0 inset-x-0 h-28 pointer-events-none transition-opacity duration-500"
+            style={{
+              background: "linear-gradient(to top, #f5f1ea 20%, transparent 100%)",
+              opacity: Math.max(0, 1 - listScrollFraction * 6),
+            }}
+          />
         </div>
       </div>
 
