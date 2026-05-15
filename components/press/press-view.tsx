@@ -145,41 +145,15 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
     return () => clearTimeout(timeout);
   }, [activeIdx]);
 
-  // Mobile: highlight whichever row is nearest the top of the viewport
+  // Track whether we're on a desktop-sized screen (lg+)
+  const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    // Only on mobile/tablet (below lg breakpoint)
     const mq = window.matchMedia("(min-width: 1024px)");
-    if (mq.matches) return;
-
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const rows = container.querySelectorAll<HTMLElement>("[data-press-row]");
-    if (rows.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the entry closest to the top that is intersecting
-        let best: { idx: number; top: number } | null = null;
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const idx = Array.from(rows).indexOf(entry.target as HTMLElement);
-          const top = entry.boundingClientRect.top;
-          if (best === null || top < best.top) {
-            best = { idx, top };
-          }
-        });
-        if (best) {
-          setActiveIdx((best as { idx: number; top: number }).idx);
-        }
-      },
-      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
-    );
-
-    rows.forEach((row) => observer.observe(row));
-    return () => observer.disconnect();
-  }, [filtered]);
+    setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   return (
     <>
@@ -258,7 +232,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                 onClick={() => setActiveIdx(idx)}
                 className="group grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_2fr_auto] gap-x-6 border-t border-rule py-6 transition-colors items-start"
                 style={
-                  hoveredIdx === idx || (activeIdx === idx && hoveredIdx === -1)
+                  isDesktop && (hoveredIdx === idx || (activeIdx === idx && hoveredIdx === -1))
                     ? { backgroundColor: `color-mix(in srgb, ${secondaryColor ?? "#b5ad8e"} 30%, transparent)` }
                     : undefined
                 }
