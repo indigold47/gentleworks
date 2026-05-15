@@ -124,11 +124,11 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
                 }}
               />
             )}
-            {/* Mobile top fade — fixed just below the sticky hero image */}
+            {/* Mobile top fade — fixed at the hero's bottom edge, z-[5] so it sits below the hero (z-10) but above text */}
             {showScrollUI && (
               <div
                 aria-hidden="true"
-                className="lg:hidden fixed left-0 right-0 h-20 pointer-events-none z-20 transition-opacity duration-500 top-[calc(33svh_+_var(--sat))] md:top-[calc(45svh_+_var(--sat))]"
+                className="lg:hidden fixed left-0 right-0 h-20 pointer-events-none z-[5] transition-opacity duration-500 top-[calc(33svh+var(--sat))] md:top-[calc(45svh+var(--sat))]"
                 style={{
                   background: "linear-gradient(to bottom, #f5f1ea 20%, transparent 100%)",
                   opacity: mobileTopFade ?? 0,

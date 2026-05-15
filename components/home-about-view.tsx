@@ -63,7 +63,6 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
       setScrollFraction(fraction);
 
       // Top fade: how far the text content has scrolled behind the sticky hero
-      // The hero height matches the CSS: 33svh on mobile, 45svh on md
       const heroH = window.innerWidth >= 768 ? viewH * 0.45 : viewH * 0.33;
       const scrolledBehindHero = heroH - rect.top;
       const topFadeZone = 80;
