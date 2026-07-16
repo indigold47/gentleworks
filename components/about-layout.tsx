@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import Link from "next/link";
 import { PortableText } from "next-sanity";
 
 import { SiteNav } from "@/components/projects/projects-nav";
@@ -60,9 +61,9 @@ export const AboutLayout = forwardRef<HTMLDivElement, AboutLayoutProps>(
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
             <SiteNav activeHref="/about" variant="dark" themeColor={mainColor} secondaryColor={secondaryColor} />
-            <div
-              role="img"
-              aria-label="Gentle Works"
+            <Link
+              href="/"
+              aria-label="Gentle Works — home"
               className="hidden lg:block absolute bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
               style={{
                 backgroundColor: mainColor ?? "#7a6f47",

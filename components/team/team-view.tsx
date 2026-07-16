@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { PortableText } from "next-sanity";
@@ -40,7 +41,7 @@ type TeamViewProps = {
 export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: TeamViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>("present");
   const memberRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
@@ -211,6 +212,35 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
     return () => panels.forEach((panel) => panel.removeEventListener("wheel", onWheel));
   }, [filtered, expandedId]);
 
+  // Arrow-key member cycling (desktop) — mirrors the wheel behavior
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (window.innerWidth < 1024) return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+
+      e.preventDefault();
+      if (isAnimatingRef.current) return;
+
+      const direction = e.key === "ArrowDown" ? 1 : -1;
+      setExpandedId((prev) => {
+        const currentIdx = prev
+          ? filtered.findIndex((m) => m._id === prev)
+          : -1;
+        const nextIdx = Math.max(
+          0,
+          Math.min(filtered.length - 1, currentIdx + direction)
+        );
+        const nextId = filtered[nextIdx]?._id ?? prev;
+        if (nextId !== prev) isAnimatingRef.current = true;
+        return nextId;
+      });
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [filtered]);
+
   function openMember(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
   }
@@ -302,12 +332,14 @@ export function TeamView({ members, themeColor, secondaryColor, teamGifUrl }: Te
               </motion.div>
             ) : null}
           </AnimatePresence>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/Gentle-works-green.svg"
-            alt="Gentle Works"
-            className="mt-4 w-[350px]"
-          />
+          <Link href="/" aria-label="Gentle Works — home" className="mt-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/Gentle-works-green.svg"
+              alt="Gentle Works"
+              className="w-[350px]"
+            />
+          </Link>
         </div>
       </div>
 

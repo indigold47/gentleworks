@@ -288,6 +288,33 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     return () => window.removeEventListener("wheel", onWheel);
   }, [filteredProjects.length]);
 
+  // Arrow-key project cycling (desktop) — mirrors the wheel behavior
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (window.innerWidth < 1024) return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      )
+        return;
+
+      e.preventDefault();
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setStickyIdx(null);
+      setWheelIdx((prev) =>
+        Math.max(0, Math.min(filteredProjects.length - 1, prev + step)),
+      );
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [filteredProjects.length]);
+
   // Scroll the active row into view when wheel index changes (desktop only)
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) return;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ViewTransition } from "react";
 
 import { ContactForm } from "@/components/contact-form";
@@ -55,10 +56,10 @@ export default async function ContactUsPage() {
               style={{ backgroundImage: `url('${heroUrl}')` }}
             />
           )}
-          <SiteNav activeHref="/contact-us" themeColor={mainColor} secondaryColor={secondaryColor} />
-          <div
-            role="img"
-            aria-label="Gentle Works"
+          <SiteNav activeHref="/contact-us" variant="dark" themeColor={mainColor} secondaryColor={secondaryColor} />
+          <Link
+            href="/"
+            aria-label="Gentle Works — home"
             className="hidden lg:block absolute bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
             style={{
               backgroundColor: mainColor ?? "#7a6f47",

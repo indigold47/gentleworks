@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 
@@ -94,6 +95,28 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
     return () => panels.forEach((p) => p.removeEventListener("wheel", onWheel));
   }, [filtered]);
 
+  // Arrow-key item cycling (desktop) — mirrors the wheel behavior
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (window.innerWidth < 1024) return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+
+      e.preventDefault();
+      if (isAnimatingRef.current) return;
+
+      const direction = e.key === "ArrowDown" ? 1 : -1;
+      setActiveIdx((prev) => {
+        const next = Math.max(0, Math.min(filtered.length - 1, prev + direction));
+        if (next !== prev) isAnimatingRef.current = true;
+        return next;
+      });
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [filtered]);
+
   // Scroll active item into view
   useEffect(() => {
     if (activeIdx < 0) return;
@@ -174,9 +197,9 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         </div>
 
         {/* Desktop inline logo — absolute bottom-left within the sticky panel */}
-        <div
-          role="img"
-          aria-label="Gentle Works"
+        <Link
+          href="/"
+          aria-label="Gentle Works — home"
           className="hidden lg:block absolute bottom-12 left-12 z-10 w-[350px] max-w-[60vw] h-[24px]"
           style={{
             backgroundColor: themeColor ?? "#7b6f47",
