@@ -256,36 +256,54 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
     setWheelIdx(0);
   }, [filteredProjects.length]);
 
-  // Wheel-based project cycling — accumulates scroll delta for smooth, slow scrolling
-  // Allows native scroll through when at boundaries (first/last project) so filters stay accessible.
-  const wheelIdxRef = useRef(0);
-  useEffect(() => { wheelIdxRef.current = wheelIdx; }, [wheelIdx]);
+  // Wheel-based project cycling — one item per gesture chunk (matches team page pattern)
+  const heroPanelRef = useRef<HTMLDivElement>(null);
+  const isAnimatingRef = useRef(false);
 
   useEffect(() => {
+    const panels = [heroPanelRef.current, listPanelRef.current].filter(Boolean) as HTMLElement[];
+    if (panels.length === 0) return;
+
     let accumulator = 0;
-    const THRESHOLD = 350; // pixels of scroll needed to advance one project
+    let lastTime = 0;
+    const CYCLE_THRESHOLD = 120;
 
     function onWheel(e: WheelEvent) {
       if (window.innerWidth < 1024) return;
 
-      // Always prevent native page scroll on desktop — filters are sticky so no need to scroll the page
+      // Block wheel events while the list is animating to the active row
+      if (isAnimatingRef.current) {
+        e.preventDefault();
+        return;
+      }
+
       e.preventDefault();
 
-      accumulator += e.deltaY;
+      const now = Date.now();
+      // Reset accumulator on gesture gap
+      if (now - lastTime > 300) accumulator = 0;
+      lastTime = now;
 
-      if (Math.abs(accumulator) >= THRESHOLD) {
-        const steps = Math.trunc(accumulator / THRESHOLD);
-        accumulator -= steps * THRESHOLD;
+      accumulator += e.deltaY;
+      // Clamp so large single events can't trigger more than one step
+      accumulator = Math.max(-CYCLE_THRESHOLD, Math.min(CYCLE_THRESHOLD, accumulator));
+
+      if (Math.abs(accumulator) >= CYCLE_THRESHOLD) {
+        const direction = accumulator > 0 ? 1 : -1;
+        accumulator = 0;
+
         setStickyIdx(null);
+        setHoveredIdx(null);
         setWheelIdx((prev) => {
-          const next = prev + steps;
-          return Math.max(0, Math.min(filteredProjects.length - 1, next));
+          const next = Math.max(0, Math.min(filteredProjects.length - 1, prev + direction));
+          if (next !== prev) isAnimatingRef.current = true;
+          return next;
         });
       }
     }
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
+    panels.forEach((p) => p.addEventListener("wheel", onWheel, { passive: false }));
+    return () => panels.forEach((p) => p.removeEventListener("wheel", onWheel));
   }, [filteredProjects.length]);
 
   // Arrow-key project cycling (desktop) — mirrors the wheel behavior
@@ -304,11 +322,15 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
         return;
 
       e.preventDefault();
+      if (isAnimatingRef.current) return;
       const step = e.key === "ArrowDown" ? 1 : -1;
       setStickyIdx(null);
-      setWheelIdx((prev) =>
-        Math.max(0, Math.min(filteredProjects.length - 1, prev + step)),
-      );
+      setHoveredIdx(null);
+      setWheelIdx((prev) => {
+        const next = Math.max(0, Math.min(filteredProjects.length - 1, prev + step));
+        if (next !== prev) isAnimatingRef.current = true;
+        return next;
+      });
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -316,12 +338,58 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
   }, [filteredProjects.length]);
 
   // Scroll the active row into view when wheel index changes (desktop only)
+  // Manual eased scroll (matches team page) so we know when the animation ends
+  // and can release the wheel/hover lock.
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) return;
+    const container = listScrollRef.current;
     const tbody = tableBodyRef.current;
-    if (!tbody) return;
-    const row = tbody.children[wheelIdx] as HTMLElement | undefined;
-    row?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (!container || !tbody) return;
+
+    isAnimatingRef.current = true;
+    const timeout = setTimeout(() => {
+      const row = tbody.children[wheelIdx] as HTMLElement | undefined;
+      if (!row) {
+        isAnimatingRef.current = false;
+        return;
+      }
+
+      // Sticky thead height — keep the active row visible below it
+      const headerOffset = 40;
+      const containerRect = container.getBoundingClientRect();
+      const rowRect = row.getBoundingClientRect();
+
+      if (
+        rowRect.top < containerRect.top + headerOffset ||
+        rowRect.bottom > containerRect.bottom
+      ) {
+        const offsetTop =
+          rowRect.top - containerRect.top + container.scrollTop - headerOffset;
+        const start = container.scrollTop;
+        const distance = offsetTop - start;
+        const duration = 800;
+        let startTime: number | null = null;
+
+        function step(timestamp: number) {
+          if (!container) return;
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          container.scrollTop = start + distance * eased;
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            isAnimatingRef.current = false;
+          }
+        }
+        requestAnimationFrame(step);
+      } else {
+        isAnimatingRef.current = false;
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, [wheelIdx]);
 
   // Mobile: highlight whichever row is nearest the top of the viewport
@@ -721,7 +789,7 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
       {/* ---- Split-screen view (desktop only) ---- */}
       <div className="hidden lg:grid min-h-svh grid-cols-1 lg:grid-cols-[3fr_2fr]">
         {/* Left: hero image — changes on table row hover */}
-        <div className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0">
+        <div ref={heroPanelRef} className="bleed-safe-top relative h-[calc(33svh_+_var(--sat))] min-h-[280px] md:h-[calc(45svh_+_var(--sat))] sticky top-0 z-10 overflow-hidden lg:h-[calc(100svh_+_var(--sat))] lg:min-h-0">
           {/* Layer A */}
           {layerA && (
             <div
@@ -853,7 +921,12 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                       ? "bg-[#b5ad8e]/30"
                       : ""
                   }`}
-                  onMouseEnter={() => { setHoveredIdx(i); setStickyIdx(i); }}
+                  onMouseEnter={() => {
+                    // Ignore hover fired by rows sliding under the cursor mid-animation
+                    if (isAnimatingRef.current) return;
+                    setHoveredIdx(i);
+                    setStickyIdx(i);
+                  }}
                   onMouseLeave={() => setHoveredIdx(null)}
                   onFocus={() => { setHoveredIdx(i); setStickyIdx(i); }}
                   onBlur={() => setHoveredIdx(null)}
