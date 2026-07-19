@@ -191,7 +191,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="rounded-full border border-rule px-12 py-3 text-sm tracking-[0.1em] transition-colors hover:border-ink hover:bg-ink hover:text-cream disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-full border border-rule px-12 py-3 text-sm tracking-[0.1em] transition-colors hover:border-[var(--page-theme-main,#7a7047)] hover:bg-[var(--page-theme-main,#7a7047)] hover:text-cream disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "sending" ? "Sending..." : "Submit"}
         </button>

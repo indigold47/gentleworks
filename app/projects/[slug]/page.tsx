@@ -8,10 +8,12 @@ import { Logo } from "@/components/logo";
 import {
   getProjectBySlug,
   getAllProjectSlugs,
+  getProjectPager,
   getSiteSettings,
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { ProjectGallery } from "@/components/projects/project-gallery";
+import { ProjectPager } from "@/components/projects/project-pager";
 import { FadeInLeft } from "@/components/projects/fade-in-left";
 import { FooterScrollToTop } from "@/components/footer-scroll-to-top";
 
@@ -65,11 +67,20 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [project, settings] = await Promise.all([
+  const [project, settings, pager] = await Promise.all([
     getProjectBySlug(slug),
     getSiteSettings(),
+    getProjectPager(),
   ]);
   if (!project) notFound();
+
+  // Prev/next wrap around: first project's prev is the last, last's next is the first
+  const pagerIdx = pager.findIndex((p) => p.slug === slug);
+  const canPage = pagerIdx >= 0 && pager.length > 1;
+  const prevProject = canPage
+    ? pager[(pagerIdx - 1 + pager.length) % pager.length]
+    : null;
+  const nextProject = canPage ? pager[(pagerIdx + 1) % pager.length] : null;
 
   const footerDefaults = {
     copyrightYear: "2026",
@@ -125,6 +136,9 @@ export default async function ProjectPage({
         </FadeInLeft>
         <Logo className="h-[60px] w-[60px] shrink-0" color={mainColor} />
       </header>
+
+      {/* Previous / next project navigation — fixed at mid-viewport */}
+      <ProjectPager prev={prevProject} next={nextProject} color={mainColor} />
 
       {/* Hero + Gallery with lightbox — description/credits sit between */}
       <div className="mx-auto w-full max-w-[1750px]">

@@ -8,6 +8,7 @@ import {
   allProjectsQuery,
   allProjectsDetailQuery,
   allProjectSlugsQuery,
+  allProjectPagerQuery,
   allPressItemsQuery,
   allTeamMembersQuery,
   contactPageQuery,
@@ -94,6 +95,16 @@ export async function getProjectBySlug(slug: string) {
 export async function getAllProjectSlugs() {
   return sanityFetch<string[], typeof allProjectSlugsQuery>({
     query: allProjectSlugsQuery,
+    tags: [PROJECTS_TAG],
+  });
+}
+
+export type ProjectPagerItem = { slug: string; title: string };
+
+/** Slugs + titles in project-index order — for prev/next navigation. */
+export async function getProjectPager() {
+  return sanityFetch<ProjectPagerItem[], typeof allProjectPagerQuery>({
+    query: allProjectPagerQuery,
     tags: [PROJECTS_TAG],
   });
 }

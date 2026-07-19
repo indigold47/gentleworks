@@ -119,6 +119,14 @@ export const allProjectSlugsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)].slug.current
 `);
 
+/** Slugs + titles in project-index order — for prev/next navigation on detail pages. */
+export const allProjectPagerQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current)] | order(coalesce(order, 9999) asc, year desc) {
+    "slug": slug.current,
+    title
+  }
+`);
+
 export const homePageQuery = defineQuery(`
   *[_type == "homePage"][0] {
     "heroMedia": heroMedia[] {

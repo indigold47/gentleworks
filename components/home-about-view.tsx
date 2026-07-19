@@ -8,6 +8,10 @@ import { AboutLayout } from "@/components/about-layout";
 import { HomeVideoCarousel } from "@/components/home-video-carousel";
 import type { AboutPageData, HomeMediaItem } from "@/sanity/lib/fetch";
 
+/** Set right before the /about scroll-up gesture navigates home, so the / page
+ *  knows to enter from the about position and glide down to the hero. */
+const RETURN_HOME_FLAG = "gw:return-home";
+
 type HomeAboutViewProps = {
   /** "home" = start at hero, "about" = start at about section */
   startAt: "home" | "about";
@@ -88,6 +92,8 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
   // Reset exit state when startAt changes (e.g. navigating back to /)
   useEffect(() => {
     setExiting(false);
+    // Consume the return-home flag after the mount that read it
+    sessionStorage.removeItem(RETURN_HOME_FLAG);
   }, [startAt]);
 
   // Scroll down on / triggers the transition to about.
@@ -141,6 +147,82 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
     return () => window.removeEventListener("wheel", onWheel);
   }, [startAt]);
 
+  // Scrolling up while already at the top of /about goes back to the homepage —
+  // the reverse of the hero → about scroll (the / page animates in from the
+  // about position on SPA navigation).
+  useEffect(() => {
+    if (startAt !== "about") return;
+
+    let armed = false;
+    const armTimer = setTimeout(() => { armed = true; }, 600);
+    let navigated = false;
+    let accumulator = 0;
+    let lastTime = 0;
+    let lastBlockedTime = 0;
+
+    const atTop = () => {
+      if (window.innerWidth >= 1024) {
+        const el = scrollPanelRef.current;
+        return el ? el.scrollTop <= 0 : true;
+      }
+      return window.scrollY <= 0;
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (!armed || navigated) return;
+      const now = Date.now();
+
+      if (!atTop()) {
+        accumulator = 0;
+        lastBlockedTime = now;
+        return;
+      }
+      // Let momentum from the scroll that reached the top settle first,
+      // so going back requires a deliberate second gesture.
+      if (now - lastBlockedTime < 400) return;
+
+      if (e.deltaY >= 0) {
+        accumulator = 0;
+        return;
+      }
+
+      if (now - lastTime > 300) accumulator = 0;
+      lastTime = now;
+      accumulator += e.deltaY;
+
+      if (accumulator <= -120) {
+        navigated = true;
+        sessionStorage.setItem(RETURN_HOME_FLAG, "1");
+        router.push("/");
+      }
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (!armed || navigated || !atTop()) return;
+      const startY = e.touches[0].clientY;
+
+      const onTouchEnd = (e2: TouchEvent) => {
+        const endY = e2.changedTouches[0].clientY;
+        if (endY - startY > 50 && !navigated && atTop()) {
+          navigated = true;
+          sessionStorage.setItem(RETURN_HOME_FLAG, "1");
+          router.push("/");
+        }
+        window.removeEventListener("touchend", onTouchEnd);
+      };
+
+      window.addEventListener("touchend", onTouchEnd);
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    return () => {
+      clearTimeout(armTimer);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+    };
+  }, [startAt, router]);
+
   const handleScrollbarMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
@@ -183,15 +265,11 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
     );
   }
 
-  // On SPA navigation (push/traverse) enter from the about position so it feels
-  // like scrolling up. On direct load or reload stay at the hero (y: 0).
+  // When arriving via the /about scroll-up gesture, enter from the about
+  // position so it feels like scrolling back up. Direct loads stay at the hero.
   let initialY = "0%";
-  if (typeof window !== "undefined") {
-    const nav = (window as unknown as { navigation?: { currentEntry?: { navigationType?: string } } }).navigation;
-    const navType = nav?.currentEntry?.navigationType;
-    if (navType === "push" || navType === "traverse") {
-      initialY = "-50%";
-    }
+  if (typeof window !== "undefined" && sessionStorage.getItem(RETURN_HOME_FLAG)) {
+    initialY = "-50%";
   }
 
   // On /: render hero + about, animate between them
@@ -200,7 +278,12 @@ export function HomeAboutView({ startAt, heroMedia = [], heroUrl, mainColor, sec
       className="fixed inset-0 h-[200dvh] w-full"
       initial={{ y: initialY }}
       animate={exiting ? { y: "-50%" } : { y: 0 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={
+        exiting
+          ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+          // Returning from /about — slower, gentler glide down to the hero
+          : { duration: 1.5, ease: [0.65, 0, 0.35, 1] }
+      }
       onAnimationComplete={() => {
         if (exiting) router.push("/about");
       }}
