@@ -83,6 +83,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
         const direction = accumulator > 0 ? 1 : -1;
         accumulator = 0;
 
+        setHoveredIdx(-1);
         setActiveIdx((prev) => {
           const next = Math.max(0, Math.min(filtered.length - 1, prev + direction));
           if (next !== prev) isAnimatingRef.current = true;
@@ -106,6 +107,7 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
       if (isAnimatingRef.current) return;
 
       const direction = e.key === "ArrowDown" ? 1 : -1;
+      setHoveredIdx(-1);
       setActiveIdx((prev) => {
         const next = Math.max(0, Math.min(filtered.length - 1, prev + direction));
         if (next !== prev) isAnimatingRef.current = true;
@@ -250,7 +252,11 @@ export function PressView({ items, themeColor, secondaryColor }: PressViewProps)
                 target="_blank"
                 rel="noopener noreferrer"
                 data-press-row
-                onMouseEnter={() => setHoveredIdx(idx)}
+                onMouseEnter={() => {
+                  // Ignore hover fired by rows sliding under the cursor mid-animation
+                  if (isAnimatingRef.current) return;
+                  setHoveredIdx(idx);
+                }}
                 onMouseLeave={() => setHoveredIdx(-1)}
                 onClick={() => setActiveIdx(idx)}
                 className="group grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_2fr_auto] gap-x-6 border-t border-rule py-6 transition-colors items-start"
