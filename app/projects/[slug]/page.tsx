@@ -13,7 +13,7 @@ import {
 } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { ProjectGallery } from "@/components/projects/project-gallery";
-import { ProjectPager } from "@/components/projects/project-pager";
+import { ProjectPager, ProjectPagerMobile } from "@/components/projects/project-pager";
 import { FadeInLeft } from "@/components/projects/fade-in-left";
 import { FooterScrollToTop } from "@/components/footer-scroll-to-top";
 
@@ -228,6 +228,9 @@ export default async function ProjectPage({
         </section>
       </ProjectGallery>
       </div>
+
+      {/* Mobile/tablet prev/next — sits above the footer */}
+      <ProjectPagerMobile prev={prevProject} next={nextProject} color={mainColor} />
 
       {/* Footer — full width */}
       <footer className="border-t border-rule px-6 py-8 sm:px-10 md:pl-[45px] md:pr-[25px]" style={{ color: mainColor, backgroundColor: secondaryColor }}>
