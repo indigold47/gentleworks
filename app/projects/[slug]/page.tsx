@@ -6,6 +6,7 @@ import { PortableText } from "next-sanity";
 import { Logo } from "@/components/logo";
 
 import {
+  getAllFilterCategories,
   getProjectBySlug,
   getAllProjectSlugs,
   getProjectPager,
@@ -67,12 +68,25 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [project, settings, pager] = await Promise.all([
+  const [project, settings, pager, filterCategories] = await Promise.all([
     getProjectBySlug(slug),
     getSiteSettings(),
     getProjectPager(),
+    getAllFilterCategories(),
   ]);
   if (!project) notFound();
+
+  // CMS-owned display labels keyed by projectField → value. Falls back to
+  // a slug → Title Case conversion if the CMS has no matching option.
+  const labelFor = (field: string, value: string) => {
+    const cat = filterCategories.find((c) => c.projectField === field);
+    const opt = cat?.options?.find((o) => o.value === value);
+    if (opt?.label) return opt.label;
+    return value
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  };
 
   // Prev/next wrap around: first project's prev is the last, last's next is the first
   const pagerIdx = pager.findIndex((p) => p.slug === slug);
@@ -174,9 +188,12 @@ export default async function ProjectPage({
               ["Status", project.status
                 ? project.status === "built" && project.year
                   ? `Built, ${project.year}`
-                  : project.status.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+                  : labelFor("status", project.status)
                 : undefined],
-              ["Type", [...(Array.isArray(project.projectType) ? project.projectType : project.projectType ? [project.projectType] : []), ...(Array.isArray(project.projectTag) ? project.projectTag : project.projectTag ? [project.projectTag] : [])].map((v) => v.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ") || undefined],
+              ["Type", [
+                ...(Array.isArray(project.projectType) ? project.projectType : project.projectType ? [project.projectType] : []).map((v) => labelFor("projectType", v)),
+                ...(Array.isArray(project.projectTag) ? project.projectTag : project.projectTag ? [project.projectTag] : []).map((v) => labelFor("projectTag", v)),
+              ].join(", ") || undefined],
               ["Location", project.location],
               ["Client", project.client ?? undefined],
             ] as [string, string | undefined][])
