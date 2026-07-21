@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -101,18 +104,47 @@ export function ProjectPager({ prev, next, color }: ProjectPagerProps) {
 }
 
 /**
- * Mobile/tablet in-flow glass pill placed above the footer.
+ * Mobile/tablet floating glass pill pinned above the viewport bottom.
+ * Hidden near the top of the page; visible once past the reveal threshold.
  * Chevron + short label only — no project titles.
  */
 export function ProjectPagerMobile({ prev, next, color }: ProjectPagerProps) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const REVEAL_AFTER = 200;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setVisible(window.scrollY >= REVEAL_AFTER);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   if (!prev && !next) return null;
   const glassBg = `color-mix(in srgb, ${color} 55%, transparent)`;
 
   return (
-    <div className="lg:hidden flex justify-center px-6 py-10 sm:py-12">
+    <div
+      className={`lg:hidden fixed inset-x-0 bottom-0 z-30 flex justify-center px-6 pt-2 pb-[calc(env(safe-area-inset-bottom)+12px)] pointer-events-none transition-all duration-300 ease-out ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
+      aria-hidden={!visible}
+    >
       <nav
         aria-label="Project navigation"
-        className="flex items-stretch gap-1 rounded-full border border-white/20 p-1 backdrop-blur-xl backdrop-saturate-150 shadow-lg shadow-black/10"
+        className="pointer-events-auto flex items-stretch gap-1 rounded-full border border-white/20 p-1 backdrop-blur-xl backdrop-saturate-150 shadow-lg shadow-black/10"
         style={{ backgroundColor: glassBg }}
       >
         {prev ? (

@@ -229,7 +229,7 @@ export default async function ProjectPage({
       </ProjectGallery>
       </div>
 
-      {/* Mobile/tablet prev/next — sits above the footer */}
+      {/* Mobile/tablet prev/next — floating pill, reveals on scroll up */}
       <ProjectPagerMobile prev={prevProject} next={nextProject} color={mainColor} />
 
       {/* Footer — full width */}
