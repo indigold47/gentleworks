@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500">
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
   <defs>
     <style>
       .cls-1 {
-        fill: url(#linear-gradient);
+        fill: none;
+        stroke: #5e7878;
+        stroke-miterlimit: 10;
+        stroke-width: .8px;
       }
     </style>
-    <linearGradient id="linear-gradient" x1="146.86" y1="281.8" x2="146.86" y2="327.68" gradientTransform="translate(-51.05 396.86) rotate(-90)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#5e7878"/>
-      <stop offset=".26" stop-color="#819696" stop-opacity=".78"/>
-      <stop offset=".81" stop-color="#dde2e2" stop-opacity=".21"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </linearGradient>
   </defs>
   <path class="cls-1" d="M236.06,251.7l23.99,27.37c1.57,1.79,4.52.68,4.52-1.7v-54.74c0-2.38-2.95-3.49-4.52-1.7l-23.99,27.37c-.85.97-.85,2.43,0,3.4Z"/>
 </svg>

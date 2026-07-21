@@ -14,11 +14,10 @@ type ProjectPagerProps = {
 };
 
 /*
- * Arrow paths lifted from public/assets/next_default.svg / previous_defult.svg,
- * inlined so the accent color can follow the project theme and the viewBox can
+ * Arrow paths lifted from public/assets/{next,previous}_{default,hover}.svg,
+ * inlined so the stroke color can follow the project theme and the viewBox can
  * be cropped tight around the glyph (the source files sit in a 500x500 canvas).
- * The default variant fades from the tip (theme color) out to transparent, and
- * the hover variant is a thin outlined stroke.
+ * Both variants are outlined strokes — thin (0.8) at rest, thicker (1.7) on hover.
  */
 const PREV_PATH =
   "M236.06,251.7l23.99,27.37c1.57,1.79,4.52.68,4.52-1.7v-54.74c0-2.38-2.95-3.49-4.52-1.7l-23.99,27.37c-.85.97-.85,2.43,0,3.4Z";
@@ -36,38 +35,20 @@ function Arrow({
   color: string;
   className?: string;
 }) {
-  const gradId = `pager-${direction}-grad`;
   const path = direction === "prev" ? PREV_PATH : NEXT_PATH;
-  // Tight crop around each glyph (+ padding for the hover stroke)
+  // Tight crop around each glyph (+ padding for the thicker hover stroke)
   const viewBox = direction === "prev" ? "234 218 32 64" : "244 218 32 64";
-  // Gradient runs from the arrow tip (theme color) out to transparent
-  const [x1, x2] =
-    direction === "prev" ? ["230.75", "276.63"] : ["278.4", "232.52"];
+  const strokeWidth = variant === "default" ? 0.8 : 1.7;
 
   return (
     <svg viewBox={viewBox} aria-hidden className={className}>
-      {variant === "default" ? (
-        <>
-          <defs>
-            <linearGradient
-              id={gradId}
-              x1={x1}
-              y1="250"
-              x2={x2}
-              y2="250"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop offset="0" stopColor={color} stopOpacity="1" />
-              <stop offset="0.26" stopColor={color} stopOpacity="0.78" />
-              <stop offset="0.81" stopColor={color} stopOpacity="0.21" />
-              <stop offset="1" stopColor={color} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path fill={`url(#${gradId})`} d={path} />
-        </>
-      ) : (
-        <path fill="none" stroke={color} strokeWidth="1.4" strokeMiterlimit="10" d={path} />
-      )}
+      <path
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeMiterlimit="10"
+        d={path}
+      />
     </svg>
   );
 }
