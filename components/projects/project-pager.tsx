@@ -10,68 +10,26 @@ type ProjectPagerProps = {
   color: string;
 };
 
-/*
- * Arrow paths lifted from public/assets/next_default.svg / previous_defult.svg,
- * inlined so the accent color can follow the project theme and the viewBox can
- * be cropped tight around the glyph (the source files sit in a 500x500 canvas).
- * The default variant fades from the tip (theme color) out to transparent, and
- * the hover variant is a thin outlined stroke.
+/**
+ * Renders a word one letter per row, stacked vertically — used as an editorial
+ * navigation label along the viewport edge.
  */
-const PREV_PATH =
-  "M236.06,251.7l23.99,27.37c1.57,1.79,4.52.68,4.52-1.7v-54.74c0-2.38-2.95-3.49-4.52-1.7l-23.99,27.37c-.85.97-.85,2.43,0,3.4Z";
-const NEXT_PATH =
-  "M273.08,248.3l-23.99-27.37c-1.57-1.79-4.52-.68-4.52,1.7v54.74c0,2.38,2.95,3.49,4.52,1.7l23.99-27.37c.85-.97.85-2.43,0-3.4Z";
-
-function Arrow({
-  direction,
-  variant,
-  color,
-  className,
-}: {
-  direction: "prev" | "next";
-  variant: "default" | "hover";
-  color: string;
-  className?: string;
-}) {
-  const gradId = `pager-${direction}-grad`;
-  const path = direction === "prev" ? PREV_PATH : NEXT_PATH;
-  // Tight crop around each glyph (+ padding for the hover stroke)
-  const viewBox = direction === "prev" ? "234 218 32 64" : "244 218 32 64";
-  // Gradient runs from the arrow tip (theme color) out to transparent
-  const [x1, x2] =
-    direction === "prev" ? ["230.75", "276.63"] : ["278.4", "232.52"];
-
+function VerticalWord({ word }: { word: string }) {
   return (
-    <svg viewBox={viewBox} aria-hidden className={className}>
-      {variant === "default" ? (
-        <>
-          <defs>
-            <linearGradient
-              id={gradId}
-              x1={x1}
-              y1="250"
-              x2={x2}
-              y2="250"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop offset="0" stopColor={color} stopOpacity="1" />
-              <stop offset="0.26" stopColor={color} stopOpacity="0.78" />
-              <stop offset="0.81" stopColor={color} stopOpacity="0.21" />
-              <stop offset="1" stopColor={color} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path fill={`url(#${gradId})`} d={path} />
-        </>
-      ) : (
-        <path fill="none" stroke={color} strokeWidth="1.4" strokeMiterlimit="10" d={path} />
-      )}
-    </svg>
+    <span aria-hidden className="flex flex-col items-center gap-[6px] leading-none">
+      {word.split("").map((letter, i) => (
+        <span key={i} className="display text-[20px] uppercase">
+          {letter}
+        </span>
+      ))}
+    </span>
   );
 }
 
 /**
  * Desktop-only previous/next project navigation on detail pages.
- * Themed gradient arrows fixed to the left/right edges at mid-viewport.
+ * Editorial vertical typography ("P/R/E/V/I/O/U/S" and "N/E/X/T") fixed to the
+ * left/right edges at mid-viewport, tinted with the project theme color.
  */
 export function ProjectPager({ prev, next, color }: ProjectPagerProps) {
   return (
@@ -80,20 +38,24 @@ export function ProjectPager({ prev, next, color }: ProjectPagerProps) {
         <Link
           href={`/projects/${prev.slug}`}
           aria-label={`Previous project: ${prev.title}`}
-          className="group hidden lg:block fixed left-[44px] top-1/2 -translate-y-1/2 z-20"
+          className="group hidden lg:block fixed left-[55px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+          style={{ color }}
         >
-          <Arrow direction="prev" variant="default" color={color} className="h-[48px] w-[24px] group-hover:hidden" />
-          <Arrow direction="prev" variant="hover" color={color} className="h-[48px] w-[24px] hidden group-hover:block" />
+          <span className="block transition-transform duration-500 ease-out group-hover:-translate-x-1.5">
+            <VerticalWord word="Previous" />
+          </span>
         </Link>
       )}
       {next && (
         <Link
           href={`/projects/${next.slug}`}
           aria-label={`Next project: ${next.title}`}
-          className="group hidden lg:block fixed right-[34px] top-1/2 -translate-y-1/2 z-20"
+          className="group hidden lg:block fixed right-[55px] top-1/2 translate-x-1/2 -translate-y-1/2 z-20"
+          style={{ color }}
         >
-          <Arrow direction="next" variant="default" color={color} className="h-[48px] w-[24px] group-hover:hidden" />
-          <Arrow direction="next" variant="hover" color={color} className="h-[48px] w-[24px] hidden group-hover:block" />
+          <span className="block transition-transform duration-500 ease-out group-hover:translate-x-1.5">
+            <VerticalWord word="Next" />
+          </span>
         </Link>
       )}
     </>
