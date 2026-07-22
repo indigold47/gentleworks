@@ -930,14 +930,30 @@ export function SplitScreen({ projects, filterCategories: cmsCategories, themeCo
                   onMouseLeave={() => setHoveredIdx(null)}
                   onFocus={() => { setHoveredIdx(i); setStickyIdx(i); }}
                   onBlur={() => setHoveredIdx(null)}
-                  onClick={() => router.push(`/projects/${project.slug}`)}
+                  onClick={() => {
+                    amplitude.track("project opened", {
+                      project_slug: project.slug,
+                      project_title: project.title,
+                      position_index: i,
+                      source: "index_row",
+                    });
+                    router.push(`/projects/${project.slug}`);
+                  }}
                 >
                   <td className="py-3.5 pr-4">
                     <Link
                       href={`/projects/${project.slug}`}
                       transitionTypes={["nav-forward"]}
                       className="display text-[22px] leading-[1.15]"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        amplitude.track("project opened", {
+                          project_slug: project.slug,
+                          project_title: project.title,
+                          position_index: i,
+                          source: "index_title",
+                        });
+                      }}
                     >
                       {project.title}
                     </Link>
