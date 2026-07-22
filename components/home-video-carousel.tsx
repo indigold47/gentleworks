@@ -50,6 +50,12 @@ export function HomeVideoCarousel({ items }: Props) {
   }
 
   const current = items[currentIndex];
+  const nextIndex = (currentIndex + 1) % items.length;
+  const next = items[nextIndex];
+  // Preload the next video so playback starts instantly on advance,
+  // even when a hero video was uploaded without a poster frame.
+  const preloadNext =
+    next && next !== current && next._type === "homeHeroVideo" ? next : null;
 
   const handleClick = (e: React.MouseEvent) => {
     advance(e.clientX / window.innerWidth >= 0.5 ? 1 : -1);
@@ -91,6 +97,20 @@ export function HomeVideoCarousel({ items }: Props) {
           style={{
             backgroundImage: `url('${urlFor(current.image).width(1920).quality(80).auto("format").url()}')`,
           }}
+        />
+      )}
+
+      {preloadNext && (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          key={`preload-${preloadNext._key}`}
+          src={preloadNext.videoUrl}
+          preload="auto"
+          muted
+          playsInline
+          aria-hidden="true"
+          tabIndex={-1}
+          className="absolute w-0 h-0 opacity-0 pointer-events-none"
         />
       )}
 
