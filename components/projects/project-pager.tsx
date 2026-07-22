@@ -15,9 +15,9 @@ type ProjectPagerProps = {
 
 /*
  * Arrow paths lifted from public/assets/{next,previous}_{default,hover}.svg,
- * inlined so the fill/stroke color can follow the project theme and the viewBox
- * can be cropped tight around the glyph (source files sit in a 500x500 canvas).
- * Default variant is a solid theme-color fill; hover swaps to a 1.7 outlined stroke.
+ * inlined so the stroke color can follow the project theme and the viewBox can
+ * be cropped tight around the glyph (source files sit in a 500x500 canvas).
+ * Both variants are outlined strokes — thin (0.8) at rest, thicker (1.7) on hover.
  */
 const PREV_PATH =
   "M236.06,251.7l23.99,27.37c1.57,1.79,4.52.68,4.52-1.7v-54.74c0-2.38-2.95-3.49-4.52-1.7l-23.99,27.37c-.85.97-.85,2.43,0,3.4Z";
@@ -38,20 +38,17 @@ function Arrow({
   const path = direction === "prev" ? PREV_PATH : NEXT_PATH;
   // Tight crop around each glyph (+ padding for the thicker hover stroke)
   const viewBox = direction === "prev" ? "234 218 32 64" : "244 218 32 64";
+  const strokeWidth = variant === "default" ? 0.8 : 1.7;
 
   return (
     <svg viewBox={viewBox} aria-hidden className={className}>
-      {variant === "default" ? (
-        <path fill={color} d={path} />
-      ) : (
-        <path
-          fill="none"
-          stroke={color}
-          strokeWidth={1.7}
-          strokeMiterlimit="10"
-          d={path}
-        />
-      )}
+      <path
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeMiterlimit="10"
+        d={path}
+      />
     </svg>
   );
 }
