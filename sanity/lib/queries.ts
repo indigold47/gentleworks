@@ -134,6 +134,8 @@ export const homePageQuery = defineQuery(`
       _key,
       "videoUrl": video.asset->url,
       "posterUrl": poster.asset->url,
+      "mobileVideoUrl": mobileVideo.asset->url,
+      mobileFocalPoint,
       alt,
       image {
         ...,

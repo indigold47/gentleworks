@@ -289,6 +289,8 @@ export type HomeHeroVideo = {
   _key: string;
   videoUrl: string;
   posterUrl?: string | null;
+  mobileVideoUrl?: string | null;
+  mobileFocalPoint?: { x?: number | null; y?: number | null } | null;
   alt: string;
 };
 

@@ -40,6 +40,38 @@ export const homePage = defineType({
               options: { hotspot: true },
             }),
             defineField({
+              name: "mobileVideo",
+              title: "Mobile video (optional)",
+              type: "file",
+              description:
+                "Optional vertical/portrait-cropped version of the video, played on phones instead of the main video. Leave empty to play the main video on all screens.",
+              options: { accept: "video/mp4,video/webm" },
+            }),
+            defineField({
+              name: "mobileFocalPoint",
+              title: "Mobile focal point",
+              type: "object",
+              description:
+                "Which point of the video stays centered when it gets cropped on mobile. 50/50 is dead center. Ignored if a mobile video is uploaded above.",
+              options: { collapsible: true, collapsed: true },
+              fields: [
+                defineField({
+                  name: "x",
+                  title: "Horizontal (0 = left, 100 = right)",
+                  type: "number",
+                  validation: (rule) => rule.min(0).max(100),
+                  initialValue: 50,
+                }),
+                defineField({
+                  name: "y",
+                  title: "Vertical (0 = top, 100 = bottom)",
+                  type: "number",
+                  validation: (rule) => rule.min(0).max(100),
+                  initialValue: 50,
+                }),
+              ],
+            }),
+            defineField({
               name: "alt",
               title: "Alt text",
               type: "string",
