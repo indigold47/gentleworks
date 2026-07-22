@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { AnimatePresence, motion } from "motion/react";
 
 import { urlFor } from "@/sanity/lib/image";
 import type { HomeMediaItem } from "@/sanity/lib/fetch";
@@ -69,41 +68,31 @@ export function HomeVideoCarousel({ items }: Props) {
       onMouseEnter={() => setShowCursor(true)}
       onMouseLeave={() => setShowCursor(false)}
     >
-      <AnimatePresence>
-        <motion.div
-          key={currentIndex}
-          className="absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          {current._type === "homeHeroVideo" ? (
-            // eslint-disable-next-line jsx-a11y/media-has-caption
-            <video
-              key={current._key}
-              src={current.videoUrl}
-              poster={current.posterUrl ?? undefined}
-              aria-label={current.alt}
-              autoPlay
-              muted
-              playsInline
-              loop={false}
-              className="absolute inset-0 w-full h-full object-cover"
-              onEnded={() => advance(1)}
-            />
-          ) : (
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              role="img"
-              aria-label={current.alt}
-              style={{
-                backgroundImage: `url('${urlFor(current.image).width(1920).quality(80).auto("format").url()}')`,
-              }}
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
+      {current._type === "homeHeroVideo" ? (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          key={current._key}
+          src={current.videoUrl}
+          poster={current.posterUrl ?? undefined}
+          aria-label={current.alt}
+          autoPlay
+          muted
+          playsInline
+          loop={false}
+          className="absolute inset-0 w-full h-full object-cover"
+          onEnded={() => advance(1)}
+        />
+      ) : (
+        <div
+          key={current._key}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          role="img"
+          aria-label={current.alt}
+          style={{
+            backgroundImage: `url('${urlFor(current.image).width(1920).quality(80).auto("format").url()}')`,
+          }}
+        />
+      )}
 
       {/* Custom directional cursor — desktop only, hidden on touch */}
       {showCursor && (
